@@ -1,0 +1,18 @@
+{
+  "name": "pdf-engine",
+  "version": "0.1.0",
+  "description": "Pure JavaScript PDF processing engine from scratch",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "node --test tests/core/*.test.js tests/objects/*.test.js tests/xref/*.test.js tests/document/*.test.js tests/streams/*.test.js tests/content/*.test.js tests/fonts/*.test.js tests/images/*.test.js tests/rendering/*.test.js tests/operations/*.test.js tests/modification/*.test.js tests/builder/*.test.js tests/forms/*.test.js tests/security/*.test.js"
+  },
+  "keywords": [
+    "pdf",
+    "engine",
+    "parser",
+    "pure-javascript"
+  ],
+  "author": "",
+  "license": "MIT"
+}
