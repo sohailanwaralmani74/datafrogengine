@@ -1,0 +1,8 @@
+{
+  "name": "PDF Engine - Jekyll",
+  "description": "Documentation and interactive studio for the Pure JavaScript Document & Data Processing Engines (PDF, Excel, XML, JSON)",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

@@ -1,0 +1,14 @@
+title: Document & Data Processing Engine Suite (PDF, Excel, XML, JSON)
+email: info@example.com
+description: >-
+  A lightweight, zero-dependency, pure JavaScript document and data processing engine suite.
+  Parse, query, validate, edit, clean, analyze, and convert across PDF-1.7, Microsoft Excel (.xlsx), W3C XML 1.0, and JSON formats.
+baseurl: ""
+url: ""
+github_username: pdf-engine
+
+# Build settings
+theme: minima
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag

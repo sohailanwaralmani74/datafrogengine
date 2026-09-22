@@ -136,5 +136,91 @@ export {
   PdfStreamException
 } from './errors/index.js';
 
+// ==========================================
+// Excel (SpreadsheetML / XLSX) Engine
+// ==========================================
+export {
+  ExcelWorkbook,
+  ExcelWorksheet,
+  ExcelRow,
+  ExcelColumn,
+  ExcelCell,
+  ExcelStyle,
+  StyleSheet,
+  ExcelBuilder,
+  ExcelReader,
+  ExcelWriter,
+  ZipArchive,
+  Crc32,
+  FormulaEvaluator,
+  CellAddress,
+  DateUtils
+} from './excel/index.js';
+
+// ==========================================
+// XML Processing Engine
+// ==========================================
+export {
+  XmlDocument,
+  XmlElement,
+  XmlText,
+  XmlCData,
+  XmlComment,
+  XmlProcessingInstruction,
+  XmlDeclaration,
+  XmlDoctype,
+  XmlNodeType,
+  XmlNode,
+  XmlLexer,
+  XmlToken,
+  XmlTokenType,
+  XmlParser,
+  XmlSaxParser,
+  XmlSerializer,
+  XmlWriter,
+  XmlQuery,
+  XmlValidator,
+  XmlConverter,
+  XmlBuilder,
+  XmlException,
+  XmlParseException,
+  XmlValidationException
+} from './xml/index.js';
+
+// ==========================================
+// JSON Processing & Data Tools Engine
+// ==========================================
+export {
+  JsonLexer,
+  JsonToken,
+  JsonTokenType,
+  JsonParser,
+  JsonParseException,
+  JsonNode,
+  JsonConverter,
+  JsonEditor,
+  JsonValidator,
+  JsonAnalyzer,
+  JsonInspector,
+  JsonCleaner,
+  JsonEngine
+} from './json/index.js';
+
+// ==========================================
+// CSV Processing & Table Workbench Engine
+// ==========================================
+export {
+  CsvParser,
+  CsvSerializer,
+  CsvBuilder,
+  CsvConverter,
+  CsvEditor,
+  CsvValidator,
+  CsvAnalyzer,
+  CsvCleaner,
+  CsvEngine
+} from './csv/index.js';
+
+
 
 

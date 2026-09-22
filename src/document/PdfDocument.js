@@ -446,6 +446,93 @@ export class PdfDocument {
   }
 
   /**
+   * Sets or updates document information metadata in the /Info dictionary.
+   * 
+   * @param {Object} metadata
+   * @param {string} [metadata.title]
+   * @param {string} [metadata.author]
+   * @param {string} [metadata.subject]
+   * @param {string} [metadata.keywords]
+   * @param {string} [metadata.creator]
+   * @param {string} [metadata.producer]
+   * @param {string} [metadata.creationDate]
+   * @param {string} [metadata.modDate]
+   * @returns {PdfDocument}
+   */
+  setMetadata(metadata = {}) {
+    let trailer = this.#xrefTable.getTrailer();
+    if (!trailer) {
+      const trailerDict = new PdfDictionary();
+      trailer = new PdfTrailer(trailerDict);
+      this.#xrefTable.setTrailer(trailer);
+    }
+
+    let infoRef = trailer.getInfo();
+    let infoDict = infoRef ? this.resolve(infoRef) : null;
+    if (!infoDict || !infoDict.isDictionary || !infoDict.isDictionary()) {
+      infoDict = new PdfDictionary();
+      infoRef = this.registerObject(infoDict);
+      trailer.dictionary.set('Info', infoRef);
+    }
+
+    if (metadata.title !== undefined) infoDict.set('Title', metadata.title ? PdfString.of(metadata.title) : null);
+    if (metadata.author !== undefined) infoDict.set('Author', metadata.author ? PdfString.of(metadata.author) : null);
+    if (metadata.subject !== undefined) infoDict.set('Subject', metadata.subject ? PdfString.of(metadata.subject) : null);
+    if (metadata.keywords !== undefined) infoDict.set('Keywords', metadata.keywords ? PdfString.of(metadata.keywords) : null);
+    if (metadata.creator !== undefined) infoDict.set('Creator', metadata.creator ? PdfString.of(metadata.creator) : null);
+    if (metadata.producer !== undefined) infoDict.set('Producer', metadata.producer ? PdfString.of(metadata.producer) : null);
+    if (metadata.creationDate !== undefined) infoDict.set('CreationDate', metadata.creationDate ? PdfString.of(metadata.creationDate) : null);
+    if (metadata.modDate !== undefined) infoDict.set('ModDate', metadata.modDate ? PdfString.of(metadata.modDate) : null);
+
+    return this;
+  }
+
+  /**
+   * Sets document title.
+   * @param {string} title
+   * @returns {PdfDocument}
+   */
+  setTitle(title) {
+    return this.setMetadata({ title });
+  }
+
+  /**
+   * Sets document author.
+   * @param {string} author
+   * @returns {PdfDocument}
+   */
+  setAuthor(author) {
+    return this.setMetadata({ author });
+  }
+
+  /**
+   * Sets document subject.
+   * @param {string} subject
+   * @returns {PdfDocument}
+   */
+  setSubject(subject) {
+    return this.setMetadata({ subject });
+  }
+
+  /**
+   * Sets document keywords.
+   * @param {string} keywords
+   * @returns {PdfDocument}
+   */
+  setKeywords(keywords) {
+    return this.setMetadata({ keywords });
+  }
+
+  /**
+   * Sets document creator application name.
+   * @param {string} creator
+   * @returns {PdfDocument}
+   */
+  setCreator(creator) {
+    return this.setMetadata({ creator });
+  }
+
+  /**
    * Extracts clean formatted plain text from the entire document or a specific page.
    * 
    * @param {number} [pageIndex]

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="{{ page.lang | default: site.lang | default: 'en' }}">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% if page.title %}{{ page.title }} | {% endif %}{{ site.title }}</title>
+    <meta name="description" content="{{ page.description | default: site.description }}">
+    <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  </head>
+  <body class="site-body">
+    <header class="site-header" id="site-header">
+      <div class="header-container">
+        <a class="site-logo" id="site-logo-link" href="{{ '/' | relative_url }}">
+          <span class="logo-badge">ENGINE</span>
+          <span class="logo-title">{{ site.title }}</span>
+        </a>
+        <nav class="site-nav" id="site-nav">
+          <a class="nav-link" id="nav-features" href="#features">Features</a>
+          <a class="nav-link" id="nav-quickstart" href="#quickstart">Quickstart</a>
+          <a class="nav-link" id="nav-architecture" href="#architecture">Architecture</a>
+          <a class="nav-badge" id="nav-jekyll-badge" href="https://jekyllrb.com" target="_blank" rel="noopener">Jekyll Site</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="site-content" id="main-content">
+      {{ content }}
+    </main>
+
+    <footer class="site-footer" id="site-footer">
+      <div class="footer-container">
+        <div class="footer-col-main">
+          <p class="footer-title">{{ site.title }}</p>
+          <p class="footer-desc">{{ site.description }}</p>
+        </div>
+        <div class="footer-col-meta">
+          <p class="footer-text">Built with <a href="https://jekyllrb.com" class="footer-link">Jekyll</a> static site generator.</p>
+          <p class="footer-copy">&copy; 2026 {{ site.title }}. Open source under the MIT License.</p>
+        </div>
+      </div>
+    </footer>
+    <script src="{{ '/assets/js/main.js' | relative_url }}"></script>
+  </body>
+</html>

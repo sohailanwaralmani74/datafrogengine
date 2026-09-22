@@ -43,7 +43,7 @@ export class PdfWriter {
     chunks.push(headerBytes);
 
     // 2. Collect and renumber all reachable indirect objects starting from Catalog
-    const { objectList, catalogRef } = PdfWriter.#collectObjects(document);
+    const { objectList, catalogRef, infoRef } = PdfWriter.#collectObjects(document);
 
     const secHandler = document.securityHandler;
     let encryptRef = null;
@@ -102,6 +102,9 @@ export class PdfWriter {
     const trailerDict = new PdfDictionary();
     trailerDict.set('Size', PdfNumber.of(totalObjects));
     trailerDict.set('Root', catalogRef);
+    if (infoRef) {
+      trailerDict.set('Info', infoRef);
+    }
 
     if (encryptRef && secHandler) {
       trailerDict.set('Encrypt', encryptRef);
@@ -215,6 +218,14 @@ export class PdfWriter {
       return val;
     };
 
+    // Check if document has /Info dictionary in trailer
+    let infoRef = null;
+    const trailer = document.getXRefTable ? document.getXRefTable().getTrailer() : null;
+    const existingInfoRef = trailer ? trailer.getInfo() : null;
+    if (existingInfoRef) {
+      infoRef = processValue(existingInfoRef);
+    }
+
     while (queue.length > 0) {
       const current = queue.shift();
       const num = current.num;
@@ -246,7 +257,7 @@ export class PdfWriter {
     // Sort objects by assigned number
     objectList.sort((a, b) => a.num - b.num);
 
-    return { objectList, catalogRef };
+    return { objectList, catalogRef, infoRef };
   }
 }
 
