@@ -1,0 +1,86 @@
+---
+layout: default
+title: YAML Engine
+format: yml
+description: High-Performance YAML 1.2 Core Parser, Serializer & Deep Diffing Engine
+---
+
+<div class="page-container" id="page-yml">
+  <div class="page-header">
+    <div class="page-badge-row">
+      <span class="page-badge badge-yml">YAML 1.2</span>
+      <span class="page-badge badge-zero-dep">Anchors &amp; Flow</span>
+      <span class="page-badge badge-methods">25 API Methods</span>
+    </div>
+    <h1 class="page-title">YAML (YML) Engine</h1>
+    <p class="page-subtitle">
+      A zero-dependency YAML 1.2 core specification engine.
+      Mappings, nested sequences, literal (|) and folded (&gt;) block scalars, anchors &amp; aliases (&amp;/*), flow styles, key reordering, and deep diffing.
+    </p>
+  </div>
+
+  <div class="page-quick-stats">
+    <div class="quick-stat-box">
+      <span class="stat-num">YAML 1.2</span>
+      <span class="stat-lbl">Specification</span>
+    </div>
+    <div class="quick-stat-box">
+      <span class="stat-num">25</span>
+      <span class="stat-lbl">Engine Operations</span>
+    </div>
+    <div class="quick-stat-box">
+      <span class="stat-num">&amp; / *</span>
+      <span class="stat-lbl">Anchors &amp; Aliases</span>
+    </div>
+    <div class="quick-stat-box">
+      <span class="stat-num">Flow</span>
+      <span class="stat-lbl">Compression</span>
+    </div>
+  </div>
+
+  <div class="page-section">
+    <h2 class="section-subheading">YAML 1.2 Capabilities</h2>
+    <div class="feature-pills-grid">
+      <div class="pill-card">
+        <h4>Anchors &amp; Aliases</h4>
+        <p>Define reusable nodes with &amp;anchor and inject references seamlessly using *alias with circular check safety.</p>
+        <code>YmlEngine.parse(yamlWithAnchors)</code>
+      </div>
+      <div class="pill-card">
+        <h4>Block &amp; Flow Styles</h4>
+        <p>Support both block-indented structures and compact flow collections with JSON interoperability.</p>
+        <code>YmlEngine.compress(yamlText)</code>
+      </div>
+      <div class="pill-card">
+        <h4>Path Getters &amp; Key Reordering</h4>
+        <p>Mutate deep documents using dot-notation paths, reorder keys alphabetically or according to schema priority.</p>
+        <code>YmlEngine.reorderKeys(yaml, ['name', 'version'])</code>
+      </div>
+      <div class="pill-card">
+        <h4>Cross-Format Bridges</h4>
+        <p>Convert YAML directly to JSON, XML, CSV, or Markdown tables with zero information loss.</p>
+        <code>YmlEngine.toJson(yamlText)</code>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-section">
+    <h2 class="section-subheading">Interactive Code Example</h2>
+    <div class="code-container">
+      <pre class="code-pre"><code><span class="token-keyword">import</span> { YmlEngine } <span class="token-keyword">from</span> <span class="token-string">'/assets/js/index.js'</span>;
+
+<span class="token-keyword">const</span> yaml = <span class="token-string">`service: Datafrog\nversion: 2.1\nenv:\n  - production\n  - staging`</span>;
+
+<span class="token-comment">// 1. Parse and deep mutate</span>
+<span class="token-keyword">const</span> parsed = YmlEngine.<span class="token-fn">parse</span>(yaml);
+YmlEngine.<span class="token-fn">set</span>(parsed, <span class="token-string">'env.2'</span>, <span class="token-string">'sandbox'</span>);
+
+<span class="token-comment">// 2. Key reordering and sorting</span>
+<span class="token-keyword">const</span> sorted = YmlEngine.<span class="token-fn">sortKeys</span>(parsed);
+
+<span class="token-comment">// 3. Deep diff against source</span>
+<span class="token-keyword">const</span> diff = YmlEngine.<span class="token-fn">diff</span>(yaml, sorted);
+console.<span class="token-fn">log</span>(<span class="token-string">'Diff summary:'</span>, diff.summary);</code></pre>
+    </div>
+  </div>
+</div>

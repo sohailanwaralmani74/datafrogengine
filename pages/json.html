@@ -1,0 +1,87 @@
+---
+layout: default
+title: JSON Engine
+format: json
+description: High-Performance JSON Query, Patch, Schema & Anomaly Detection Engine
+---
+
+<div class="page-container" id="page-json">
+  <div class="page-header">
+    <div class="page-badge-row">
+      <span class="page-badge badge-json">RFC 8259</span>
+      <span class="page-badge badge-zero-dep">RFC 6902 Patch</span>
+      <span class="page-badge badge-methods">35 API Methods</span>
+    </div>
+    <h1 class="page-title">JSON Engine</h1>
+    <p class="page-subtitle">
+      A comprehensive, zero-dependency JSON processing engine.
+      JSONPath queries, RFC 6902 JSON Patching, schema inference, syntax repair, anomaly detection, deep diffing, and key reordering.
+    </p>
+  </div>
+
+  <div class="page-quick-stats">
+    <div class="quick-stat-box">
+      <span class="stat-num">RFC 8259</span>
+      <span class="stat-lbl">Specification</span>
+    </div>
+    <div class="quick-stat-box">
+      <span class="stat-num">35</span>
+      <span class="stat-lbl">Engine Operations</span>
+    </div>
+    <div class="quick-stat-box">
+      <span class="stat-num">RFC 6902</span>
+      <span class="stat-lbl">JSON Patch</span>
+    </div>
+    <div class="quick-stat-box">
+      <span class="stat-num">Self-Healing</span>
+      <span class="stat-lbl">Syntax Repair</span>
+    </div>
+  </div>
+
+  <div class="page-section">
+    <h2 class="section-subheading">Advanced Data Transformation</h2>
+    <div class="feature-pills-grid">
+      <div class="pill-card">
+        <h4>RFC 6902 JSON Patch</h4>
+        <p>Generate precise delta patches between two documents and atomically apply patch sets across complex objects.</p>
+        <code>JsonEngine.createPatch(docA, docB)</code>
+      </div>
+      <div class="pill-card">
+        <h4>Schema Inference &amp; Anomaly Detection</h4>
+        <p>Infer JSON Schema definitions automatically and detect type shifts, outlier keys, and inconsistent collections.</p>
+        <code>JsonEngine.inferSchema(dataset)</code>
+      </div>
+      <div class="pill-card">
+        <h4>Key Permutation &amp; Reordering</h4>
+        <p>Reorder keys based on priority arrays, sort keys recursively, and flatten/unflatten nested dictionaries.</p>
+        <code>JsonEngine.reorderKeys(obj, ['id', 'name'])</code>
+      </div>
+      <div class="pill-card">
+        <h4>Self-Healing Repair</h4>
+        <p>Heal malformed JSON strings containing trailing commas, unquoted keys, single quotes, or unclosed brackets.</p>
+        <code>JsonEngine.repair('{name: "Datafrog",}')</code>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-section">
+    <h2 class="section-subheading">Interactive Code Example</h2>
+    <div class="code-container">
+      <pre class="code-pre"><code><span class="token-keyword">import</span> { JsonEngine } <span class="token-keyword">from</span> <span class="token-string">'/assets/js/index.js'</span>;
+
+<span class="token-keyword">const</span> raw = <span class="token-string">`{ status: "ok", count: 12, details: { tags: ["prod", "us-east"], } }`</span>;
+
+<span class="token-comment">// 1. Repair malformed JSON</span>
+<span class="token-keyword">const</span> repaired = JsonEngine.<span class="token-fn">repair</span>(raw);
+<span class="token-keyword">const</span> parsed = JsonEngine.<span class="token-fn">parse</span>(repaired);
+
+<span class="token-comment">// 2. Query with JSONPath</span>
+<span class="token-keyword">const</span> tags = JsonEngine.<span class="token-fn">query</span>(parsed, <span class="token-string">'$.details.tags[*]'</span>);
+
+<span class="token-comment">// 3. Infer Schema &amp; Diff</span>
+<span class="token-keyword">const</span> schema = JsonEngine.<span class="token-fn">inferSchema</span>(parsed);
+<span class="token-keyword">const</span> diff = JsonEngine.<span class="token-fn">diff</span>({ count: 10 }, parsed);
+console.<span class="token-fn">log</span>(<span class="token-string">'Differences:'</span>, diff.differences);</code></pre>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,88 @@
+---
+layout: default
+title: PDF Engine
+format: pdf
+description: High-Performance Pure JavaScript PDF 1.7 Parser, Serializer, Merger, Splitter & Anonymizer
+---
+
+<div class="page-container" id="page-pdf">
+  <div class="page-header">
+    <div class="page-badge-row">
+      <span class="page-badge badge-pdf">ISO 32000-1</span>
+      <span class="page-badge badge-zero-dep">Zero Dependencies</span>
+      <span class="page-badge badge-methods">24 API Methods</span>
+    </div>
+    <h1 class="page-title">PDF Engine</h1>
+    <p class="page-subtitle">
+      A zero-dependency PDF 1.7 document processing engine written completely in pure JavaScript.
+      Parse indirect object graphs, cross-reference tables, stream compressions, page rotations, document splitting/merging, watermarking, and visual anonymization.
+    </p>
+  </div>
+
+  <div class="page-quick-stats">
+    <div class="quick-stat-box">
+      <span class="stat-num">PDF 1.7</span>
+      <span class="stat-lbl">Specification</span>
+    </div>
+    <div class="quick-stat-box">
+      <span class="stat-num">24</span>
+      <span class="stat-lbl">Engine Operations</span>
+    </div>
+    <div class="quick-stat-box">
+      <span class="stat-num">0</span>
+      <span class="stat-lbl">Native Binaries</span>
+    </div>
+    <div class="quick-stat-box">
+      <span class="stat-num">100%</span>
+      <span class="stat-lbl">Browser &amp; Node.js</span>
+    </div>
+  </div>
+
+  <div class="page-section">
+    <h2 class="section-subheading">Core PDF Operations</h2>
+    <div class="feature-pills-grid">
+      <div class="pill-card">
+        <h4>Document Manipulation</h4>
+        <p>Rotate pages, delete page ranges, reorder page indices, split documents into single pages or merge multiple PDF buffers.</p>
+        <code>PdfEngine.split(pdfBuffer)</code>
+      </div>
+      <div class="pill-card">
+        <h4>Text &amp; Data Extraction</h4>
+        <p>Extract structured text, parse operator streams, convert content trees to JSON metadata or structured XML.</p>
+        <code>PdfEngine.toText(pdfBuffer)</code>
+      </div>
+      <div class="pill-card">
+        <h4>Security &amp; Anonymization</h4>
+        <p>Mask sensitive text coordinates, redact metadata, and stamp diagonal watermark layers across all pages.</p>
+        <code>PdfEngine.anonymize(buffer)</code>
+      </div>
+      <div class="pill-card">
+        <h4>Structural Diffing</h4>
+        <p>Compare two PDF documents across object catalogues, font dictionaries, and page count trees.</p>
+        <code>PdfEngine.diff(bufA, bufB)</code>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-section">
+    <h2 class="section-subheading">Interactive Code Example</h2>
+    <div class="code-container">
+      <pre class="code-pre"><code><span class="token-keyword">import</span> { PdfEngine } <span class="token-keyword">from</span> <span class="token-string">'/assets/js/index.js'</span>;
+
+<span class="token-comment">// 1. Load an existing PDF document</span>
+<span class="token-keyword">const</span> pdfDoc = <span class="token-keyword">await</span> PdfEngine.<span class="token-fn">load</span>(pdfBuffer);
+
+<span class="token-comment">// 2. Reorder pages and rotate orientation</span>
+<span class="token-keyword">const</span> reordered = PdfEngine.<span class="token-fn">reorderPages</span>(pdfBuffer, [2, 0, 1]);
+<span class="token-keyword">const</span> rotated = PdfEngine.<span class="token-fn">rotateAll</span>(reordered, 90);
+
+<span class="token-comment">// 3. Add diagonal watermark and anonymize</span>
+<span class="token-keyword">const</span> watermarked = PdfEngine.<span class="token-fn">addWatermark</span>(rotated, <span class="token-string">'CONFIDENTIAL'</span>);
+<span class="token-keyword">const</span> sanitized = PdfEngine.<span class="token-fn">anonymize</span>(watermarked);
+
+<span class="token-comment">// 4. Split or extract text</span>
+<span class="token-keyword">const</span> text = PdfEngine.<span class="token-fn">toText</span>(sanitized);
+console.<span class="token-fn">log</span>(<span class="token-string">'Extracted text:'</span>, text);</code></pre>
+    </div>
+  </div>
+</div>

@@ -12,9 +12,9 @@ title: Home
       High-Performance Document &amp; Data Processing Engine Suite
     </h1>
     <p class="hero-subtitle" id="hero-subtitle">
-      Four full-featured, spec-compliant document &amp; data processing engines written completely from scratch in pure JavaScript.
-      Parse, query, calculate formulas, validate, edit, clean, analyze, and convert across PDF-1.7,
-      Microsoft Excel (.xlsx), W3C XML 1.0, and JSON formats across any modern JavaScript runtime.
+      Eight full-featured, spec-compliant document, data, spatial &amp; financial processing engines written completely from scratch in pure JavaScript.
+      Parse, query, convert, compress, edit, analyze, compare, clean, and reconcile across CSV, Microsoft Excel (.xlsx),
+      W3C XML 1.0, JSON, PDF-1.7, YAML (YML), RFC 7946 GeoJSON, and Financial formats (QIF, QFX, QBO, OFX) across any modern JavaScript runtime.
     </p>
     <div class="hero-actions" id="hero-actions">
       <a href="#quickstart" class="btn btn-primary" id="btn-get-started">Explore Quickstart</a>
@@ -25,11 +25,11 @@ title: Home
 
     <div class="hero-stats" id="hero-stats">
       <div class="stat-card" id="stat-spec">
-        <span class="stat-value">PDF &bull; XLSX &bull; XML &bull; JSON</span>
-        <span class="stat-label">ISO 32000 &bull; ECMA-376 &bull; W3C &bull; RFC 8259</span>
+        <span class="stat-value">CSV &bull; XLSX &bull; XML &bull; JSON &bull; PDF &bull; YML &bull; GeoJSON &bull; QIF/QFX/QBO</span>
+        <span class="stat-label">ISO 32000 &bull; ECMA-376 &bull; W3C &bull; RFC 8259 &bull; RFC 7946 &bull; OFX 1.x/2.x</span>
       </div>
       <div class="stat-card" id="stat-suites">
-        <span class="stat-value">4 Engines</span>
+        <span class="stat-value">8 Engines</span>
         <span class="stat-label">Unified Zero-Dep Suite</span>
       </div>
       <div class="stat-card" id="stat-deps">
@@ -306,7 +306,7 @@ title: Home
 
     <!-- Excel Engine Code -->
     <div class="code-block" id="block-excel">
-      <pre><code><span class="tok-kw">import</span> { ExcelWorkbook, ExcelStyle } <span class="tok-kw">from</span> <span class="tok-str">'./src/index.js'</span>;
+      <pre><code><span class="tok-kw">import</span> { ExcelWorkbook, ExcelStyle } <span class="tok-kw">from</span> <span class="tok-str">'./assets/js/index.js'</span>;
 
 <span class="tok-comment">// 1. Create a new workbook and worksheet</span>
 <span class="tok-kw">const</span> wb = <span class="tok-kw">new</span> <span class="tok-fn">ExcelWorkbook</span>();
@@ -349,7 +349,7 @@ console.<span class="tok-fn">log</span>(sheet.<span class="tok-fn">getCell</span
 
     <!-- Excel Builder Code -->
     <div class="code-block" id="block-excel-builder" style="display: none;">
-      <pre><code><span class="tok-kw">import</span> { ExcelBuilder } <span class="tok-kw">from</span> <span class="tok-str">'./src/index.js'</span>;
+      <pre><code><span class="tok-kw">import</span> { ExcelBuilder } <span class="tok-kw">from</span> <span class="tok-str">'./assets/js/index.js'</span>;
 
 <span class="tok-comment">// Declarative report generation with styled titles and tables</span>
 <span class="tok-kw">const</span> builder = <span class="tok-kw">new</span> <span class="tok-fn">ExcelBuilder</span>({
@@ -377,7 +377,7 @@ builder
 
     <!-- PDF Engine Code -->
     <div class="code-block" id="block-pdf" style="display: none;">
-      <pre><code><span class="tok-kw">import</span> { PdfDocumentBuilder, PdfDocument } <span class="tok-kw">from</span> <span class="tok-str">'./src/index.js'</span>;
+      <pre><code><span class="tok-kw">import</span> { PdfDocumentBuilder, PdfDocument } <span class="tok-kw">from</span> <span class="tok-str">'./assets/js/index.js'</span>;
 
 <span class="tok-comment">// 1. Build a structured PDF document</span>
 <span class="tok-kw">const</span> builder = <span class="tok-kw">new</span> <span class="tok-fn">PdfDocumentBuilder</span>({ pageSize: <span class="tok-str">'A4'</span>, margins: <span class="tok-num">40</span> });
@@ -404,7 +404,7 @@ console.<span class="tok-fn">log</span>(<span class="tok-str">`Pages: ${doc.page
 console.<span class="tok-fn">log</span>(text);</code></pre>
     <!-- XML Engine Code -->
     <div class="code-block" id="block-xml" style="display: none;">
-      <pre><code><span class="tok-kw">import</span> { XmlParser, XmlBuilder, XmlConverter, XmlQuery, XmlValidator } <span class="tok-kw">from</span> <span class="tok-str">'./src/index.js'</span>;
+      <pre><code><span class="tok-kw">import</span> { XmlParser, XmlBuilder, XmlConverter, XmlQuery, XmlValidator } <span class="tok-kw">from</span> <span class="tok-str">'./assets/js/index.js'</span>;
 
 <span class="tok-comment">// 1. Parse XML into W3C DOM tree</span>
 <span class="tok-kw">const</span> doc = XmlParser.<span class="tok-fn">parse</span>(<span class="tok-str">`&lt;catalog name="Store"&gt;&lt;item id="i1" inStock="true"&gt;&lt;title&gt;Notebook&lt;/title&gt;&lt;price&gt;29.99&lt;/price&gt;&lt;/item&gt;&lt;/catalog&gt;`</span>);
@@ -431,7 +431,7 @@ console.<span class="tok-fn">log</span>(builder.<span class="tok-fn">toString</s
 
     <!-- JSON Engine Code -->
     <div class="code-block" id="block-json" style="display: none;">
-      <pre><code><span class="tok-kw">import</span> { JsonEngine, JsonConverter, JsonEditor, JsonValidator, JsonAnalyzer, JsonCleaner } <span class="tok-kw">from</span> <span class="tok-str">'./src/index.js'</span>;
+      <pre><code><span class="tok-kw">import</span> { JsonEngine, JsonConverter, JsonEditor, JsonValidator, JsonAnalyzer, JsonCleaner } <span class="tok-kw">from</span> <span class="tok-str">'./assets/js/index.js'</span>;
 
 <span class="tok-comment">// 1. Lenient parse &amp; auto-repair (handles single quotes, unquoted keys, comments &amp; trailing commas)</span>
 <span class="tok-kw">const</span> raw = <span class="tok-str">`{ name: 'Quantum Processor', price: 899.95, /* in stock */ inStock: true, }`</span>;

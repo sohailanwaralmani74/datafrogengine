@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="{{ page.lang | default: site.lang | default: 'en' }}">
+<html lang="en">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{% if page.title %}{{ page.title }} | {% endif %}Datafrog Studio</title>
-    <meta name="description" content="{{ page.description | default: site.description }}">
-    <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
+    <title>GeoJSON Engine | Datafrog Studio</title>
+    <meta name="description" content="High-Performance RFC 7946 Spatial GeoJSON Engine with WKT & Topology">
+    <link rel="stylesheet" href="/assets/css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -18,7 +18,7 @@
         
         <!-- Left: Datafrog Company Name & Logo -->
         <div class="header-left" id="header-left">
-          <a class="site-logo" id="site-logo-link" href="{{ '/' | relative_url }}">
+          <a class="site-logo" id="site-logo-link" href="/">
             <div class="logo-mark" id="logo-mark">
               <!-- Geometric Frog / Data Node Icon -->
               <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -89,42 +89,42 @@
           <span class="sidebar-count">8 ENGINES</span>
         </div>
         <nav class="formats-nav" id="formats-nav">
-          <a class="format-nav-item {% if page.format == 'pdf' %}active{% endif %}" id="format-nav-pdf" href="{{ '/pages/pdf.html' | relative_url }}" title="PDF Engine (ISO 32000-1)">
+          <a class="format-nav-item " id="format-nav-pdf" href="/pages/pdf.html" title="PDF Engine (ISO 32000-1)">
             <span class="format-badge format-badge-pdf">PDF</span>
             <span class="format-name">PDF</span>
           </a>
-          <a class="format-nav-item {% if page.format == 'excel' %}active{% endif %}" id="format-nav-excel" href="{{ '/pages/excel.html' | relative_url }}" title="Excel Engine (.xlsx / ECMA-376)">
+          <a class="format-nav-item " id="format-nav-excel" href="/pages/excel.html" title="Excel Engine (.xlsx / ECMA-376)">
             <span class="format-badge format-badge-excel">XLS</span>
             <span class="format-name">Excel</span>
           </a>
-          <a class="format-nav-item {% if page.format == 'csv' %}active{% endif %}" id="format-nav-csv" href="{{ '/pages/csv.html' | relative_url }}" title="CSV Engine (RFC 4180)">
+          <a class="format-nav-item " id="format-nav-csv" href="/pages/csv.html" title="CSV Engine (RFC 4180)">
             <span class="format-badge format-badge-csv">CSV</span>
             <span class="format-name">CSV</span>
           </a>
-          <a class="format-nav-item {% if page.format == 'json' %}active{% endif %}" id="format-nav-json" href="{{ '/pages/json.html' | relative_url }}" title="JSON Engine (RFC 8259)">
+          <a class="format-nav-item " id="format-nav-json" href="/pages/json.html" title="JSON Engine (RFC 8259)">
             <span class="format-badge format-badge-json">JSON</span>
             <span class="format-name">JSON</span>
           </a>
-          <a class="format-nav-item {% if page.format == 'xml' %}active{% endif %}" id="format-nav-xml" href="{{ '/pages/xml.html' | relative_url }}" title="XML Engine (W3C XML 1.0)">
+          <a class="format-nav-item " id="format-nav-xml" href="/pages/xml.html" title="XML Engine (W3C XML 1.0)">
             <span class="format-badge format-badge-xml">XML</span>
             <span class="format-name">XML</span>
           </a>
-          <a class="format-nav-item {% if page.format == 'yml' %}active{% endif %}" id="format-nav-yml" href="{{ '/pages/yml.html' | relative_url }}" title="YAML Engine (YAML 1.2)">
+          <a class="format-nav-item " id="format-nav-yml" href="/pages/yml.html" title="YAML Engine (YAML 1.2)">
             <span class="format-badge format-badge-yml">YML</span>
             <span class="format-name">YAML</span>
           </a>
-          <a class="format-nav-item {% if page.format == 'geojson' %}active{% endif %}" id="format-nav-geojson" href="{{ '/pages/geojson.html' | relative_url }}" title="GeoJSON Engine (RFC 7946)">
+          <a class="format-nav-item active" id="format-nav-geojson" href="/pages/geojson.html" title="GeoJSON Engine (RFC 7946)">
             <span class="format-badge format-badge-geojson">GEO</span>
             <span class="format-name">GeoJSON</span>
           </a>
-          <a class="format-nav-item {% if page.format == 'financial' %}active{% endif %}" id="format-nav-financial" href="{{ '/pages/financial.html' | relative_url }}" title="Financial Engine (QIF, QFX, QBO, OFX)">
+          <a class="format-nav-item " id="format-nav-financial" href="/pages/financial.html" title="Financial Engine (QIF, QFX, QBO, OFX)">
             <span class="format-badge format-badge-fin">QBO</span>
             <span class="format-name">Financial</span>
           </a>
         </nav>
 
         <div class="sidebar-footer" id="sidebar-footer">
-          <a href="{{ '/' | relative_url }}" class="sidebar-home-link" id="sidebar-home-link">
+          <a href="/" class="sidebar-home-link" id="sidebar-home-link">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
               <polyline points="9 22 9 12 15 12 15 22"></polyline>
@@ -136,7 +136,91 @@
 
       <!-- Main Layout Body (Right 90%) -->
       <main class="site-content" id="main-content">
-        {{ content }}
+        
+<div class="page-container" id="page-geojson">
+  <div class="page-header">
+    <div class="page-badge-row">
+      <span class="page-badge badge-geojson">RFC 7946</span>
+      <span class="page-badge badge-zero-dep">WKT &amp; KML</span>
+      <span class="page-badge badge-methods">25 API Methods</span>
+    </div>
+    <h1 class="page-title">GeoJSON Engine</h1>
+    <p class="page-subtitle">
+      A zero-dependency RFC 7946 spatial processing engine.
+      Geometry validation, coordinate transformations (shifts/scaling), bounding box recalculation, Ramer-Douglas-Peucker simplification, and WKT / KML / SVG conversions.
+    </p>
+  </div>
+
+  <div class="page-quick-stats">
+    <div class="quick-stat-box">
+      <span class="stat-num">RFC 7946</span>
+      <span class="stat-lbl">Spatial Spec</span>
+    </div>
+    <div class="quick-stat-box">
+      <span class="stat-num">25</span>
+      <span class="stat-lbl">Engine Operations</span>
+    </div>
+    <div class="quick-stat-box">
+      <span class="stat-num">WKT/KML/SVG</span>
+      <span class="stat-lbl">Conversions</span>
+    </div>
+    <div class="quick-stat-box">
+      <span class="stat-num">RDP</span>
+      <span class="stat-lbl">Simplification</span>
+    </div>
+  </div>
+
+  <div class="page-section">
+    <h2 class="section-subheading">Spatial Topology Capabilities</h2>
+    <div class="feature-pills-grid">
+      <div class="pill-card">
+        <h4>WKT &amp; KML Conversion</h4>
+        <p>Convert geometries to and from Well-Known Text (WKT), Keyhole Markup Language (KML), and SVG path elements.</p>
+        <code>GeoJsonEngine.toWkt(geoJsonFeature)</code>
+      </div>
+      <div class="pill-card">
+        <h4>Polygon Simplification</h4>
+        <p>Reduce coordinate density using the Ramer-Douglas-Peucker algorithm while maintaining geometric topology.</p>
+        <code>GeoJsonEngine.simplify(feature, 0.001)</code>
+      </div>
+      <div class="pill-card">
+        <h4>Transforms &amp; BBox Recalculation</h4>
+        <p>Apply coordinate translations, centroid scaling, ring winding repairs, and update envelope bounding boxes.</p>
+        <code>GeoJsonEngine.translate(feature, 0.05, -0.02)</code>
+      </div>
+      <div class="pill-card">
+        <h4>Spatial Diffing &amp; Compression</h4>
+        <p>Compare two GeoJSON layers for vertex drift and truncate coordinate precision to minimize payload size.</p>
+        <code>GeoJsonEngine.compress(feature, 5)</code>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-section">
+    <h2 class="section-subheading">Interactive Code Example</h2>
+    <div class="code-container">
+      <pre class="code-pre"><code><span class="token-keyword">import</span> { GeoJsonEngine } <span class="token-keyword">from</span> <span class="token-string">'./src/index.js'</span>;
+
+<span class="token-keyword">const</span> point = {
+  type: <span class="token-string">'Feature'</span>,
+  geometry: { type: <span class="token-string">'Point'</span>, coordinates: [-122.4194, 37.7749] },
+  properties: { city: <span class="token-string">'San Francisco'</span> }
+};
+
+<span class="token-comment">// 1. Validate RFC 7946 bounds</span>
+<span class="token-keyword">const</span> isValid = GeoJsonEngine.<span class="token-fn">isValid</span>(point);
+
+<span class="token-comment">// 2. Convert to WKT or KML</span>
+<span class="token-keyword">const</span> wkt = GeoJsonEngine.<span class="token-fn">toWkt</span>(point);
+<span class="token-keyword">const</span> kml = GeoJsonEngine.<span class="token-fn">toKml</span>(point);
+
+<span class="token-comment">// 3. Calculate Bounding Box</span>
+<span class="token-keyword">const</span> bbox = GeoJsonEngine.<span class="token-fn">calculateBBox</span>(point);
+console.<span class="token-fn">log</span>(<span class="token-string">'WKT representation:'</span>, wkt);</code></pre>
+    </div>
+  </div>
+</div>
+
       </main>
 
     </div>
@@ -155,20 +239,20 @@
         </div>
         <div class="footer-col-meta" id="footer-col-meta">
           <div class="footer-links-row">
-            <a href="{{ '/pages/pdf.html' | relative_url }}" class="footer-link">PDF</a>
-            <a href="{{ '/pages/excel.html' | relative_url }}" class="footer-link">Excel</a>
-            <a href="{{ '/pages/csv.html' | relative_url }}" class="footer-link">CSV</a>
-            <a href="{{ '/pages/json.html' | relative_url }}" class="footer-link">JSON</a>
-            <a href="{{ '/pages/xml.html' | relative_url }}" class="footer-link">XML</a>
-            <a href="{{ '/pages/yml.html' | relative_url }}" class="footer-link">YAML</a>
-            <a href="{{ '/pages/geojson.html' | relative_url }}" class="footer-link">GeoJSON</a>
-            <a href="{{ '/pages/financial.html' | relative_url }}" class="footer-link">Financial</a>
+            <a href="/pages/pdf.html" class="footer-link">PDF</a>
+            <a href="/pages/excel.html" class="footer-link">Excel</a>
+            <a href="/pages/csv.html" class="footer-link">CSV</a>
+            <a href="/pages/json.html" class="footer-link">JSON</a>
+            <a href="/pages/xml.html" class="footer-link">XML</a>
+            <a href="/pages/yml.html" class="footer-link">YAML</a>
+            <a href="/pages/geojson.html" class="footer-link">GeoJSON</a>
+            <a href="/pages/financial.html" class="footer-link">Financial</a>
           </div>
           <p class="footer-copy">&copy; 2026 Datafrog Inc. Open source under the MIT License.</p>
         </div>
       </div>
     </footer>
 
-    <script src="{{ '/assets/js/main.js' | relative_url }}"></script>
+    <script src="/assets/js/main.js"></script>
   </body>
 </html>

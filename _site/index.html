@@ -4,31 +4,139 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Home | Document & Data Processing Engine Suite (PDF, Excel, XML, JSON)</title>
+    <title>Home | Datafrog Studio</title>
     <meta name="description" content="A lightweight, zero-dependency, pure JavaScript document and data processing engine suite. Parse, query, validate, edit, clean, analyze, and convert across PDF-1.7, Microsoft Excel (.xlsx), W3C XML 1.0, and JSON formats.">
     <link rel="stylesheet" href="/assets/css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   </head>
   <body class="site-body">
+    <!-- Top Global Header -->
     <header class="site-header" id="site-header">
-      <div class="header-container">
-        <a class="site-logo" id="site-logo-link" href="/">
-          <span class="logo-badge">ENGINE</span>
-          <span class="logo-title">Document & Data Processing Engine Suite (PDF, Excel, XML, JSON)</span>
-        </a>
-        <nav class="site-nav" id="site-nav">
-          <a class="nav-link" id="nav-features" href="#features">Features</a>
-          <a class="nav-link" id="nav-quickstart" href="#quickstart">Quickstart</a>
-          <a class="nav-link" id="nav-architecture" href="#architecture">Architecture</a>
-          <a class="nav-badge" id="nav-jekyll-badge" href="https://jekyllrb.com" target="_blank" rel="noopener">Jekyll Site</a>
-        </nav>
+      <div class="header-container" id="header-container">
+        
+        <!-- Left: Datafrog Company Name & Logo -->
+        <div class="header-left" id="header-left">
+          <a class="site-logo" id="site-logo-link" href="/">
+            <div class="logo-mark" id="logo-mark">
+              <!-- Geometric Frog / Data Node Icon -->
+              <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="32" height="32" rx="8" fill="#10b981" />
+                <!-- Frog Eye Orbs / Data Nodes -->
+                <circle cx="10" cy="11" r="4.5" fill="#064e3b" />
+                <circle cx="10" cy="11" r="2.2" fill="#ffffff" />
+                <circle cx="22" cy="11" r="4.5" fill="#064e3b" />
+                <circle cx="22" cy="11" r="2.2" fill="#ffffff" />
+                <!-- Frog Smile / Data Wave Line -->
+                <path d="M9 20C11.5 23.5 20.5 23.5 23 20" stroke="#064e3b" stroke-width="2.5" stroke-linecap="round" />
+                <circle cx="16" cy="15" r="1.5" fill="#064e3b" />
+              </svg>
+            </div>
+            <div class="logo-text-group" id="logo-text-group">
+              <span class="logo-brand-name" id="logo-brand-name">Datafrog</span>
+              <span class="logo-subtext" id="logo-subtext">Engine Suite</span>
+            </div>
+          </a>
+        </div>
+
+        <!-- Center: Global Tools Search Box -->
+        <div class="header-center" id="header-center">
+          <div class="global-search-wrapper" id="global-search-wrapper">
+            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input 
+              type="text" 
+              class="global-search-input" 
+              id="global-tools-search" 
+              placeholder="Search tools, formats, APIs (e.g. PDF split, Excel formulas, GeoJSON simplify, QBO)..." 
+              aria-label="Global tools search box"
+              autocomplete="off"
+            />
+            <span class="search-shortcut-badge" id="search-shortcut-badge">⌘K</span>
+            <div class="search-results-dropdown" id="search-results-dropdown" style="display: none;">
+              <!-- Dynamically populated search items -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Add to preferred resources (from Google) -->
+        <div class="header-right" id="header-right">
+          <button type="button" class="btn-prefer-resource" id="btn-add-prefer-resource" title="Add Datafrog Engine Suite to preferred resources from Google">
+            <svg class="google-icon" width="16" height="16" viewBox="0 0 24 24">
+              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+            </svg>
+            <span class="prefer-text" id="prefer-text">Add to Preferred Resources</span>
+            <span class="prefer-check-icon" id="prefer-check-icon" style="display: none;">✓ Added</span>
+          </button>
+        </div>
+
       </div>
     </header>
 
-    <main class="site-content" id="main-content">
+    <!-- Master Layout Wrapper (Left 10% Sidebar + Dynamic Content) -->
+    <div class="app-layout-container" id="app-layout-container">
       
+      <!-- Left 10% Format Pages Sidebar -->
+      <aside class="formats-sidebar" id="formats-sidebar" aria-label="File format engines">
+        <div class="sidebar-header" id="sidebar-header">
+          <span class="sidebar-title">FORMATS</span>
+          <span class="sidebar-count">8 ENGINES</span>
+        </div>
+        <nav class="formats-nav" id="formats-nav">
+          <a class="format-nav-item " id="format-nav-pdf" href="/pages/pdf.html" title="PDF Engine (ISO 32000-1)">
+            <span class="format-badge format-badge-pdf">PDF</span>
+            <span class="format-name">PDF</span>
+          </a>
+          <a class="format-nav-item " id="format-nav-excel" href="/pages/excel.html" title="Excel Engine (.xlsx / ECMA-376)">
+            <span class="format-badge format-badge-excel">XLS</span>
+            <span class="format-name">Excel</span>
+          </a>
+          <a class="format-nav-item " id="format-nav-csv" href="/pages/csv.html" title="CSV Engine (RFC 4180)">
+            <span class="format-badge format-badge-csv">CSV</span>
+            <span class="format-name">CSV</span>
+          </a>
+          <a class="format-nav-item " id="format-nav-json" href="/pages/json.html" title="JSON Engine (RFC 8259)">
+            <span class="format-badge format-badge-json">JSON</span>
+            <span class="format-name">JSON</span>
+          </a>
+          <a class="format-nav-item " id="format-nav-xml" href="/pages/xml.html" title="XML Engine (W3C XML 1.0)">
+            <span class="format-badge format-badge-xml">XML</span>
+            <span class="format-name">XML</span>
+          </a>
+          <a class="format-nav-item " id="format-nav-yml" href="/pages/yml.html" title="YAML Engine (YAML 1.2)">
+            <span class="format-badge format-badge-yml">YML</span>
+            <span class="format-name">YAML</span>
+          </a>
+          <a class="format-nav-item " id="format-nav-geojson" href="/pages/geojson.html" title="GeoJSON Engine (RFC 7946)">
+            <span class="format-badge format-badge-geojson">GEO</span>
+            <span class="format-name">GeoJSON</span>
+          </a>
+          <a class="format-nav-item " id="format-nav-financial" href="/pages/financial.html" title="Financial Engine (QIF, QFX, QBO, OFX)">
+            <span class="format-badge format-badge-fin">QBO</span>
+            <span class="format-name">Financial</span>
+          </a>
+        </nav>
+
+        <div class="sidebar-footer" id="sidebar-footer">
+          <a href="/" class="sidebar-home-link" id="sidebar-home-link">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+              <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+            <span>Overview</span>
+          </a>
+        </div>
+      </aside>
+
+      <!-- Main Layout Body (Right 90%) -->
+      <main class="site-content" id="main-content">
+        
 <section class="hero-section" id="hero-section">
   <div class="hero-container">
     <div class="hero-pill" id="hero-pill">
@@ -38,9 +146,9 @@
       High-Performance Document &amp; Data Processing Engine Suite
     </h1>
     <p class="hero-subtitle" id="hero-subtitle">
-      Four full-featured, spec-compliant document &amp; data processing engines written completely from scratch in pure JavaScript.
-      Parse, query, calculate formulas, validate, edit, clean, analyze, and convert across PDF-1.7,
-      Microsoft Excel (.xlsx), W3C XML 1.0, and JSON formats across any modern JavaScript runtime.
+      Eight full-featured, spec-compliant document, data, spatial &amp; financial processing engines written completely from scratch in pure JavaScript.
+      Parse, query, convert, compress, edit, analyze, compare, clean, and reconcile across CSV, Microsoft Excel (.xlsx),
+      W3C XML 1.0, JSON, PDF-1.7, YAML (YML), RFC 7946 GeoJSON, and Financial formats (QIF, QFX, QBO, OFX) across any modern JavaScript runtime.
     </p>
     <div class="hero-actions" id="hero-actions">
       <a href="#quickstart" class="btn btn-primary" id="btn-get-started">Explore Quickstart</a>
@@ -51,11 +159,11 @@
 
     <div class="hero-stats" id="hero-stats">
       <div class="stat-card" id="stat-spec">
-        <span class="stat-value">PDF &bull; XLSX &bull; XML &bull; JSON</span>
-        <span class="stat-label">ISO 32000 &bull; ECMA-376 &bull; W3C &bull; RFC 8259</span>
+        <span class="stat-value">CSV &bull; XLSX &bull; XML &bull; JSON &bull; PDF &bull; YML &bull; GeoJSON &bull; QIF/QFX/QBO</span>
+        <span class="stat-label">ISO 32000 &bull; ECMA-376 &bull; W3C &bull; RFC 8259 &bull; RFC 7946 &bull; OFX 1.x/2.x</span>
       </div>
       <div class="stat-card" id="stat-suites">
-        <span class="stat-value">4 Engines</span>
+        <span class="stat-value">8 Engines</span>
         <span class="stat-label">Unified Zero-Dep Suite</span>
       </div>
       <div class="stat-card" id="stat-deps">
@@ -670,20 +778,38 @@ console.<span class="tok-fn">log</span>(JsonEngine.<span class="tok-fn">format</
   </div>
 </section>
 
-    </main>
+      </main>
 
+    </div>
+
+    <!-- Master Footer -->
     <footer class="site-footer" id="site-footer">
-      <div class="footer-container">
-        <div class="footer-col-main">
-          <p class="footer-title">Document & Data Processing Engine Suite (PDF, Excel, XML, JSON)</p>
-          <p class="footer-desc">A lightweight, zero-dependency, pure JavaScript document and data processing engine suite. Parse, query, validate, edit, clean, analyze, and convert across PDF-1.7, Microsoft Excel (.xlsx), W3C XML 1.0, and JSON formats.</p>
+      <div class="footer-container" id="footer-container">
+        <div class="footer-col-main" id="footer-col-main">
+          <div class="footer-brand" id="footer-brand">
+            <span class="footer-brand-name">Datafrog</span>
+            <span class="footer-badge">Unified Document &amp; Data Processing Suite</span>
+          </div>
+          <p class="footer-desc">
+            High-performance zero-dependency JavaScript engines for PDF, Excel, CSV, JSON, XML, YAML, GeoJSON, and Financial (QIF, QFX, QBO, OFX) processing across Node.js, browsers, and edge runtimes.
+          </p>
         </div>
-        <div class="footer-col-meta">
-          <p class="footer-text">Built with <a href="https://jekyllrb.com" class="footer-link">Jekyll</a> static site generator.</p>
-          <p class="footer-copy">&copy; 2026 Document & Data Processing Engine Suite (PDF, Excel, XML, JSON). Open source under the MIT License.</p>
+        <div class="footer-col-meta" id="footer-col-meta">
+          <div class="footer-links-row">
+            <a href="/pages/pdf.html" class="footer-link">PDF</a>
+            <a href="/pages/excel.html" class="footer-link">Excel</a>
+            <a href="/pages/csv.html" class="footer-link">CSV</a>
+            <a href="/pages/json.html" class="footer-link">JSON</a>
+            <a href="/pages/xml.html" class="footer-link">XML</a>
+            <a href="/pages/yml.html" class="footer-link">YAML</a>
+            <a href="/pages/geojson.html" class="footer-link">GeoJSON</a>
+            <a href="/pages/financial.html" class="footer-link">Financial</a>
+          </div>
+          <p class="footer-copy">&copy; 2026 Datafrog Inc. Open source under the MIT License.</p>
         </div>
       </div>
     </footer>
+
     <script src="/assets/js/main.js"></script>
   </body>
 </html>

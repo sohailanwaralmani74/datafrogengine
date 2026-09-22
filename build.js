@@ -39,22 +39,22 @@ export function buildSite() {
     return (base + (input.startsWith('/') ? input : '/' + input)).replace(/\/+/g, '/');
   });
 
-  // 3. Render index.html
-  const indexPath = path.join(rootDir, 'index.html');
-  if (fs.existsSync(indexPath)) {
-    const rawContent = fs.readFileSync(indexPath, 'utf8');
+  // Helper to render any HTML file with front-matter and layout
+  function renderHtmlFile(srcRelativePath, destRelativePath) {
+    const fullSrcPath = path.join(rootDir, srcRelativePath);
+    if (!fs.existsSync(fullSrcPath)) return;
 
+    const rawContent = fs.readFileSync(fullSrcPath, 'utf8');
     let frontMatter = {};
     let contentBody = rawContent;
 
-    // Parse Front Matter if present
     const fmMatch = rawContent.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/);
     if (fmMatch) {
       try {
         frontMatter = yamlLoad(fmMatch[1]) || {};
         contentBody = fmMatch[2];
       } catch (e) {
-        console.warn('Front matter parsing failed:', e);
+        console.warn(`Front matter parsing failed for ${srcRelativePath}:`, e);
       }
     }
 
@@ -63,10 +63,7 @@ export function buildSite() {
       page: { ...frontMatter }
     };
 
-    // Render inner content
     const renderedInner = engine.parseAndRenderSync(contentBody, context);
-
-    // Render within layout if specified
     let finalHtml = renderedInner;
     const layoutName = frontMatter.layout;
     if (layoutName) {
@@ -80,10 +77,29 @@ export function buildSite() {
       }
     }
 
-    fs.writeFileSync(path.join(siteDir, 'index.html'), finalHtml, 'utf8');
+    const fullDestPath = path.join(siteDir, destRelativePath);
+    const destDir = path.dirname(fullDestPath);
+    if (!fs.existsSync(destDir)) {
+      fs.mkdirSync(destDir, { recursive: true });
+    }
+    fs.writeFileSync(fullDestPath, finalHtml, 'utf8');
   }
 
-  // 4. Copy assets & asset directories
+  // 3. Render index.html
+  renderHtmlFile('index.html', 'index.html');
+
+  // 4. Render pages in /pages directory
+  const pagesDir = path.join(rootDir, 'pages');
+  if (fs.existsSync(pagesDir)) {
+    const pageFiles = fs.readdirSync(pagesDir);
+    for (const pFile of pageFiles) {
+      if (pFile.endsWith('.html')) {
+        renderHtmlFile(path.join('pages', pFile), path.join('pages', pFile));
+      }
+    }
+  }
+
+  // 5. Copy assets & asset directories
   for (const assetFolder of ['assets', 'asset']) {
     const assetsSrc = path.join(rootDir, assetFolder);
     const assetsDest = path.join(siteDir, assetFolder);
@@ -92,7 +108,7 @@ export function buildSite() {
     }
   }
 
-  // 5. Also sync to dist/ for static hosts
+  // 6. Also sync to dist/ for static hosts
   const distDir = path.join(rootDir, 'dist');
   copyRecursiveSync(siteDir, distDir);
 

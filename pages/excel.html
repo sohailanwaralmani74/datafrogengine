@@ -1,0 +1,89 @@
+---
+layout: default
+title: Excel Engine
+format: excel
+description: High-Performance Pure JavaScript OpenXML (.xlsx) Spreadsheet Engine
+---
+
+<div class="page-container" id="page-excel">
+  <div class="page-header">
+    <div class="page-badge-row">
+      <span class="page-badge badge-excel">ECMA-376</span>
+      <span class="page-badge badge-zero-dep">Zero Dependencies</span>
+      <span class="page-badge badge-methods">30 API Methods</span>
+    </div>
+    <h1 class="page-title">Excel Engine</h1>
+    <p class="page-subtitle">
+      A fast, zero-dependency OpenXML (.xlsx) spreadsheet processing engine.
+      Read, build, write, sort, filter, format cells, evaluate formulas, and convert across CSV, JSON, Markdown, HTML, XML, and PDF.
+    </p>
+  </div>
+
+  <div class="page-quick-stats">
+    <div class="quick-stat-box">
+      <span class="stat-num">.xlsx</span>
+      <span class="stat-lbl">OpenXML Format</span>
+    </div>
+    <div class="quick-stat-box">
+      <span class="stat-num">30</span>
+      <span class="stat-lbl">Engine Operations</span>
+    </div>
+    <div class="quick-stat-box">
+      <span class="stat-num">7+</span>
+      <span class="stat-lbl">Export Formats</span>
+    </div>
+    <div class="quick-stat-box">
+      <span class="stat-num">100%</span>
+      <span class="stat-lbl">Pure JavaScript</span>
+    </div>
+  </div>
+
+  <div class="page-section">
+    <h2 class="section-subheading">Core Spreadsheet Operations</h2>
+    <div class="feature-pills-grid">
+      <div class="pill-card">
+        <h4>Fluent Workbook Builder</h4>
+        <p>Chain sheets, headers, typed cells, number formats, column widths, and calculated formula cells.</p>
+        <code>ExcelEngine.builder().addSheet('Q1')...</code>
+      </div>
+      <div class="pill-card">
+        <h4>Relational Reordering</h4>
+        <p>Reorder sheets, transpose rows, sort column hierarchies, and filter rows by conditional expressions.</p>
+        <code>ExcelEngine.sortRows(buf, 'Revenue', false)</code>
+      </div>
+      <div class="pill-card">
+        <h4>Format Bridges</h4>
+        <p>Convert workbooks directly to multi-sheet JSON, RFC 4180 CSV, Markdown tables, styled HTML, or PDF reports.</p>
+        <code>ExcelEngine.toJson(xlsxBuffer)</code>
+      </div>
+      <div class="pill-card">
+        <h4>Coordinate Diffing</h4>
+        <p>Compare two workbooks to locate cell-by-cell formula or value discrepancies with row/col coordinate maps.</p>
+        <code>ExcelEngine.diff(bufA, bufB)</code>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-section">
+    <h2 class="section-subheading">Interactive Code Example</h2>
+    <div class="code-container">
+      <pre class="code-pre"><code><span class="token-keyword">import</span> { ExcelEngine } <span class="token-keyword">from</span> <span class="token-string">'/assets/js/index.js'</span>;
+
+<span class="token-comment">// 1. Build an Excel workbook fluently</span>
+<span class="token-keyword">const</span> buffer = <span class="token-keyword">await</span> ExcelEngine.<span class="token-fn">builder</span>()
+  .<span class="token-fn">addSheet</span>(<span class="token-string">'Financial Summary'</span>)
+  .<span class="token-fn">addRow</span>([<span class="token-string">'Department'</span>, <span class="token-string">'Q1 Budget'</span>, <span class="token-string">'Q1 Spend'</span>])
+  .<span class="token-fn">addRow</span>([<span class="token-string">'Engineering'</span>, 150000, 142000])
+  .<span class="token-fn">addRow</span>([<span class="token-string">'Marketing'</span>, 80000, 78500])
+  .<span class="token-fn">build</span>();
+
+<span class="token-comment">// 2. Convert directly to CSV or JSON</span>
+<span class="token-keyword">const</span> csv = ExcelEngine.<span class="token-fn">toCsv</span>(buffer);
+<span class="token-keyword">const</span> json = ExcelEngine.<span class="token-fn">toJson</span>(buffer);
+
+<span class="token-comment">// 3. Audit cell metrics</span>
+<span class="token-keyword">const</span> analysis = ExcelEngine.<span class="token-fn">analyze</span>(buffer);
+console.<span class="token-fn">log</span>(<span class="token-string">'Total sheets:'</span>, analysis.sheetCount);</code></pre>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,88 @@
+---
+layout: default
+title: CSV Engine
+format: csv
+description: High-Performance RFC 4180 Delimited Tabular Data Engine
+---
+
+<div class="page-container" id="page-csv">
+  <div class="page-header">
+    <div class="page-badge-row">
+      <span class="page-badge badge-csv">RFC 4180</span>
+      <span class="page-badge badge-zero-dep">Zero Dependencies</span>
+      <span class="page-badge badge-methods">34 API Methods</span>
+    </div>
+    <h1 class="page-title">CSV Engine</h1>
+    <p class="page-subtitle">
+      A fast, zero-dependency tabular data engine.
+      Automatic delimiter detection, relational joins, grouping, pivot tables, column/row reordering, schema validation, and tabular diffing.
+    </p>
+  </div>
+
+  <div class="page-quick-stats">
+    <div class="quick-stat-box">
+      <span class="stat-num">RFC 4180</span>
+      <span class="stat-lbl">Specification</span>
+    </div>
+    <div class="quick-stat-box">
+      <span class="stat-num">34</span>
+      <span class="stat-lbl">Engine Operations</span>
+    </div>
+    <div class="quick-stat-box">
+      <span class="stat-num">Auto</span>
+      <span class="stat-lbl">Delimiter Sniffing</span>
+    </div>
+    <div class="quick-stat-box">
+      <span class="stat-num">SQL-like</span>
+      <span class="stat-lbl">Join &amp; Group By</span>
+    </div>
+  </div>
+
+  <div class="page-section">
+    <h2 class="section-subheading">Relational Tabular Capabilities</h2>
+    <div class="feature-pills-grid">
+      <div class="pill-card">
+        <h4>Auto Delimiter Sniffing</h4>
+        <p>Instantly detect commas, tabs, semicolons, and pipes while safely parsing multiline escaped quotes.</p>
+        <code>CsvEngine.detectDelimiter(text)</code>
+      </div>
+      <div class="pill-card">
+        <h4>Relational Joins &amp; Grouping</h4>
+        <p>Perform inner, left, and full joins between CSV datasets, compute aggregations, and generate pivot tables.</p>
+        <code>CsvEngine.join(csvA, csvB, 'id')</code>
+      </div>
+      <div class="pill-card">
+        <h4>Column &amp; Row Reordering</h4>
+        <p>Reorder column sequences, drop sensitive columns, rename headers, and sort rows by multi-column comparators.</p>
+        <code>CsvEngine.reorderColumns(csv, ['id', 'name'])</code>
+      </div>
+      <div class="pill-card">
+        <h4>Data Profiling &amp; Schema</h4>
+        <p>Profile column null counts, infer column data types (dates, integers, booleans), and validate strict schemas.</p>
+        <code>CsvEngine.profile(csvText)</code>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-section">
+    <h2 class="section-subheading">Interactive Code Example</h2>
+    <div class="code-container">
+      <pre class="code-pre"><code><span class="token-keyword">import</span> { CsvEngine } <span class="token-keyword">from</span> <span class="token-string">'/assets/js/index.js'</span>;
+
+<span class="token-keyword">const</span> rawCsv = <span class="token-string">`id,country,sales,year\n1,USA,50000,2025\n2,Germany,34000,2025\n3,USA,62000,2026`</span>;
+
+<span class="token-comment">// 1. Reorder columns &amp; filter rows</span>
+<span class="token-keyword">const</span> filtered = CsvEngine.<span class="token-fn">filter</span>(rawCsv, row =&gt; Number(row.sales) &gt; 40000);
+<span class="token-keyword">const</span> reordered = CsvEngine.<span class="token-fn">reorderColumns</span>(filtered, [<span class="token-string">'country'</span>, <span class="token-string">'sales'</span>, <span class="token-string">'year'</span>]);
+
+<span class="token-comment">// 2. Group by country with aggregation</span>
+<span class="token-keyword">const</span> summary = CsvEngine.<span class="token-fn">groupBy</span>(rawCsv, <span class="token-string">'country'</span>, {
+  totalSales: rows =&gt; rows.reduce((acc, r) =&gt; acc + Number(r.sales), 0)
+});
+
+<span class="token-comment">// 3. Convert to Excel or JSON</span>
+<span class="token-keyword">const</span> json = CsvEngine.<span class="token-fn">toJson</span>(reordered);
+console.<span class="token-fn">log</span>(<span class="token-string">'Summary JSON:'</span>, json);</code></pre>
+    </div>
+  </div>
+</div>

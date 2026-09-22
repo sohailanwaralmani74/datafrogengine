@@ -1,0 +1,90 @@
+---
+layout: default
+title: GeoJSON Engine
+format: geojson
+description: High-Performance RFC 7946 Spatial GeoJSON Engine with WKT & Topology
+---
+
+<div class="page-container" id="page-geojson">
+  <div class="page-header">
+    <div class="page-badge-row">
+      <span class="page-badge badge-geojson">RFC 7946</span>
+      <span class="page-badge badge-zero-dep">WKT &amp; KML</span>
+      <span class="page-badge badge-methods">25 API Methods</span>
+    </div>
+    <h1 class="page-title">GeoJSON Engine</h1>
+    <p class="page-subtitle">
+      A zero-dependency RFC 7946 spatial processing engine.
+      Geometry validation, coordinate transformations (shifts/scaling), bounding box recalculation, Ramer-Douglas-Peucker simplification, and WKT / KML / SVG conversions.
+    </p>
+  </div>
+
+  <div class="page-quick-stats">
+    <div class="quick-stat-box">
+      <span class="stat-num">RFC 7946</span>
+      <span class="stat-lbl">Spatial Spec</span>
+    </div>
+    <div class="quick-stat-box">
+      <span class="stat-num">25</span>
+      <span class="stat-lbl">Engine Operations</span>
+    </div>
+    <div class="quick-stat-box">
+      <span class="stat-num">WKT/KML/SVG</span>
+      <span class="stat-lbl">Conversions</span>
+    </div>
+    <div class="quick-stat-box">
+      <span class="stat-num">RDP</span>
+      <span class="stat-lbl">Simplification</span>
+    </div>
+  </div>
+
+  <div class="page-section">
+    <h2 class="section-subheading">Spatial Topology Capabilities</h2>
+    <div class="feature-pills-grid">
+      <div class="pill-card">
+        <h4>WKT &amp; KML Conversion</h4>
+        <p>Convert geometries to and from Well-Known Text (WKT), Keyhole Markup Language (KML), and SVG path elements.</p>
+        <code>GeoJsonEngine.toWkt(geoJsonFeature)</code>
+      </div>
+      <div class="pill-card">
+        <h4>Polygon Simplification</h4>
+        <p>Reduce coordinate density using the Ramer-Douglas-Peucker algorithm while maintaining geometric topology.</p>
+        <code>GeoJsonEngine.simplify(feature, 0.001)</code>
+      </div>
+      <div class="pill-card">
+        <h4>Transforms &amp; BBox Recalculation</h4>
+        <p>Apply coordinate translations, centroid scaling, ring winding repairs, and update envelope bounding boxes.</p>
+        <code>GeoJsonEngine.translate(feature, 0.05, -0.02)</code>
+      </div>
+      <div class="pill-card">
+        <h4>Spatial Diffing &amp; Compression</h4>
+        <p>Compare two GeoJSON layers for vertex drift and truncate coordinate precision to minimize payload size.</p>
+        <code>GeoJsonEngine.compress(feature, 5)</code>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-section">
+    <h2 class="section-subheading">Interactive Code Example</h2>
+    <div class="code-container">
+      <pre class="code-pre"><code><span class="token-keyword">import</span> { GeoJsonEngine } <span class="token-keyword">from</span> <span class="token-string">'/assets/js/index.js'</span>;
+
+<span class="token-keyword">const</span> point = {
+  type: <span class="token-string">'Feature'</span>,
+  geometry: { type: <span class="token-string">'Point'</span>, coordinates: [-122.4194, 37.7749] },
+  properties: { city: <span class="token-string">'San Francisco'</span> }
+};
+
+<span class="token-comment">// 1. Validate RFC 7946 bounds</span>
+<span class="token-keyword">const</span> isValid = GeoJsonEngine.<span class="token-fn">isValid</span>(point);
+
+<span class="token-comment">// 2. Convert to WKT or KML</span>
+<span class="token-keyword">const</span> wkt = GeoJsonEngine.<span class="token-fn">toWkt</span>(point);
+<span class="token-keyword">const</span> kml = GeoJsonEngine.<span class="token-fn">toKml</span>(point);
+
+<span class="token-comment">// 3. Calculate Bounding Box</span>
+<span class="token-keyword">const</span> bbox = GeoJsonEngine.<span class="token-fn">calculateBBox</span>(point);
+console.<span class="token-fn">log</span>(<span class="token-string">'WKT representation:'</span>, wkt);</code></pre>
+    </div>
+  </div>
+</div>

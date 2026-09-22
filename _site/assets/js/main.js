@@ -609,4 +609,142 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     runJsonProcessing(); // Initial JSON run
   }
+
+  // Header: Add to preferred resources (from Google) handler
+  const btnPrefer = document.getElementById('btn-add-prefer-resource');
+  const preferText = document.getElementById('prefer-text');
+  const preferCheck = document.getElementById('prefer-check-icon');
+
+  if (btnPrefer) {
+    // Check localStorage state
+    const isPreferred = localStorage.getItem('datafrog_preferred_resource') === 'true';
+    if (isPreferred) {
+      btnPrefer.classList.add('preferred');
+      if (preferText) preferText.style.display = 'none';
+      if (preferCheck) preferCheck.style.display = 'inline';
+    }
+
+    btnPrefer.addEventListener('click', () => {
+      const currentlyPreferred = btnPrefer.classList.contains('preferred');
+      if (!currentlyPreferred) {
+        btnPrefer.classList.add('preferred');
+        localStorage.setItem('datafrog_preferred_resource', 'true');
+        if (preferText) preferText.style.display = 'none';
+        if (preferCheck) preferCheck.style.display = 'inline';
+
+        // Provide visual indicator
+        const notification = document.createElement('div');
+        notification.style.position = 'fixed';
+        notification.style.bottom = '24px';
+        notification.style.right = '24px';
+        notification.style.background = '#064e3b';
+        notification.style.border = '1px solid #10b981';
+        notification.style.color = '#ffffff';
+        notification.style.padding = '12px 18px';
+        notification.style.borderRadius = '8px';
+        notification.style.fontSize = '0.875rem';
+        notification.style.boxShadow = '0 10px 25px rgba(0,0,0,0.5)';
+        notification.style.zIndex = '9999';
+        notification.innerHTML = '<strong>Datafrog Engine Suite</strong> added to your preferred resources from Google.';
+        document.body.appendChild(notification);
+        setTimeout(() => {
+          notification.remove();
+        }, 3200);
+      } else {
+        btnPrefer.classList.remove('preferred');
+        localStorage.setItem('datafrog_preferred_resource', 'false');
+        if (preferText) preferText.style.display = 'inline';
+        if (preferCheck) preferCheck.style.display = 'none';
+      }
+    });
+  }
+
+  // Header: Global Tools Search Box implementation
+  const searchInput = document.getElementById('global-tools-search');
+  const searchDropdown = document.getElementById('search-results-dropdown');
+
+  const searchableItems = [
+    { title: 'PDF Engine Overview', url: '/pages/pdf.html', badge: 'PDF', desc: 'ISO 32000-1 document parser, merger, split, watermark, anonymize' },
+    { title: 'PDF Split & Merge', url: '/pages/pdf.html', badge: 'PDF', desc: 'Split documents by page range or merge buffers' },
+    { title: 'PDF Text Extraction', url: '/pages/pdf.html', badge: 'PDF', desc: 'Extract plain text streams and page catalogues' },
+    { title: 'Excel Engine Overview', url: '/pages/excel.html', badge: 'XLSX', desc: 'ECMA-376 spreadsheet builder, formulas, cell styles' },
+    { title: 'Excel Workbook Builder', url: '/pages/excel.html', badge: 'XLSX', desc: 'Fluent API to generate multi-sheet workbooks' },
+    { title: 'Excel to CSV / JSON', url: '/pages/excel.html', badge: 'XLSX', desc: 'Bi-directional conversions across tabular formats' },
+    { title: 'CSV Engine Overview', url: '/pages/csv.html', badge: 'CSV', desc: 'RFC 4180 delimiter detection, relational joins, grouping' },
+    { title: 'CSV Auto Delimiter Sniffing', url: '/pages/csv.html', badge: 'CSV', desc: 'Detect commas, tabs, semicolons, and pipes' },
+    { title: 'CSV Relational Joins', url: '/pages/csv.html', badge: 'CSV', desc: 'Inner, left, and full joins between CSV datasets' },
+    { title: 'JSON Engine Overview', url: '/pages/json.html', badge: 'JSON', desc: 'RFC 8259, RFC 6902 Patch, JSONPath, repair, anomaly detection' },
+    { title: 'JSON Data Processing Tools', url: '/#json-studio', badge: 'JSON', desc: 'Live browser JSON validator, formatter, schema inferrer' },
+    { title: 'JSON Syntax Repair', url: '/pages/json.html', badge: 'JSON', desc: 'Heals unquoted keys, trailing commas, single quotes' },
+    { title: 'XML Engine Overview', url: '/pages/xml.html', badge: 'XML', desc: 'W3C XML 1.0 SAX streaming, DOM tree, XPath querying' },
+    { title: 'XML Live Inspector', url: '/#xml-playground', badge: 'XML', desc: 'Interactive visual DOM tree viewer & query inspector' },
+    { title: 'XML to JSON Converter', url: '/pages/xml.html', badge: 'XML', desc: 'Convert XML structures cleanly into JSON objects' },
+    { title: 'YAML (YML) Engine Overview', url: '/pages/yml.html', badge: 'YAML', desc: 'YAML 1.2 mappings, block scalars, anchors & aliases (&/*)' },
+    { title: 'YAML Deep Diffing', url: '/pages/yml.html', badge: 'YAML', desc: 'Structural diffs between YAML configurations' },
+    { title: 'GeoJSON Engine Overview', url: '/pages/geojson.html', badge: 'GEO', desc: 'RFC 7946 spatial topology, WKT, KML, RDP simplification' },
+    { title: 'GeoJSON Simplification (RDP)', url: '/pages/geojson.html', badge: 'GEO', desc: 'Ramer-Douglas-Peucker polygon coordinate reducer' },
+    { title: 'GeoJSON to WKT / KML', url: '/pages/geojson.html', badge: 'GEO', desc: 'Export spatial features to Well-Known Text and KML' },
+    { title: 'Financial Engine Overview', url: '/pages/financial.html', badge: 'FIN', desc: 'QIF, QFX, QBO, OFX bank statements & reconciliation' },
+    { title: 'QBO / QFX Bank Reconciliation', url: '/pages/financial.html', badge: 'FIN', desc: 'Match bank transaction records against accounting ledgers' },
+    { title: 'Payee Anonymizer & Cleaner', url: '/pages/financial.html', badge: 'FIN', desc: 'Clean POS terminal codes and mask sensitive numbers' }
+  ];
+
+  if (searchInput && searchDropdown) {
+    // Keyboard shortcut ⌘K or Ctrl+K
+    window.addEventListener('keydown', (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        searchInput.focus();
+        searchInput.select();
+      }
+    });
+
+    const renderSearchResults = (query) => {
+      const q = query.trim().toLowerCase();
+      if (!q) {
+        searchDropdown.style.display = 'none';
+        return;
+      }
+
+      const matches = searchableItems.filter(item => 
+        item.title.toLowerCase().includes(q) ||
+        item.desc.toLowerCase().includes(q) ||
+        item.badge.toLowerCase().includes(q)
+      ).slice(0, 7);
+
+      if (matches.length === 0) {
+        searchDropdown.innerHTML = '<div style="padding: 12px; color: #94a3b8; font-size: 0.8125rem; text-align: center;">No matching tools or formats found</div>';
+      } else {
+        searchDropdown.innerHTML = matches.map(item => `
+          <a href="${item.url}" class="search-item">
+            <div class="search-item-left">
+              <span class="search-item-badge badge-${item.badge.toLowerCase()}">${item.badge}</span>
+              <div>
+                <div style="font-weight: 600; color: #ffffff;">${item.title}</div>
+                <div class="search-item-desc">${item.desc}</div>
+              </div>
+            </div>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </a>
+        `).join('');
+      }
+      searchDropdown.style.display = 'block';
+    };
+
+    searchInput.addEventListener('input', (e) => {
+      renderSearchResults(e.target.value);
+    });
+
+    searchInput.addEventListener('focus', (e) => {
+      if (e.target.value.trim()) {
+        renderSearchResults(e.target.value);
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!searchInput.contains(e.target) && !searchDropdown.contains(e.target)) {
+        searchDropdown.style.display = 'none';
+      }
+    });
+  }
 });
