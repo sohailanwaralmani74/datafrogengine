@@ -7,7 +7,7 @@ import { Liquid } from 'liquidjs';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-export function buildSite() {
+export function buildSite(options = {}) {
   const rootDir = __dirname;
   const siteDir = path.join(rootDir, '_site');
 
@@ -23,6 +23,30 @@ export function buildSite() {
       config = yamlLoad(fs.readFileSync(configPath, 'utf8')) || {};
     } catch (e) {
       console.warn('Error reading _config.yml:', e.message);
+    }
+  }
+
+  // 1b. Load _data/ directory into site.data (standard Jekyll data files)
+  config.data = {};
+  const dataDir = path.join(rootDir, '_data');
+  if (fs.existsSync(dataDir)) {
+    const dataFiles = fs.readdirSync(dataDir);
+    for (const dFile of dataFiles) {
+      const ext = path.extname(dFile).toLowerCase();
+      const baseName = path.basename(dFile, ext);
+      if (ext === '.yml' || ext === '.yaml') {
+        try {
+          config.data[baseName] = yamlLoad(fs.readFileSync(path.join(dataDir, dFile), 'utf8')) || [];
+        } catch (e) {
+          console.warn(`Error reading _data/${dFile}:`, e.message);
+        }
+      } else if (ext === '.json') {
+        try {
+          config.data[baseName] = JSON.parse(fs.readFileSync(path.join(dataDir, dFile), 'utf8')) || [];
+        } catch (e) {
+          console.warn(`Error reading _data/${dFile}:`, e.message);
+        }
+      }
     }
   }
 
@@ -58,9 +82,9 @@ export function buildSite() {
       }
     }
 
-    const computedUrl = pageUrl !== undefined ? pageUrl : (
+    const computedUrl = frontMatter.permalink || (pageUrl !== undefined ? pageUrl : (
       srcRelativePath === 'index.html' ? '/' : '/' + srcRelativePath.replace(/\.html$/, '').replace(/\/index$/, '')
-    );
+    ));
 
     const context = {
       site: config,
@@ -113,6 +137,30 @@ export function buildSite() {
         renderHtmlFile(path.join('pages', pFile), path.join('pages', pFile), cleanUrl);
         // Also output /pages/<name>/index.html for static server directory fallback
         renderHtmlFile(path.join('pages', pFile), path.join('pages', baseName, 'index.html'), cleanUrl);
+
+        // If it's pdf.html, also make it available at /pdf and /pdf/index.html
+        if (baseName === 'pdf') {
+          renderHtmlFile(path.join('pages', pFile), 'pdf.html', '/pdf');
+          renderHtmlFile(path.join('pages', pFile), path.join('pdf', 'index.html'), '/pdf');
+        }
+      }
+    }
+  }
+
+  // 4b. Render pages in /pdf directory (e.g. /pdf/compress-pdf)
+  const pdfDir = path.join(rootDir, 'pdf');
+  if (fs.existsSync(pdfDir)) {
+    const pdfFiles = fs.readdirSync(pdfDir);
+    for (const pFile of pdfFiles) {
+      if (pFile.endsWith('.html')) {
+        const baseName = pFile.replace(/\.html$/, '');
+        const cleanUrl = baseName === 'index' ? '/pdf' : `/pdf/${baseName}`;
+        // Output /pdf/<name>.html
+        renderHtmlFile(path.join('pdf', pFile), path.join('pdf', pFile), cleanUrl);
+        // Output /pdf/<name>/index.html
+        if (baseName !== 'index') {
+          renderHtmlFile(path.join('pdf', pFile), path.join('pdf', baseName, 'index.html'), cleanUrl);
+        }
       }
     }
   }
@@ -121,31 +169,39 @@ export function buildSite() {
   const assetsSrc = path.join(rootDir, 'assets');
   const assetsDest = path.join(siteDir, 'assets');
   if (fs.existsSync(assetsSrc)) {
-    copyRecursiveSync(assetsSrc, assetsDest);
+    fs.cpSync(assetsSrc, assetsDest, { recursive: true });
   }
 
-  // 6. Also sync to dist/ for static hosts
-  const distDir = path.join(rootDir, 'dist');
-  copyRecursiveSync(siteDir, distDir);
-
-  console.log('Jekyll site generated in _site/ and dist/');
-  return siteDir;
-}
-
-function copyRecursiveSync(src, dest) {
-  const exists = fs.existsSync(src);
-  const stats = exists && fs.statSync(src);
-  const isDirectory = exists && stats.isDirectory();
-  if (isDirectory) {
-    if (!fs.existsSync(dest)) {
-      fs.mkdirSync(dest, { recursive: true });
+  // 5b. Export /assets/data/tools.json for global client-side search
+  if (config.data && config.data.tools) {
+    const srcDataDir = path.join(rootDir, 'assets', 'data');
+    if (!fs.existsSync(srcDataDir)) {
+      fs.mkdirSync(srcDataDir, { recursive: true });
     }
-    fs.readdirSync(src).forEach((childItemName) => {
-      copyRecursiveSync(path.join(src, childItemName), path.join(dest, childItemName));
-    });
-  } else {
-    fs.copyFileSync(src, dest);
+    fs.writeFileSync(
+      path.join(srcDataDir, 'tools.json'),
+      JSON.stringify(config.data.tools, null, 2),
+      'utf8'
+    );
+
+    const clientDataDir = path.join(siteDir, 'assets', 'data');
+    if (!fs.existsSync(clientDataDir)) {
+      fs.mkdirSync(clientDataDir, { recursive: true });
+    }
+    fs.writeFileSync(
+      path.join(clientDataDir, 'tools.json'),
+      JSON.stringify(config.data.tools, null, 2),
+      'utf8'
+    );
   }
+
+  // 6. Also sync to dist/ for static hosts (skipped during fast on-demand dev reloads)
+  if (options.syncDist !== false) {
+    const distDir = path.join(rootDir, 'dist');
+    fs.cpSync(siteDir, distDir, { recursive: true });
+  }
+
+  return siteDir;
 }
 
 // Run if called directly

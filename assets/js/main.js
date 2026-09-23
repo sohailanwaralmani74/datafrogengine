@@ -664,6 +664,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const searchDropdown = document.getElementById('search-results-dropdown');
 
   const searchableItems = [
+    { title: 'Compress PDF Online', url: '/pages/compress-pdf', badge: 'PDF', desc: 'Reduce PDF file size up to 85% with interactive viewer, zero server uploads' },
     { title: 'PDF Tools Overview', url: '/pages/pdf', badge: 'PDF', desc: 'ISO 32000-1 document parser, merger, split, watermark, anonymize' },
     { title: 'PDF Split & Merge', url: '/pages/pdf', badge: 'PDF', desc: 'Split documents by page range or merge buffers' },
     { title: 'PDF Text Extraction', url: '/pages/pdf', badge: 'PDF', desc: 'Extract plain text streams and page catalogues' },

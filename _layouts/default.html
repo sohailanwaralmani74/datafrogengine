@@ -66,9 +66,13 @@
               <div class="mega-col">
                 <div class="mega-col-heading">Documents &amp; Spreadsheets</div>
                 <div class="mega-links-list">
-                  <a href="{{ '/pages/pdf' | relative_url }}" class="mega-item-link {% if page.format == 'pdf' %}active{% endif %}">
+                  <a href="{{ '/pages/compress-pdf' | relative_url }}" class="mega-item-link {% if page.tool == 'compress-pdf' %}active{% endif %}">
                     <span class="format-badge format-badge-pdf">PDF</span>
-                    <span class="mega-item-name">PDF Tools</span>
+                    <span class="mega-item-name">Compress PDF</span>
+                  </a>
+                  <a href="{{ '/pages/pdf' | relative_url }}" class="mega-item-link {% if page.format == 'pdf' and page.tool != 'compress-pdf' %}active{% endif %}">
+                    <span class="format-badge format-badge-pdf">PDF</span>
+                    <span class="mega-item-name">PDF Tools Suite</span>
                   </a>
                   <a href="{{ '/pages/excel' | relative_url }}" class="mega-item-link {% if page.format == 'excel' %}active{% endif %}">
                     <span class="format-badge format-badge-excel">XLS</span>

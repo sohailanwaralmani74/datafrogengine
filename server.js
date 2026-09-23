@@ -27,15 +27,18 @@ const MIME_TYPES = {
 };
 
 const server = http.createServer((req, res) => {
-  // Always rebuild on demand for dynamic preview updates
-  try {
-    buildSite();
-  } catch (err) {
-    console.error('Error rebuilding Jekyll site:', err);
-  }
-
   const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
   let pathname = url.pathname;
+
+  // Only rebuild HTML pages on-demand (and skip dist sync for sub-millisecond response)
+  const isDocRequest = req.method === 'GET' && (!path.extname(pathname) || pathname.endsWith('.html'));
+  if (isDocRequest) {
+    try {
+      buildSite({ syncDist: false });
+    } catch (err) {
+      console.error('Error rebuilding Jekyll site:', err);
+    }
+  }
 
   // Enforce Jekyll clean URLs: redirect if URL ends with trailing slash (except root)
   if (pathname.length > 1 && pathname.endsWith('/')) {
@@ -49,6 +52,13 @@ const server = http.createServer((req, res) => {
   if (pathname.endsWith('.html') && pathname !== '/index.html') {
     const cleanPath = pathname.replace(/\.html$/, '') + url.search;
     res.writeHead(301, { 'Location': cleanPath });
+    res.end();
+    return;
+  }
+
+  // Explicit redirects for tools moved to /pdf/
+  if (pathname === '/pages/compress-pdf' || pathname === '/compress-pdf') {
+    res.writeHead(301, { 'Location': '/pdf/compress-pdf' });
     res.end();
     return;
   }
@@ -69,10 +79,27 @@ const server = http.createServer((req, res) => {
 
   fs.stat(filePath, (err, stats) => {
     if (err || !stats.isFile()) {
-      // 1. Check if clean URL matches a .html file in _site (e.g. /pages/pdf -> /pages/pdf.html)
+      // 1. Check if clean URL matches a .html file in _site (e.g. /pdf/compress-pdf -> /pdf/compress-pdf.html)
       const htmlCandidate = filePath + '.html';
       if (fs.existsSync(htmlCandidate) && fs.statSync(htmlCandidate).isFile()) {
         serveFile(htmlCandidate, res);
+        return;
+      }
+
+      // 1b. Check if clean URL matches /pdf (e.g. /pdf -> /pages/pdf.html or /pdf.html)
+      if (pathname === '/pdf') {
+        const pdfCandidate = path.join(siteDir, 'pages', 'pdf.html');
+        if (fs.existsSync(pdfCandidate)) {
+          serveFile(pdfCandidate, res);
+          return;
+        }
+      }
+
+      // 1c. Check if clean URL exists in pages/ (e.g. /excel -> /pages/excel)
+      const pageCandidate = path.join(siteDir, 'pages', pathname.replace(/^\//, '') + '.html');
+      if (fs.existsSync(pageCandidate) && fs.statSync(pageCandidate).isFile()) {
+        res.writeHead(301, { 'Location': `/pages/${pathname.replace(/^\//, '')}` });
+        res.end();
         return;
       }
 

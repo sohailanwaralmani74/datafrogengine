@@ -1,0 +1,201 @@
+# Global Tools Registry for Datafrog
+# Used for global search (header, Ctrl+K), category pages, and navigational components
+
+- id: compress-pdf
+  title: "Compress PDF"
+  name: "Compress PDF Online"
+  url: "/pdf/compress-pdf"
+  category: "pdf"
+  category_name: "PDF Tools"
+  badge: "PDF"
+  badge_color: "emerald"
+  icon: "file-minus"
+  status: "live"
+  featured: true
+  description: "Reduce PDF file sizes up to 85% in your browser with lossless stream re-compression, dead object removal, and zero server uploads."
+  tags:
+    - compress pdf
+    - reduce pdf size
+    - shrink pdf
+    - pdf compressor
+    - pdf optimizer
+    - make pdf smaller
+    - pdf compression online
+    - compress pdf free
+    - client side pdf
+    - lossless pdf compression
+  highlights:
+    size_reduction: "Up to 85%"
+    privacy: "100% In-Browser"
+    compliance: "GDPR & HIPAA Safe"
+  features:
+    - "Zero Server Uploads (100% Local Browser Engine)"
+    - "Three Compression Presets (Recommended, Extreme, Low)"
+    - "Interactive Canvas & Native PDF Preview"
+    - "Real-Time Reduction Percentage & Instant Download"
+
+- id: pdf-merge
+  title: "Merge PDF"
+  name: "Merge PDF Documents"
+  url: "/pdf#merge"
+  category: "pdf"
+  category_name: "PDF Tools"
+  badge: "PDF"
+  badge_color: "blue"
+  icon: "layers"
+  status: "coming_soon"
+  featured: false
+  description: "Combine multiple PDF documents into a single consolidated PDF file with custom page re-ordering."
+  tags:
+    - merge pdf
+    - combine pdf
+    - join pdf files
+    - append pdf
+
+- id: pdf-split
+  title: "Split PDF"
+  name: "Split PDF Pages"
+  url: "/pdf#split"
+  category: "pdf"
+  category_name: "PDF Tools"
+  badge: "PDF"
+  badge_color: "indigo"
+  icon: "scissors"
+  status: "coming_soon"
+  featured: false
+  description: "Extract specific page ranges or burst a multi-page PDF document into standalone individual pages."
+  tags:
+    - split pdf
+    - extract pdf pages
+    - separate pdf
+    - cut pdf
+
+- id: pdf-anonymize
+  title: "Anonymize PDF"
+  name: "Anonymize & Redact PDF"
+  url: "/pdf#anonymize"
+  category: "pdf"
+  category_name: "PDF Tools"
+  badge: "PDF"
+  badge_color: "purple"
+  icon: "shield"
+  status: "coming_soon"
+  featured: false
+  description: "Scrub metadata, sanitize indirect object dictionaries, and redact sensitive coordinate areas across pages."
+  tags:
+    - anonymize pdf
+    - redact pdf
+    - remove pdf metadata
+    - sanitize pdf
+
+- id: excel-studio
+  title: "Excel Workbook Studio"
+  name: "Excel XLSX Engine & Studio"
+  url: "/pages/excel"
+  category: "excel"
+  category_name: "Excel Tools"
+  badge: "XLSX"
+  badge_color: "emerald"
+  icon: "table"
+  status: "live"
+  featured: true
+  description: "Create and read multi-sheet XLSX workbooks with cell styling, formula calculation, and ZIP binary streaming."
+  tags:
+    - excel
+    - xlsx
+    - spreadsheet
+    - formulas
+    - excel builder
+
+- id: csv-studio
+  title: "CSV Studio & Sniffer"
+  name: "CSV Dialect Detector & Engine"
+  url: "/pages/csv"
+  category: "csv"
+  category_name: "CSV Tools"
+  badge: "CSV"
+  badge_color: "amber"
+  icon: "file-text"
+  status: "live"
+  featured: true
+  description: "Automatic dialect detection for commas, tabs, semicolons, relational joins, grouping, and RFC 4180 parsing."
+  tags:
+    - csv
+    - delimiter detection
+    - join csv
+    - parse csv
+
+- id: json-studio
+  title: "JSON Data Studio"
+  name: "JSON Validator & Repair Studio"
+  url: "/pages/json"
+  category: "json"
+  category_name: "JSON Tools"
+  badge: "JSON"
+  badge_color: "amber"
+  icon: "braces"
+  status: "live"
+  featured: true
+  description: "Format, validate, repair malformed syntax, compute JSON Patches (RFC 6902), and infer schemas."
+  tags:
+    - json
+    - json validator
+    - json repair
+    - json patch
+
+- id: xml-studio
+  title: "XML Inspector & XPath"
+  name: "XML SAX Parser & XPath Studio"
+  url: "/pages/xml"
+  category: "xml"
+  category_name: "XML Tools"
+  badge: "XML"
+  badge_color: "cyan"
+  icon: "code"
+  status: "live"
+  featured: false
+  description: "Streaming SAX parser, DOM tree visualization, and XPath query engine for structured W3C XML documents."
+  tags:
+    - xml
+    - xpath
+    - sax parser
+    - xml inspector
+
+- id: geojson-studio
+  title: "GeoJSON Spatial Engine"
+  name: "GeoJSON Map & Topology Studio"
+  url: "/pages/geojson"
+  category: "geojson"
+  category_name: "GeoJSON Tools"
+  badge: "GEOJSON"
+  badge_color: "rose"
+  icon: "map-pin"
+  status: "live"
+  featured: false
+  description: "Spatial topology operations, polygon simplification, bounding box calculation, and GeoJSON validation."
+  tags:
+    - geojson
+    - spatial
+    - polygon
+    - gis
+    - map data
+
+- id: financial-studio
+  title: "Financial Ledger Engine"
+  name: "QIF, OFX, QBO & QFX Parser"
+  url: "/pages/financial"
+  category: "financial"
+  category_name: "Financial Tools"
+  badge: "FINANCE"
+  badge_color: "violet"
+  icon: "dollar-sign"
+  status: "live"
+  featured: false
+  description: "Parse bank statements, reconcile transactions, and normalize ledgers across OFX, QIF, QBO, and QFX formats."
+  tags:
+    - qif
+    - ofx
+    - qbo
+    - qfx
+    - financial statement
+    - bank ledger

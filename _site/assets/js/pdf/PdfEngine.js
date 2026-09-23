@@ -256,4 +256,8 @@ export class PdfEngine {
   static compress(docOrBytes, options) {
     return PdfCompressor.compress(docOrBytes, options);
   }
+
+  static compressWithReport(docOrBytes, options) {
+    return PdfCompressor.compressWithReport(docOrBytes, options);
+  }
 }
