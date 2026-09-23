@@ -1,0 +1,77 @@
+---
+layout: default
+title: "404 - Page Not Found"
+permalink: /404.html
+description: "The page or document processing tool you are looking for could not be found."
+---
+
+<div class="page-container page-404-container" id="page-404">
+  <div class="not-found-card">
+    <div class="not-found-badge">
+      <span class="pulse-dot"></span> HTTP 404 &bull; MISSING NODE
+    </div>
+
+    <div class="not-found-code-art">
+      <span class="code-art-num">404</span>
+      <div class="code-art-icon">
+        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+      </div>
+    </div>
+
+    <h1 class="not-found-title">Resource or Tool Not Found</h1>
+    <p class="not-found-desc">
+      The URI coordinate you navigated to doesn't correspond to any active page, format parser, or API documentation endpoint in the Datafrog Suite.
+    </p>
+
+    <div class="not-found-actions">
+      <a href="{{ '/' | relative_url }}" class="btn btn-primary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+          <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+        Return to Home
+      </a>
+      <button type="button" class="btn btn-secondary" onclick="document.getElementById('global-tools-search')?.focus()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        Search Tools (⌘K)
+      </button>
+    </div>
+
+    <div class="not-found-recommendations">
+      <div class="rec-heading">Explore Popular Tools &amp; Formats</div>
+      <div class="rec-grid">
+        <a href="{{ '/pages/pdf' | relative_url }}" class="rec-link">
+          <span class="format-badge format-badge-pdf">PDF</span>
+          <span class="rec-link-name">PDF Tools</span>
+        </a>
+        <a href="{{ '/pages/excel' | relative_url }}" class="rec-link">
+          <span class="format-badge format-badge-excel">XLS</span>
+          <span class="rec-link-name">Excel Tools</span>
+        </a>
+        <a href="{{ '/pages/json' | relative_url }}" class="rec-link">
+          <span class="format-badge format-badge-json">JSON</span>
+          <span class="rec-link-name">JSON Tools</span>
+        </a>
+        <a href="{{ '/pages/csv' | relative_url }}" class="rec-link">
+          <span class="format-badge format-badge-csv">CSV</span>
+          <span class="rec-link-name">CSV Tools</span>
+        </a>
+        <a href="{{ '/pages/xml' | relative_url }}" class="rec-link">
+          <span class="format-badge format-badge-xml">XML</span>
+          <span class="rec-link-name">XML Tools</span>
+        </a>
+        <a href="{{ '/pages/geojson' | relative_url }}" class="rec-link">
+          <span class="format-badge format-badge-geojson">GEO</span>
+          <span class="rec-link-name">GeoJSON Tools</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

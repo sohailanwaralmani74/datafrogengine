@@ -645,7 +645,7 @@ document.addEventListener('DOMContentLoaded', () => {
         notification.style.fontSize = '0.875rem';
         notification.style.boxShadow = '0 10px 25px rgba(0,0,0,0.5)';
         notification.style.zIndex = '9999';
-        notification.innerHTML = '<strong>Datafrog Engine Suite</strong> added to your preferred resources from Google.';
+        notification.innerHTML = '<strong>Datafrog Tools Suite</strong> added to your preferred resources from Google.';
         document.body.appendChild(notification);
         setTimeout(() => {
           notification.remove();
@@ -664,29 +664,29 @@ document.addEventListener('DOMContentLoaded', () => {
   const searchDropdown = document.getElementById('search-results-dropdown');
 
   const searchableItems = [
-    { title: 'PDF Engine Overview', url: '/pages/pdf.html', badge: 'PDF', desc: 'ISO 32000-1 document parser, merger, split, watermark, anonymize' },
-    { title: 'PDF Split & Merge', url: '/pages/pdf.html', badge: 'PDF', desc: 'Split documents by page range or merge buffers' },
-    { title: 'PDF Text Extraction', url: '/pages/pdf.html', badge: 'PDF', desc: 'Extract plain text streams and page catalogues' },
-    { title: 'Excel Engine Overview', url: '/pages/excel.html', badge: 'XLSX', desc: 'ECMA-376 spreadsheet builder, formulas, cell styles' },
-    { title: 'Excel Workbook Builder', url: '/pages/excel.html', badge: 'XLSX', desc: 'Fluent API to generate multi-sheet workbooks' },
-    { title: 'Excel to CSV / JSON', url: '/pages/excel.html', badge: 'XLSX', desc: 'Bi-directional conversions across tabular formats' },
-    { title: 'CSV Engine Overview', url: '/pages/csv.html', badge: 'CSV', desc: 'RFC 4180 delimiter detection, relational joins, grouping' },
-    { title: 'CSV Auto Delimiter Sniffing', url: '/pages/csv.html', badge: 'CSV', desc: 'Detect commas, tabs, semicolons, and pipes' },
-    { title: 'CSV Relational Joins', url: '/pages/csv.html', badge: 'CSV', desc: 'Inner, left, and full joins between CSV datasets' },
-    { title: 'JSON Engine Overview', url: '/pages/json.html', badge: 'JSON', desc: 'RFC 8259, RFC 6902 Patch, JSONPath, repair, anomaly detection' },
+    { title: 'PDF Tools Overview', url: '/pages/pdf', badge: 'PDF', desc: 'ISO 32000-1 document parser, merger, split, watermark, anonymize' },
+    { title: 'PDF Split & Merge', url: '/pages/pdf', badge: 'PDF', desc: 'Split documents by page range or merge buffers' },
+    { title: 'PDF Text Extraction', url: '/pages/pdf', badge: 'PDF', desc: 'Extract plain text streams and page catalogues' },
+    { title: 'Excel Tools Overview', url: '/pages/excel', badge: 'XLSX', desc: 'ECMA-376 spreadsheet builder, formulas, cell styles' },
+    { title: 'Excel Workbook Builder', url: '/pages/excel', badge: 'XLSX', desc: 'Fluent API to generate multi-sheet workbooks' },
+    { title: 'Excel to CSV / JSON', url: '/pages/excel', badge: 'XLSX', desc: 'Bi-directional conversions across tabular formats' },
+    { title: 'CSV Tools Overview', url: '/pages/csv', badge: 'CSV', desc: 'RFC 4180 delimiter detection, relational joins, grouping' },
+    { title: 'CSV Auto Delimiter Sniffing', url: '/pages/csv', badge: 'CSV', desc: 'Detect commas, tabs, semicolons, and pipes' },
+    { title: 'CSV Relational Joins', url: '/pages/csv', badge: 'CSV', desc: 'Inner, left, and full joins between CSV datasets' },
+    { title: 'JSON Tools Overview', url: '/pages/json', badge: 'JSON', desc: 'RFC 8259, RFC 6902 Patch, JSONPath, repair, anomaly detection' },
     { title: 'JSON Data Processing Tools', url: '/#json-studio', badge: 'JSON', desc: 'Live browser JSON validator, formatter, schema inferrer' },
-    { title: 'JSON Syntax Repair', url: '/pages/json.html', badge: 'JSON', desc: 'Heals unquoted keys, trailing commas, single quotes' },
-    { title: 'XML Engine Overview', url: '/pages/xml.html', badge: 'XML', desc: 'W3C XML 1.0 SAX streaming, DOM tree, XPath querying' },
+    { title: 'JSON Syntax Repair', url: '/pages/json', badge: 'JSON', desc: 'Heals unquoted keys, trailing commas, single quotes' },
+    { title: 'XML Tools Overview', url: '/pages/xml', badge: 'XML', desc: 'W3C XML 1.0 SAX streaming, DOM tree, XPath querying' },
     { title: 'XML Live Inspector', url: '/#xml-playground', badge: 'XML', desc: 'Interactive visual DOM tree viewer & query inspector' },
-    { title: 'XML to JSON Converter', url: '/pages/xml.html', badge: 'XML', desc: 'Convert XML structures cleanly into JSON objects' },
-    { title: 'YAML (YML) Engine Overview', url: '/pages/yml.html', badge: 'YAML', desc: 'YAML 1.2 mappings, block scalars, anchors & aliases (&/*)' },
-    { title: 'YAML Deep Diffing', url: '/pages/yml.html', badge: 'YAML', desc: 'Structural diffs between YAML configurations' },
-    { title: 'GeoJSON Engine Overview', url: '/pages/geojson.html', badge: 'GEO', desc: 'RFC 7946 spatial topology, WKT, KML, RDP simplification' },
-    { title: 'GeoJSON Simplification (RDP)', url: '/pages/geojson.html', badge: 'GEO', desc: 'Ramer-Douglas-Peucker polygon coordinate reducer' },
-    { title: 'GeoJSON to WKT / KML', url: '/pages/geojson.html', badge: 'GEO', desc: 'Export spatial features to Well-Known Text and KML' },
-    { title: 'Financial Engine Overview', url: '/pages/financial.html', badge: 'FIN', desc: 'QIF, QFX, QBO, OFX bank statements & reconciliation' },
-    { title: 'QBO / QFX Bank Reconciliation', url: '/pages/financial.html', badge: 'FIN', desc: 'Match bank transaction records against accounting ledgers' },
-    { title: 'Payee Anonymizer & Cleaner', url: '/pages/financial.html', badge: 'FIN', desc: 'Clean POS terminal codes and mask sensitive numbers' }
+    { title: 'XML to JSON Converter', url: '/pages/xml', badge: 'XML', desc: 'Convert XML structures cleanly into JSON objects' },
+    { title: 'YAML (YML) Tools Overview', url: '/pages/yml', badge: 'YAML', desc: 'YAML 1.2 mappings, block scalars, anchors & aliases (&/*)' },
+    { title: 'YAML Deep Diffing', url: '/pages/yml', badge: 'YAML', desc: 'Structural diffs between YAML configurations' },
+    { title: 'GeoJSON Tools Overview', url: '/pages/geojson', badge: 'GEO', desc: 'RFC 7946 spatial topology, WKT, KML, RDP simplification' },
+    { title: 'GeoJSON Simplification (RDP)', url: '/pages/geojson', badge: 'GEO', desc: 'Ramer-Douglas-Peucker polygon coordinate reducer' },
+    { title: 'GeoJSON to WKT / KML', url: '/pages/geojson', badge: 'GEO', desc: 'Export spatial features to Well-Known Text and KML' },
+    { title: 'Financial Tools Overview', url: '/pages/financial', badge: 'FIN', desc: 'QIF, QFX, QBO, OFX bank statements & reconciliation' },
+    { title: 'QBO / QFX Bank Reconciliation', url: '/pages/financial', badge: 'FIN', desc: 'Match bank transaction records against accounting ledgers' },
+    { title: 'Payee Anonymizer & Cleaner', url: '/pages/financial', badge: 'FIN', desc: 'Clean POS terminal codes and mask sensitive numbers' }
   ];
 
   if (searchInput && searchDropdown) {
@@ -747,4 +747,120 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
+
+  // Header Nav: Mega Menu Dropdown interactivity
+  const megaTrigger = document.getElementById('mega-menu-trigger');
+  const megaMenu = document.getElementById('nav-mega-menu');
+  const megaWrapper = document.getElementById('mega-menu-wrapper');
+
+  if (megaTrigger && megaMenu) {
+    const setMegaMenuState = (isOpen) => {
+      if (isOpen) {
+        megaMenu.classList.add('is-open');
+        megaTrigger.setAttribute('aria-expanded', 'true');
+        megaTrigger.classList.add('active');
+      } else {
+        megaMenu.classList.remove('is-open');
+        megaTrigger.setAttribute('aria-expanded', 'false');
+        megaTrigger.classList.remove('active');
+      }
+    };
+
+    megaTrigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = megaMenu.classList.contains('is-open');
+      setMegaMenuState(!isOpen);
+    });
+
+    // Close on click outside
+    document.addEventListener('click', (e) => {
+      if (megaWrapper && !megaWrapper.contains(e.target)) {
+        setMegaMenuState(false);
+      }
+    });
+
+    // Keyboard accessibility: Escape key closes menu and focuses trigger
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && megaMenu.classList.contains('is-open')) {
+        setMegaMenuState(false);
+        megaTrigger.focus();
+      }
+    });
+
+    // Hover intent for desktop screens
+    let hoverTimeout = null;
+    if (megaWrapper) {
+      megaWrapper.addEventListener('mouseenter', () => {
+        if (window.innerWidth >= 900) {
+          clearTimeout(hoverTimeout);
+          setMegaMenuState(true);
+        }
+      });
+
+      megaWrapper.addEventListener('mouseleave', () => {
+        if (window.innerWidth >= 900) {
+          hoverTimeout = setTimeout(() => {
+            setMegaMenuState(false);
+          }, 220);
+        }
+      });
+    }
+  }
+
+  // Desktop Sticky Ads: ensure lower ad is never clipped or hidden under footer
+  function initStickyAds() {
+    const sidebarTrack = document.getElementById('ads-sticky-track');
+    const sidebarCol = document.getElementById('ads-sidebar-column');
+    const footer = document.getElementById('site-footer');
+    if (!sidebarTrack || !sidebarCol || !footer) return;
+
+    function handleSticky() {
+      if (window.innerWidth <= 1024) {
+        sidebarTrack.style.position = '';
+        sidebarTrack.style.top = '';
+        return;
+      }
+
+      const viewportHeight = window.innerHeight;
+      const headerOffset = 75;
+      const bottomPadding = 24;
+      const trackHeight = sidebarTrack.offsetHeight;
+      const availableHeight = viewportHeight - headerOffset;
+
+      if (trackHeight + bottomPadding <= availableHeight) {
+        sidebarTrack.style.position = 'sticky';
+        sidebarTrack.style.top = headerOffset + 'px';
+      } else {
+        // When track height exceeds available space, stick to the bottom of the viewport
+        // so the lower ad scrolls into full view and stays above the footer
+        const targetTop = viewportHeight - trackHeight - bottomPadding;
+        sidebarTrack.style.position = 'sticky';
+        sidebarTrack.style.top = targetTop + 'px';
+      }
+    }
+
+    window.addEventListener('scroll', handleSticky, { passive: true });
+    window.addEventListener('resize', handleSticky, { passive: true });
+    handleSticky();
+  }
+
+  // Mobile Sticky Bottom Ad Bar: dismissible & non-intrusive
+  function initMobileAdBar() {
+    const mobileAdBar = document.getElementById('mobile-sticky-ad-bar');
+    const closeBtn = document.getElementById('btn-close-mobile-ad');
+    if (!mobileAdBar || !closeBtn) return;
+
+    closeBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      mobileAdBar.classList.add('collapsed');
+      const container = document.getElementById('app-layout-container');
+      if (container) {
+        container.style.paddingBottom = '0px';
+      }
+    });
+  }
+
+  initStickyAds();
+  initMobileAdBar();
 });
+

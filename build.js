@@ -40,7 +40,7 @@ export function buildSite() {
   });
 
   // Helper to render any HTML file with front-matter and layout
-  function renderHtmlFile(srcRelativePath, destRelativePath) {
+  function renderHtmlFile(srcRelativePath, destRelativePath, pageUrl) {
     const fullSrcPath = path.join(rootDir, srcRelativePath);
     if (!fs.existsSync(fullSrcPath)) return;
 
@@ -58,9 +58,17 @@ export function buildSite() {
       }
     }
 
+    const computedUrl = pageUrl !== undefined ? pageUrl : (
+      srcRelativePath === 'index.html' ? '/' : '/' + srcRelativePath.replace(/\.html$/, '').replace(/\/index$/, '')
+    );
+
     const context = {
       site: config,
-      page: { ...frontMatter }
+      page: {
+        url: computedUrl,
+        permalink: computedUrl,
+        ...frontMatter
+      }
     };
 
     const renderedInner = engine.parseAndRenderSync(contentBody, context);
@@ -86,26 +94,34 @@ export function buildSite() {
   }
 
   // 3. Render index.html
-  renderHtmlFile('index.html', 'index.html');
+  renderHtmlFile('index.html', 'index.html', '/');
 
-  // 4. Render pages in /pages directory
+  // 3b. Render 404.html
+  if (fs.existsSync(path.join(rootDir, '404.html'))) {
+    renderHtmlFile('404.html', '404.html', '/404');
+  }
+
+  // 4. Render pages in /pages directory with clean URLs (no .html, no trailing slash)
   const pagesDir = path.join(rootDir, 'pages');
   if (fs.existsSync(pagesDir)) {
     const pageFiles = fs.readdirSync(pagesDir);
     for (const pFile of pageFiles) {
       if (pFile.endsWith('.html')) {
-        renderHtmlFile(path.join('pages', pFile), path.join('pages', pFile));
+        const baseName = pFile.replace(/\.html$/, '');
+        const cleanUrl = `/pages/${baseName}`;
+        // Output /pages/<name>.html
+        renderHtmlFile(path.join('pages', pFile), path.join('pages', pFile), cleanUrl);
+        // Also output /pages/<name>/index.html for static server directory fallback
+        renderHtmlFile(path.join('pages', pFile), path.join('pages', baseName, 'index.html'), cleanUrl);
       }
     }
   }
 
-  // 5. Copy assets & asset directories
-  for (const assetFolder of ['assets', 'asset']) {
-    const assetsSrc = path.join(rootDir, assetFolder);
-    const assetsDest = path.join(siteDir, assetFolder);
-    if (fs.existsSync(assetsSrc)) {
-      copyRecursiveSync(assetsSrc, assetsDest);
-    }
+  // 5. Copy assets directory
+  const assetsSrc = path.join(rootDir, 'assets');
+  const assetsDest = path.join(siteDir, 'assets');
+  if (fs.existsSync(assetsSrc)) {
+    copyRecursiveSync(assetsSrc, assetsDest);
   }
 
   // 6. Also sync to dist/ for static hosts

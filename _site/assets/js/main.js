@@ -747,4 +747,64 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
+
+  // Header Nav: Mega Menu Dropdown interactivity
+  const megaTrigger = document.getElementById('mega-menu-trigger');
+  const megaMenu = document.getElementById('nav-mega-menu');
+  const megaWrapper = document.getElementById('mega-menu-wrapper');
+
+  if (megaTrigger && megaMenu) {
+    const setMegaMenuState = (isOpen) => {
+      if (isOpen) {
+        megaMenu.classList.add('is-open');
+        megaTrigger.setAttribute('aria-expanded', 'true');
+        megaTrigger.classList.add('active');
+      } else {
+        megaMenu.classList.remove('is-open');
+        megaTrigger.setAttribute('aria-expanded', 'false');
+        megaTrigger.classList.remove('active');
+      }
+    };
+
+    megaTrigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = megaMenu.classList.contains('is-open');
+      setMegaMenuState(!isOpen);
+    });
+
+    // Close on click outside
+    document.addEventListener('click', (e) => {
+      if (megaWrapper && !megaWrapper.contains(e.target)) {
+        setMegaMenuState(false);
+      }
+    });
+
+    // Keyboard accessibility: Escape key closes menu and focuses trigger
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && megaMenu.classList.contains('is-open')) {
+        setMegaMenuState(false);
+        megaTrigger.focus();
+      }
+    });
+
+    // Hover intent for desktop screens
+    let hoverTimeout = null;
+    if (megaWrapper) {
+      megaWrapper.addEventListener('mouseenter', () => {
+        if (window.innerWidth >= 900) {
+          clearTimeout(hoverTimeout);
+          setMegaMenuState(true);
+        }
+      });
+
+      megaWrapper.addEventListener('mouseleave', () => {
+        if (window.innerWidth >= 900) {
+          hoverTimeout = setTimeout(() => {
+            setMegaMenuState(false);
+          }, 220);
+        }
+      });
+    }
+  }
 });
+

@@ -8,6 +8,7 @@ url: ""
 github_username: pdf-engine
 
 # Build settings
+permalink: /:categories/:basename
 theme: minima
 plugins:
   - jekyll-feed

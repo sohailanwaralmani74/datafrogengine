@@ -37,6 +37,22 @@ const server = http.createServer((req, res) => {
   const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
   let pathname = url.pathname;
 
+  // Enforce Jekyll clean URLs: redirect if URL ends with trailing slash (except root)
+  if (pathname.length > 1 && pathname.endsWith('/')) {
+    const cleanPath = pathname.slice(0, -1) + url.search;
+    res.writeHead(301, { 'Location': cleanPath });
+    res.end();
+    return;
+  }
+
+  // Enforce Jekyll clean URLs: redirect if URL ends with .html (except /index.html if direct access)
+  if (pathname.endsWith('.html') && pathname !== '/index.html') {
+    const cleanPath = pathname.replace(/\.html$/, '') + url.search;
+    res.writeHead(301, { 'Location': cleanPath });
+    res.end();
+    return;
+  }
+
   if (pathname === '/' || pathname === '') {
     pathname = '/index.html';
   }
@@ -53,13 +69,19 @@ const server = http.createServer((req, res) => {
 
   fs.stat(filePath, (err, stats) => {
     if (err || !stats.isFile()) {
-      // If folder, try index.html inside
+      // 1. Check if clean URL matches a .html file in _site (e.g. /pages/pdf -> /pages/pdf.html)
+      const htmlCandidate = filePath + '.html';
+      if (fs.existsSync(htmlCandidate) && fs.statSync(htmlCandidate).isFile()) {
+        serveFile(htmlCandidate, res);
+        return;
+      }
+
+      // 2. If folder, try index.html inside
       const fallbackIndex = path.join(filePath, 'index.html');
       if (fs.existsSync(fallbackIndex)) {
         serveFile(fallbackIndex, res);
       } else {
-        res.writeHead(404, { 'Content-Type': 'text/plain' });
-        res.end('Not Found');
+        serve404(siteDir, res);
       }
       return;
     }
@@ -68,7 +90,17 @@ const server = http.createServer((req, res) => {
   });
 });
 
-function serveFile(file, res) {
+function serve404(siteDir, res) {
+  const notFoundPage = path.join(siteDir, '404.html');
+  if (fs.existsSync(notFoundPage)) {
+    serveFile(notFoundPage, res, 404);
+  } else {
+    res.writeHead(404, { 'Content-Type': 'text/plain' });
+    res.end('404 Not Found');
+  }
+}
+
+function serveFile(file, res, statusCode = 200) {
   const ext = path.extname(file).toLowerCase();
   const contentType = MIME_TYPES[ext] || 'application/octet-stream';
 
@@ -79,7 +111,7 @@ function serveFile(file, res) {
       return;
     }
 
-    res.writeHead(200, {
+    res.writeHead(statusCode, {
       'Content-Type': contentType,
       'Cache-Control': 'no-cache, no-store, must-revalidate'
     });

@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Financial Engine | Datafrog Studio</title>
+    <meta name="description" content="High-Performance QIF, QFX, QBO & OFX Financial Statements & Reconciliation Engine">
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  </head>
+  <body class="site-body">
+    <!-- Top Global Header with Mega Menu Navigation -->
+    <header class="site-header" id="site-header">
+      <div class="header-container" id="header-container">
+        
+        <!-- Left: Logo & Main Navigation -->
+        <div class="header-left-group" id="header-left-group">
+          <a class="site-logo" id="site-logo-link" href="/">
+            <div class="logo-mark" id="logo-mark">
+              <!-- Geometric Frog / Data Node Icon -->
+              <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="32" height="32" rx="8" fill="#10b981" />
+                <circle cx="10" cy="11" r="4.5" fill="#064e3b" />
+                <circle cx="10" cy="11" r="2.2" fill="#ffffff" />
+                <circle cx="22" cy="11" r="4.5" fill="#064e3b" />
+                <circle cx="22" cy="11" r="2.2" fill="#ffffff" />
+                <path d="M9 20C11.5 23.5 20.5 23.5 23 20" stroke="#064e3b" stroke-width="2.5" stroke-linecap="round" />
+                <circle cx="16" cy="15" r="1.5" fill="#064e3b" />
+              </svg>
+            </div>
+            <div class="logo-text-group" id="logo-text-group">
+              <span class="logo-brand-name" id="logo-brand-name">Datafrog</span>
+              <span class="logo-subtext" id="logo-subtext">Engine Suite</span>
+            </div>
+          </a>
+
+          <!-- Primary Navigation with Mega Menu -->
+          <nav class="primary-nav" id="primary-nav" aria-label="Main Navigation">
+            <div class="mega-menu-wrapper" id="mega-menu-wrapper">
+              <button 
+                type="button" 
+                class="nav-link nav-mega-btn" 
+                id="mega-menu-trigger" 
+                aria-expanded="false" 
+                aria-haspopup="true"
+                aria-controls="nav-mega-menu"
+              >
+                <svg class="nav-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="3" width="7" height="7"></rect>
+                  <rect x="14" y="3" width="7" height="7"></rect>
+                  <rect x="14" y="14" width="7" height="7"></rect>
+                  <rect x="3" y="14" width="7" height="7"></rect>
+                </svg>
+                <span>Engines &amp; Formats</span>
+                <span class="mega-count-badge">8</span>
+                <svg class="chevron-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </button>
+
+              <!-- Mega Menu Dropdown Panel -->
+              <div class="nav-mega-menu" id="nav-mega-menu" role="region" aria-label="Engines and Formats Menu">
+                <div class="mega-menu-inner">
+                  
+                  <!-- Mega Menu Top Header -->
+                  <div class="mega-menu-header">
+                    <div class="mega-header-title-wrap">
+                      <span class="mega-header-title">Datafrog Engine Catalog</span>
+                      <span class="mega-header-subtitle">Spec-compliant pure JavaScript engines for browser, Node.js &amp; edge runtimes</span>
+                    </div>
+                    <div class="mega-header-stats">
+                      <span class="mega-stat-tag">Zero Native Dependencies</span>
+                      <span class="mega-stat-tag">100% Pure JS</span>
+                    </div>
+                  </div>
+
+                  <!-- 3 Column Formats Grid -->
+                  <div class="mega-menu-grid">
+                    
+                    <!-- Column 1: Document & Spreadsheets -->
+                    <div class="mega-col">
+                      <div class="mega-col-heading">
+                        <span class="mega-col-label">DOCUMENTS &amp; SPREADSHEETS</span>
+                      </div>
+                      <div class="mega-links-list">
+                        <a href="/pages/pdf.html" class="mega-card-item ">
+                          <div class="mega-card-icon-wrap">
+                            <span class="format-badge format-badge-pdf">PDF</span>
+                          </div>
+                          <div class="mega-card-body">
+                            <div class="mega-card-title-row">
+                              <span class="mega-card-title">PDF Engine</span>
+                              <span class="mega-card-spec">ISO 32000-1</span>
+                            </div>
+                            <p class="mega-card-desc">Parse, edit, merge, split, watermark, render to Canvas/SVG, forms &amp; digital signatures.</p>
+                          </div>
+                        </a>
+
+                        <a href="/pages/excel.html" class="mega-card-item ">
+                          <div class="mega-card-icon-wrap">
+                            <span class="format-badge format-badge-excel">XLS</span>
+                          </div>
+                          <div class="mega-card-body">
+                            <div class="mega-card-title-row">
+                              <span class="mega-card-title">Excel Engine</span>
+                              <span class="mega-card-spec">ECMA-376</span>
+                            </div>
+                            <p class="mega-card-desc">Read &amp; build .xlsx workbooks, evaluate formulas, style cells, and compress ZIP packages.</p>
+                          </div>
+                        </a>
+                      </div>
+                    </div>
+
+                    <!-- Column 2: Structured Data Formats -->
+                    <div class="mega-col">
+                      <div class="mega-col-heading">
+                        <span class="mega-col-label">STRUCTURED DATA</span>
+                      </div>
+                      <div class="mega-links-list">
+                        <a href="/pages/csv.html" class="mega-card-item ">
+                          <div class="mega-card-icon-wrap">
+                            <span class="format-badge format-badge-csv">CSV</span>
+                          </div>
+                          <div class="mega-card-body">
+                            <div class="mega-card-title-row">
+                              <span class="mega-card-title">CSV / TSV Engine</span>
+                              <span class="mega-card-spec">RFC 4180</span>
+                            </div>
+                            <p class="mega-card-desc">Streaming parser, dialect/delimiter detection, column mapping, and format conversion.</p>
+                          </div>
+                        </a>
+
+                        <a href="/pages/json.html" class="mega-card-item ">
+                          <div class="mega-card-icon-wrap">
+                            <span class="format-badge format-badge-json">JSON</span>
+                          </div>
+                          <div class="mega-card-body">
+                            <div class="mega-card-title-row">
+                              <span class="mega-card-title">JSON Suite</span>
+                              <span class="mega-card-spec">RFC 8259</span>
+                            </div>
+                            <p class="mega-card-desc">JSON Pointer (RFC 6901), Patch (RFC 6902), schema inference, anomaly analyzer &amp; repair.</p>
+                          </div>
+                        </a>
+
+                        <a href="/pages/xml.html" class="mega-card-item ">
+                          <div class="mega-card-icon-wrap">
+                            <span class="format-badge format-badge-xml">XML</span>
+                          </div>
+                          <div class="mega-card-body">
+                            <div class="mega-card-title-row">
+                              <span class="mega-card-title">XML 1.0 Engine</span>
+                              <span class="mega-card-spec">W3C XML 1.0</span>
+                            </div>
+                            <p class="mega-card-desc">SAX streaming &amp; DOM tree parser, XPath-like query engine, serializer &amp; node editor.</p>
+                          </div>
+                        </a>
+
+                        <a href="/pages/yml.html" class="mega-card-item ">
+                          <div class="mega-card-icon-wrap">
+                            <span class="format-badge format-badge-yml">YML</span>
+                          </div>
+                          <div class="mega-card-body">
+                            <div class="mega-card-title-row">
+                              <span class="mega-card-title">YAML Engine</span>
+                              <span class="mega-card-spec">YAML 1.2</span>
+                            </div>
+                            <p class="mega-card-desc">Block/flow scalars, anchors, document streams, compressor &amp; JSON bidirectional conversion.</p>
+                          </div>
+                        </a>
+                      </div>
+                    </div>
+
+                    <!-- Column 3: Spatial & Financial -->
+                    <div class="mega-col">
+                      <div class="mega-col-heading">
+                        <span class="mega-col-label">SPATIAL &amp; FINANCIAL</span>
+                      </div>
+                      <div class="mega-links-list">
+                        <a href="/pages/geojson.html" class="mega-card-item ">
+                          <div class="mega-card-icon-wrap">
+                            <span class="format-badge format-badge-geojson">GEO</span>
+                          </div>
+                          <div class="mega-card-body">
+                            <div class="mega-card-title-row">
+                              <span class="mega-card-title">GeoJSON Engine</span>
+                              <span class="mega-card-spec">RFC 7946</span>
+                            </div>
+                            <p class="mega-card-desc">Geometry collections, bbox bounds, Douglas-Peucker simplification &amp; spatial filters.</p>
+                          </div>
+                        </a>
+
+                        <a href="/pages/financial.html" class="mega-card-item active">
+                          <div class="mega-card-icon-wrap">
+                            <span class="format-badge format-badge-fin">QBO</span>
+                          </div>
+                          <div class="mega-card-body">
+                            <div class="mega-card-title-row">
+                              <span class="mega-card-title">Financial Suite</span>
+                              <span class="mega-card-spec">QIF / QFX / OFX</span>
+                            </div>
+                            <p class="mega-card-desc">Banking statement reconciliation, ledger balances, transaction categorization &amp; QBO export.</p>
+                          </div>
+                        </a>
+                      </div>
+                    </div>
+
+                  </div>
+
+                  <!-- Mega Menu Footer Strip with Quick Links to Interactive Studios -->
+                  <div class="mega-menu-footer">
+                    <div class="mega-footer-tools">
+                      <span class="mega-footer-label">Interactive Studios:</span>
+                      <a href="/#json-studio" class="mega-footer-link">
+                        <span class="dot-indicator green"></span>
+                        <span>JSON Data Studio</span>
+                      </a>
+                      <a href="/#xml-playground" class="mega-footer-link">
+                        <span class="dot-indicator purple"></span>
+                        <span>XML Live Inspector</span>
+                      </a>
+                      <a href="/#quickstart" class="mega-footer-link">
+                        <span class="dot-indicator blue"></span>
+                        <span>Quickstart Code</span>
+                      </a>
+                      <a href="/#features" class="mega-footer-link">
+                        <span class="dot-indicator amber"></span>
+                        <span>Feature Matrix</span>
+                      </a>
+                    </div>
+                    <div class="mega-footer-action">
+                      <a href="/" class="mega-overview-btn">
+                        <span>All Engines Overview</span>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                          <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                      </a>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            <!-- Header Quick Nav Links -->
+            <a href="/#json-studio" class="nav-link">JSON Studio</a>
+            <a href="/#xml-playground" class="nav-link">XML Inspector</a>
+            <a href="/#quickstart" class="nav-link">Quickstart</a>
+          </nav>
+        </div>
+
+        <!-- Right: Global Search & Preferred Resource -->
+        <div class="header-right-group" id="header-right-group">
+          <div class="global-search-wrapper" id="global-search-wrapper">
+            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input 
+              type="text" 
+              class="global-search-input" 
+              id="global-tools-search" 
+              placeholder="Search tools, formats, APIs (e.g. PDF, Excel, GeoJSON)..." 
+              aria-label="Global tools search box"
+              autocomplete="off"
+            />
+            <span class="search-shortcut-badge" id="search-shortcut-badge">⌘K</span>
+            <div class="search-results-dropdown" id="search-results-dropdown" style="display: none;">
+              <!-- Dynamically populated search items -->
+            </div>
+          </div>
+
+          <button type="button" class="btn-prefer-resource" id="btn-add-prefer-resource" title="Add Datafrog Engine Suite to preferred resources from Google">
+            <svg class="google-icon" width="16" height="16" viewBox="0 0 24 24">
+              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+            </svg>
+            <span class="prefer-text" id="prefer-text">Add to Preferred Resources</span>
+            <span class="prefer-check-icon" id="prefer-check-icon" style="display: none;">✓ Added</span>
+          </button>
+        </div>
+
+      </div>
+    </header>
+
+    <!-- Master Layout Wrapper (Full Width Canvas Without Left Sidebar) -->
+    <div class="app-layout-container" id="app-layout-container">
+      <main class="site-content" id="main-content">
+        
+<div class="page-container" id="page-financial">
+  <div class="page-header">
+    <div class="page-badge-row">
+      <span class="page-badge badge-fin">QIF &bull; QFX &bull; QBO &bull; OFX</span>
+      <span class="page-badge badge-zero-dep">Zero Dependencies</span>
+      <span class="page-badge badge-methods">26 API Methods</span>
+    </div>
+    <h1 class="page-title">Financial Engine</h1>
+    <p class="page-subtitle">
+      A unified, zero-dependency financial statement engine supporting Quicken (QIF), Quicken Financial Exchange (QFX), QuickBooks Online (QBO), and OFX 1.x/2.x.
+      Automated format detection, statement reconciliation, auto-categorization, anonymization, and cashflow analytics.
+    </p>
+  </div>
+
+  <div class="page-quick-stats">
+    <div class="quick-stat-box">
+      <span class="stat-num">4 Formats</span>
+      <span class="stat-lbl">QIF/QFX/QBO/OFX</span>
+    </div>
+    <div class="quick-stat-box">
+      <span class="stat-num">26</span>
+      <span class="stat-lbl">Engine Operations</span>
+    </div>
+    <div class="quick-stat-box">
+      <span class="stat-num">Auto</span>
+      <span class="stat-lbl">Reconciliation</span>
+    </div>
+    <div class="quick-stat-box">
+      <span class="stat-num">Clean</span>
+      <span class="stat-lbl">Payee Anonymizer</span>
+    </div>
+  </div>
+
+  <div class="page-section">
+    <h2 class="section-subheading">Financial Statement Pipeline</h2>
+    <div class="feature-pills-grid">
+      <div class="pill-card">
+        <h4>Auto-Detection &amp; SGML Normalization</h4>
+        <p>Distinguish QIF, QFX, QBO, and OFX files automatically, repairing unclosed SGML tag hierarchies into validated trees.</p>
+        <code>FinancialEngine.parse(statementString)</code>
+      </div>
+      <div class="pill-card">
+        <h4>Bank Reconciliation</h4>
+        <p>Reconcile bank statement exports against accounting ledgers with amount, date window, and FITID matching.</p>
+        <code>FinancialEngine.reconcile(bankQbo, ledgerQif)</code>
+      </div>
+      <div class="pill-card">
+        <h4>Cashflow Analytics &amp; Profiling</h4>
+        <p>Compute inflows, outflows, net balances, category spending shares, and monthly transaction velocities.</p>
+        <code>FinancialEngine.analyze(parsedStatement)</code>
+      </div>
+      <div class="pill-card">
+        <h4>Payee Cleaning &amp; Anonymization</h4>
+        <p>Strip POS terminal junk, masked account numbers, eliminate duplicates, and export cleanly into Excel workbooks.</p>
+        <code>FinancialEngine.toExcel(statement)</code>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-section">
+    <h2 class="section-subheading">Interactive Code Example</h2>
+    <div class="code-container">
+      <pre class="code-pre"><code><span class="token-keyword">import</span> { FinancialEngine } <span class="token-keyword">from</span> <span class="token-string">'/assets/js/index.js'</span>;
+
+<span class="token-comment">// 1. Parse QBO / QFX or QIF</span>
+<span class="token-keyword">const</span> statement = FinancialEngine.<span class="token-fn">parse</span>(qboString);
+
+<span class="token-comment">// 2. Auto-categorize transactions</span>
+FinancialEngine.<span class="token-fn">autoCategorize</span>(statement, [
+  { pattern: <span class="token-string">'Amazon'</span>, category: <span class="token-string">'Office Supplies'</span> },
+  { pattern: <span class="token-string">'Payroll'</span>, category: <span class="token-string">'Income'</span> }
+]);
+
+<span class="token-comment">// 3. Reconcile against source records</span>
+<span class="token-keyword">const</span> report = FinancialEngine.<span class="token-fn">reconcile</span>(statement, internalLedger);
+console.<span class="token-fn">log</span>(<span class="token-string">'Reconciliation Discrepancy:'</span>, report.discrepancy);
+
+<span class="token-comment">// 4. Export to Excel or CSV</span>
+<span class="token-keyword">const</span> excelWorkbook = FinancialEngine.<span class="token-fn">toExcel</span>(statement);</code></pre>
+    </div>
+  </div>
+</div>
+
+      </main>
+    </div>
+
+    <!-- Master Footer -->
+    <footer class="site-footer" id="site-footer">
+      <div class="footer-container" id="footer-container">
+        <div class="footer-col-main" id="footer-col-main">
+          <div class="footer-brand" id="footer-brand">
+            <span class="footer-brand-name">Datafrog</span>
+            <span class="footer-badge">Unified Document &amp; Data Processing Suite</span>
+          </div>
+          <p class="footer-desc">
+            High-performance zero-dependency JavaScript engines for PDF, Excel, CSV, JSON, XML, YAML, GeoJSON, and Financial (QIF, QFX, QBO, OFX) processing across Node.js, browsers, and edge runtimes.
+          </p>
+        </div>
+        <div class="footer-col-meta" id="footer-col-meta">
+          <div class="footer-links-row">
+            <a href="/pages/pdf.html" class="footer-link">PDF</a>
+            <a href="/pages/excel.html" class="footer-link">Excel</a>
+            <a href="/pages/csv.html" class="footer-link">CSV</a>
+            <a href="/pages/json.html" class="footer-link">JSON</a>
+            <a href="/pages/xml.html" class="footer-link">XML</a>
+            <a href="/pages/yml.html" class="footer-link">YAML</a>
+            <a href="/pages/geojson.html" class="footer-link">GeoJSON</a>
+            <a href="/pages/financial.html" class="footer-link">Financial</a>
+          </div>
+          <p class="footer-copy">&copy; 2026 Datafrog Inc. Open source under the MIT License.</p>
+        </div>
+      </div>
+    </footer>
+
+    <script src="/assets/js/main.js"></script>
+  </body>
+</html>
