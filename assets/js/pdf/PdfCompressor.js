@@ -1,113 +1,79 @@
 /**
  * PdfCompressor - File size reduction and stream optimization for PDF documents.
- * Purges unreferenced indirect objects, sanitizes metadata, compresses streams,
- * and serializes compact binary streams.
  */
 
 import { PdfDocument } from '../document/PdfDocument.js';
 import { PdfCleaner } from './PdfCleaner.js';
-import '../writer/PdfWriter.js';
+import { PdfStream } from '../objects/PdfStream.js';
+import { PdfArray } from '../objects/PdfArray.js';
+import { PdfName } from '../objects/PdfName.js';
+import { FlateDecode } from '../streams/filters/FlateDecode.js';
+import { FlateEncode } from '../streams/filters/FlateEncode.js';
 
 export class PdfCompressor {
-  /**
-   * Compresses a PDF document or byte buffer with preset options
-   * @param {PdfDocument|Uint8Array} docOrBytes
-   * @param {object} [options]
-   * @param {'recommended'|'extreme'|'low'} [options.level='recommended']
-   * @param {boolean} [options.stripMetadata]
-   * @param {boolean} [options.stripAnnotations]
-   * @param {boolean} [options.compressStreams]
-   * @returns {Uint8Array} Compressed PDF bytes
-   */
   static compress(docOrBytes, options = {}) {
-    const report = PdfCompressor.compressWithReport(docOrBytes, options);
-    return report.bytes;
+    return PdfCompressor.compressWithReport(docOrBytes, options).bytes;
   }
 
   /**
-   * Compresses PDF and returns an exhaustive analytical report with metrics
-   * @param {PdfDocument|Uint8Array} docOrBytes
-   * @param {object} [options]
-   * @returns {{
-   *   bytes: Uint8Array,
-   *   originalSize: number,
-   *   compressedSize: number,
-   *   savedBytes: number,
-   *   ratioPercent: number,
-   *   pageCount: number,
-   *   objectsPurged: number,
-   *   durationMs: number,
-   *   level: string
-   * }}
+   * Compresses a PDF and returns metrics describing the actual result.
+   *
+   * Stream compression is deliberately lossless. A stream is replaced only
+   * when the resulting bytes are smaller than the existing stream bytes.
    */
   static compressWithReport(docOrBytes, options = {}) {
     const startTime = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
-    
-    let originalSize = 0;
-    if (docOrBytes instanceof Uint8Array) {
-      originalSize = docOrBytes.length;
-    }
 
+    let originalSize = docOrBytes instanceof Uint8Array ? docOrBytes.length : 0;
     const doc = docOrBytes instanceof PdfDocument ? docOrBytes : PdfDocument.load(docOrBytes);
 
-    if (originalSize === 0) {
-      // If loaded from object, serialize once to get baseline size
-      originalSize = doc.save().length;
-    }
+    if (originalSize === 0) originalSize = doc.save().length;
 
     const level = options.level || 'recommended';
-    const stripMeta = options.stripMetadata !== undefined 
-      ? options.stripMetadata 
+    const stripMeta = options.stripMetadata !== undefined
+      ? options.stripMetadata
       : (level === 'extreme' || level === 'recommended');
-    const stripAnnots = options.stripAnnotations !== undefined 
-      ? options.stripAnnotations 
+    const stripAnnots = options.stripAnnotations !== undefined
+      ? options.stripAnnotations
       : (level === 'extreme');
+    const compressStreams = options.compressStreams !== undefined
+      ? options.compressStreams
+      : true;
 
-    // 1. Strip metadata if configured
     if (stripMeta) {
-      PdfCleaner.clean(doc, { 
-        stripMetadata: true,
-        stripAnnotations: stripAnnots 
-      });
+      PdfCleaner.clean(doc, { stripMetadata: true, stripAnnotations: stripAnnots });
     } else if (stripAnnots) {
-      PdfCleaner.clean(doc, {
-        stripMetadata: false,
-        stripAnnotations: true
-      });
+      PdfCleaner.clean(doc, { stripMetadata: false, stripAnnotations: true });
     }
 
-    // 2. Count original objects from XRef table if available
     let originalObjectCount = 0;
     try {
       const xref = doc.getXRefTable();
-      if (xref && xref.entries) {
-        originalObjectCount = xref.entries.size;
-      }
+      if (xref && xref.entries) originalObjectCount = xref.entries.size;
     } catch (_) {}
 
-    // 3. Serialize document (drops unreferenced objects and repacks catalog)
+    const streamStats = { scanned: 0, compressed: 0, bytesSaved: 0, skipped: 0 };
+
+    if (compressStreams) PdfCompressor.#compressStreams(doc, streamStats);
+
     const compressedBytes = doc.save();
     const compressedSize = compressedBytes.length;
 
-    // 4. Calculate metrics
     let finalObjectCount = 0;
     try {
       const reloaded = PdfDocument.load(compressedBytes);
       const xref = reloaded.getXRefTable();
-      if (xref && xref.entries) {
-        finalObjectCount = xref.entries.size;
-      }
+      if (xref && xref.entries) finalObjectCount = xref.entries.size;
     } catch (_) {}
 
     const objectsPurged = Math.max(0, originalObjectCount - finalObjectCount);
-    const savedBytes = Math.max(0, originalSize - compressedSize);
-    const ratioPercent = originalSize > 0 
-      ? Math.max(0, Number(((savedBytes / originalSize) * 100).toFixed(1)))
+    const savedBytes = originalSize - compressedSize;
+    const ratioPercent = originalSize > 0
+      ? Number(((savedBytes / originalSize) * 100).toFixed(1))
       : 0;
 
     const pageCount = doc.getPageCount ? doc.getPageCount() : 1;
     const endTime = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
-    const durationMs = Math.max(1, Math.round(endTime - startTime));
 
     return {
       bytes: compressedBytes,
@@ -115,11 +81,78 @@ export class PdfCompressor {
       compressedSize,
       savedBytes,
       ratioPercent,
+      reductionPercent: Math.max(0, ratioPercent),
+      grew: savedBytes < 0,
       pageCount,
       objectsPurged,
-      durationMs,
-      level
+      durationMs: Math.max(1, Math.round(endTime - startTime)),
+      level,
+      streams: streamStats
     };
   }
-}
 
+  static #compressStreams(doc, stats) {
+    const xref = doc.getXRefTable();
+    if (!xref || !xref.entries) return;
+
+    for (const [objectNumber, entry] of xref.entries) {
+      if (!entry || (entry.isFree && entry.isFree()) || (entry.isCompressed && entry.isCompressed())) continue;
+
+      let object;
+      try {
+        object = doc.resolveObject(objectNumber, entry.generationNumber || 0);
+      } catch (_) {
+        continue;
+      }
+
+      if (!(object instanceof PdfStream)) continue;
+      stats.scanned++;
+
+      const filterNames = PdfCompressor.#filterNames(object.getFilter());
+      let rawBytes;
+      let shouldSetFilter = false;
+
+      try {
+        if (filterNames.length === 0) {
+          rawBytes = object.bytes;
+          shouldSetFilter = true;
+        } else if (filterNames.length === 1 && filterNames[0] === 'FlateDecode') {
+          rawBytes = FlateDecode.decode(object.bytes);
+        } else {
+          stats.skipped++;
+          continue;
+        }
+
+        const encoded = FlateEncode.encode(rawBytes);
+        if (encoded.length >= object.bytes.length) {
+          stats.skipped++;
+          continue;
+        }
+
+        const oldLength = object.bytes.length;
+        object.setBytes(encoded);
+
+        if (shouldSetFilter) object.dictionary.set('Filter', PdfName.of('FlateDecode'));
+
+        stats.compressed++;
+        stats.bytesSaved += oldLength - encoded.length;
+      } catch (_) {
+        stats.skipped++;
+      }
+    }
+  }
+
+  static #filterNames(filter) {
+    if (!filter) return [];
+
+    if (filter.isName && filter.isName()) return [filter.value];
+
+    if (filter instanceof PdfArray) {
+      return filter.asArray()
+        .filter(item => item && item.isName && item.isName())
+        .map(item => item.value);
+    }
+
+    return [];
+  }
+}
