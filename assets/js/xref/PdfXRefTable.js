@@ -6,6 +6,7 @@ import { PdfXRefEntry } from './PdfXRefEntry.js';
 import { PdfTrailer } from './PdfTrailer.js';
 import { PdfIndirectObject } from '../objects/PdfIndirectObject.js';
 import { PdfStream } from '../objects/PdfStream.js';
+import { PdfStreamDecoder } from '../streams/PdfStreamDecoder.js';
 import { PdfXRefException } from '../errors/PdfXRefException.js';
 import { PdfInvalidArgumentException } from '../errors/PdfInvalidArgumentException.js';
 
@@ -175,7 +176,9 @@ export class PdfXRefTable {
       ranges.push([0, size]);
     }
 
-    const bytes = xrefStream.bytes;
+    // XRef streams are PDF streams and may themselves be filtered (commonly FlateDecode).
+    // Decode the stream before reading the binary xref fields.
+    const bytes = PdfStreamDecoder.decode(xrefStream);
     let offset = 0;
     for (const [firstObject, count] of ranges) {
       for (let i = 0; i < count; i++) {
