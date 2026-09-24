@@ -24,14 +24,20 @@ description: Free online tools for working with QIF, QFX, QBO, and OFX financial
   </div>
 
   <div class="page-section">
-    <h2 class="section-subheading">What You Can Do With Financial Files</h2>
+    <h2 class="section-subheading">Available FINANCIAL Tools</h2>
     <div class="feature-pills-grid">
-      <div class="pill-card"><h4>Review Transactions</h4><p>Open statement files and review transaction dates, descriptions, amounts, and other available details.</p></div>
-      <div class="pill-card"><h4>Clean Statement Data</h4><p>Remove unwanted transaction details, clean payee information, and prepare records for further use.</p></div>
-      <div class="pill-card"><h4>Compare Records</h4><p>Compare two statement files or sets of records to identify differences.</p></div>
-      <div class="pill-card"><h4>Reconcile Statements</h4><p>Check records against each other and identify transactions or amounts that do not match.</p></div>
-      <div class="pill-card"><h4>Review Cash Flow</h4><p>Review available income, spending, balances, and transaction information in an easier-to-understand view.</p></div>
-      <div class="pill-card"><h4>Convert Financial Files</h4><p>Convert supported financial statement data to formats such as CSV or Excel for further use.</p></div>
+      {% assign category_tools = site.data.tools | where: "category", "financial" %}
+      {% if category_tools.size > 0 %}
+        {% for tool in category_tools %}
+          <div class="pill-card">
+            <h4>{{ tool.name }}</h4>
+            {% if tool.description %}<p>{{ tool.description }}</p>{% endif %}
+            {% if tool.url %}<a href="{{ tool.url | relative_url }}" class="btn btn-secondary">Open Tool</a>{% endif %}
+          </div>
+        {% endfor %}
+      {% else %}
+        <p class="section-desc">No tools are currently listed in this category.</p>
+      {% endif %}
     </div>
   </div>
 
