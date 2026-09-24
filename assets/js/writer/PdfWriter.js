@@ -1,5 +1,4 @@
 import { PdfObjectWriter } from './PdfObjectWriter.js';
-import { pageExtractionHelper } from '../document/PdfPage.js';
 import { PdfDictionary } from '../objects/PdfDictionary.js';
 import { PdfReference } from '../objects/PdfReference.js';
 import { PdfNumber } from '../objects/PdfNumber.js';
@@ -259,5 +258,3 @@ export class PdfWriter {
     return { objectList, catalogRef, infoRef };
   }
 }
-
-pageExtractionHelper.PdfWriter = PdfWriter;
