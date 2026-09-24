@@ -659,39 +659,20 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Header: Global Tools Search Box implementation
+  // Header: Global Tools Search Box
+  // Only tools listed in _data/tools.yml are searchable.
   const searchInput = document.getElementById('global-tools-search');
   const searchDropdown = document.getElementById('search-results-dropdown');
-
-  const searchableItems = [
-    { title: 'Compress PDF Online', url: '/pages/compress-pdf', badge: 'PDF', desc: 'Reduce PDF file size up to 85% with interactive viewer, zero server uploads' },
-    { title: 'PDF Tools Overview', url: '/pages/pdf', badge: 'PDF', desc: 'ISO 32000-1 document parser, merger, split, watermark, anonymize' },
-    { title: 'PDF Split & Merge', url: '/pages/pdf', badge: 'PDF', desc: 'Split documents by page range or merge buffers' },
-    { title: 'PDF Text Extraction', url: '/pages/pdf', badge: 'PDF', desc: 'Extract plain text streams and page catalogues' },
-    { title: 'Excel Tools Overview', url: '/pages/excel', badge: 'XLSX', desc: 'ECMA-376 spreadsheet builder, formulas, cell styles' },
-    { title: 'Excel Workbook Builder', url: '/pages/excel', badge: 'XLSX', desc: 'Fluent API to generate multi-sheet workbooks' },
-    { title: 'Excel to CSV / JSON', url: '/pages/excel', badge: 'XLSX', desc: 'Bi-directional conversions across tabular formats' },
-    { title: 'CSV Tools Overview', url: '/pages/csv', badge: 'CSV', desc: 'RFC 4180 delimiter detection, relational joins, grouping' },
-    { title: 'CSV Auto Delimiter Sniffing', url: '/pages/csv', badge: 'CSV', desc: 'Detect commas, tabs, semicolons, and pipes' },
-    { title: 'CSV Relational Joins', url: '/pages/csv', badge: 'CSV', desc: 'Inner, left, and full joins between CSV datasets' },
-    { title: 'JSON Tools Overview', url: '/pages/json', badge: 'JSON', desc: 'RFC 8259, RFC 6902 Patch, JSONPath, repair, anomaly detection' },
-    { title: 'JSON Data Processing Tools', url: '/#json-studio', badge: 'JSON', desc: 'Live browser JSON validator, formatter, schema inferrer' },
-    { title: 'JSON Syntax Repair', url: '/pages/json', badge: 'JSON', desc: 'Heals unquoted keys, trailing commas, single quotes' },
-    { title: 'XML Tools Overview', url: '/pages/xml', badge: 'XML', desc: 'W3C XML 1.0 SAX streaming, DOM tree, XPath querying' },
-    { title: 'XML Live Inspector', url: '/#xml-playground', badge: 'XML', desc: 'Interactive visual DOM tree viewer & query inspector' },
-    { title: 'XML to JSON Converter', url: '/pages/xml', badge: 'XML', desc: 'Convert XML structures cleanly into JSON objects' },
-    { title: 'YAML (YML) Tools Overview', url: '/pages/yml', badge: 'YAML', desc: 'YAML 1.2 mappings, block scalars, anchors & aliases (&/*)' },
-    { title: 'YAML Deep Diffing', url: '/pages/yml', badge: 'YAML', desc: 'Structural diffs between YAML configurations' },
-    { title: 'GeoJSON Tools Overview', url: '/pages/geojson', badge: 'GEO', desc: 'RFC 7946 spatial topology, WKT, KML, RDP simplification' },
-    { title: 'GeoJSON Simplification (RDP)', url: '/pages/geojson', badge: 'GEO', desc: 'Ramer-Douglas-Peucker polygon coordinate reducer' },
-    { title: 'GeoJSON to WKT / KML', url: '/pages/geojson', badge: 'GEO', desc: 'Export spatial features to Well-Known Text and KML' },
-    { title: 'Financial Tools Overview', url: '/pages/financial', badge: 'FIN', desc: 'QIF, QFX, QBO, OFX bank statements & reconciliation' },
-    { title: 'QBO / QFX Bank Reconciliation', url: '/pages/financial', badge: 'FIN', desc: 'Match bank transaction records against accounting ledgers' },
-    { title: 'Payee Anonymizer & Cleaner', url: '/pages/financial', badge: 'FIN', desc: 'Clean POS terminal codes and mask sensitive numbers' }
-  ];
+  const searchableItems = Array.isArray(window.datafrogTools)
+    ? window.datafrogTools.map(tool => ({
+        title: tool.name || tool.title || '',
+        url: tool.url || tool.path || '',
+        badge: tool.badge || tool.format || tool.category || '',
+        desc: tool.description || ''
+      })).filter(item => item.title && item.url)
+    : [];
 
   if (searchInput && searchDropdown) {
-    // Keyboard shortcut ⌘K or Ctrl+K
     window.addEventListener('keydown', (e) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
@@ -706,15 +687,14 @@ document.addEventListener('DOMContentLoaded', () => {
         searchDropdown.style.display = 'none';
         return;
       }
-
-      const matches = searchableItems.filter(item => 
+      const matches = searchableItems.filter(item =>
         item.title.toLowerCase().includes(q) ||
         item.desc.toLowerCase().includes(q) ||
         item.badge.toLowerCase().includes(q)
       ).slice(0, 7);
 
       if (matches.length === 0) {
-        searchDropdown.innerHTML = '<div style="padding: 12px; color: #94a3b8; font-size: 0.8125rem; text-align: center;">No matching tools or formats found</div>';
+        searchDropdown.innerHTML = '<div style="padding: 12px; color: #94a3b8; font-size: 0.8125rem; text-align: center;">No matching tools found</div>';
       } else {
         searchDropdown.innerHTML = matches.map(item => `
           <a href="${item.url}" class="search-item">
@@ -732,16 +712,10 @@ document.addEventListener('DOMContentLoaded', () => {
       searchDropdown.style.display = 'block';
     };
 
-    searchInput.addEventListener('input', (e) => {
-      renderSearchResults(e.target.value);
-    });
-
+    searchInput.addEventListener('input', (e) => renderSearchResults(e.target.value));
     searchInput.addEventListener('focus', (e) => {
-      if (e.target.value.trim()) {
-        renderSearchResults(e.target.value);
-      }
+      if (e.target.value.trim()) renderSearchResults(e.target.value);
     });
-
     document.addEventListener('click', (e) => {
       if (!searchInput.contains(e.target) && !searchDropdown.contains(e.target)) {
         searchDropdown.style.display = 'none';
