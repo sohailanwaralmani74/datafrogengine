@@ -60,7 +60,7 @@ export class PdfCompressor {
 
     if (compressStreams) PdfCompressor.#compressStreams(doc, streamStats);
 
-    let compressedBytes = doc.save();
+    let compressedBytes = doc.save({ compact: true });
     let compressedSize = compressedBytes.length;
 
     // A compressor must never make the user's PDF larger. The current writer
