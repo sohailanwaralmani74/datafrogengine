@@ -14,6 +14,7 @@ import { PdfString } from '../objects/PdfString.js';
 import { PdfHexString } from '../objects/PdfHexString.js';
 import { PdfPage } from './PdfPage.js';
 import { PdfWriter } from '../writer/PdfWriter.js';
+import { PdfStreamDecoder } from '../streams/PdfStreamDecoder.js';
 import { PdfStructureException } from '../errors/PdfStructureException.js';
 import { PdfInvalidArgumentException } from '../errors/PdfInvalidArgumentException.js';
 
@@ -327,7 +328,7 @@ export class PdfDocument {
     const n = dict.getNumber('N') || 0;
     const first = dict.getNumber('First') || 0;
 
-    const streamBytes = streamObj.bytes;
+    const streamBytes = PdfStreamDecoder.decode(streamObj);
     const streamReader = new PdfBinaryReader(streamBytes.buffer, streamBytes.byteOffset, streamBytes.byteLength);
     const lexer = new PdfLexer(streamReader);
 
