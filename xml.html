@@ -10,7 +10,7 @@ description: Free browser-based XML tools for formatting, validating, searching,
     <div class="page-badge-row">
       <span class="page-badge badge-xml">W3C XML 1.0</span>
       <span class="page-badge badge-zero-dep">SAX &amp; DOM</span>
-      <span class="page-badge badge-methods">Practical XML Operations</span>
+      <span class="page-badge badge-methods">XML Tools</span>
     </div>
     <h1 class="page-title">XML Tools</h1>
     <p class="page-subtitle">
@@ -24,8 +24,8 @@ description: Free browser-based XML tools for formatting, validating, searching,
       <span class="stat-lbl">W3C Standard</span>
     </div>
     <div class="quick-stat-box">
-      <span class="stat-num">25</span>
-      <span class="stat-lbl">Tool Operations</span>
+      <span class="stat-num">XML</span>
+      <span class="stat-lbl">Tool Tools</span>
     </div>
     <div class="quick-stat-box">
       <span class="stat-num">XPath</span>
@@ -38,7 +38,7 @@ description: Free browser-based XML tools for formatting, validating, searching,
   </div>
 
   <div class="page-section">
-    <h2 class="section-subheading">XML Architecture &amp; Capabilities</h2>
+    <h2 class="section-subheading">XML What You Can Do</h2>
     <div class="feature-pills-grid">
       <div class="pill-card">
         <h4>Streaming SAX &amp; DOM</h4>
@@ -66,19 +66,19 @@ description: Free browser-based XML tools for formatting, validating, searching,
   <div class="page-section">
     <h2 class="section-subheading">Example XML Workflow</h2>
     <div class="code-container">
-      <pre class="code-pre"><code><span class="token-keyword">import</span> { XmlEngine } <span class="token-keyword">from</span> <span class="token-string">'/assets/js/index.js'</span>;
+      <pre class="code-pre"><code><span class="token-keyword">import</span> { XmlTool } <span class="token-keyword">from</span> <span class="token-string">'/assets/js/index.js'</span>;
 
 <span class="token-keyword">const</span> xml = <span class="token-string">`&lt;catalog&gt;&lt;book id="bk101"&gt;&lt;title&gt;Datafrog Manual&lt;/title&gt;&lt;price&gt;44.95&lt;/price&gt;&lt;/book&gt;&lt;/catalog&gt;`</span>;
 
 <span class="token-comment">// 1. Parse into DOM tree</span>
-<span class="token-keyword">const</span> doc = XmlEngine.<span class="token-fn">parse</span>(xml);
+<span class="token-keyword">const</span> doc = XmlTool.<span class="token-fn">parse</span>(xml);
 
 <span class="token-comment">// 2. Query nodes</span>
-<span class="token-keyword">const</span> book = XmlEngine.<span class="token-fn">query</span>(doc, <span class="token-string">'book'</span>);
-XmlEngine.<span class="token-fn">setAttribute</span>(book, <span class="token-string">'status'</span>, <span class="token-string">'active'</span>);
+<span class="token-keyword">const</span> book = XmlTool.<span class="token-fn">query</span>(doc, <span class="token-string">'book'</span>);
+XmlTool.<span class="token-fn">setAttribute</span>(book, <span class="token-string">'status'</span>, <span class="token-string">'active'</span>);
 
 <span class="token-comment">// 3. Convert to JSON</span>
-<span class="token-keyword">const</span> json = XmlEngine.<span class="token-fn">toJson</span>(xml);
+<span class="token-keyword">const</span> json = XmlTool.<span class="token-fn">toJson</span>(xml);
 console.<span class="token-fn">log</span>(<span class="token-string">'Converted JSON:'</span>, json);</code></pre>
     </div>
   </div>
