@@ -10,7 +10,7 @@ description: Free browser-based JSON tools for formatting, validating, repairing
     <div class="page-badge-row">
       <span class="page-badge badge-json">RFC 8259</span>
       <span class="page-badge badge-zero-dep">RFC 6902 Patch</span>
-      <span class="page-badge badge-methods">Practical JSON Operations</span>
+      <span class="page-badge badge-methods">JSON Tools</span>
     </div>
     <h1 class="page-title">JSON Tools</h1>
     <p class="page-subtitle">
@@ -25,8 +25,8 @@ description: Free browser-based JSON tools for formatting, validating, repairing
       <span class="stat-lbl">Specification</span>
     </div>
     <div class="quick-stat-box">
-      <span class="stat-num">35</span>
-      <span class="stat-lbl">Tool Operations</span>
+      <span class="stat-num">JSON</span>
+      <span class="stat-lbl">Tool Tools</span>
     </div>
     <div class="quick-stat-box">
       <span class="stat-num">RFC 6902</span>
@@ -67,20 +67,20 @@ description: Free browser-based JSON tools for formatting, validating, repairing
   <div class="page-section">
     <h2 class="section-subheading">Example Data Workflow</h2>
     <div class="code-container">
-      <pre class="code-pre"><code><span class="token-keyword">import</span> { JsonEngine } <span class="token-keyword">from</span> <span class="token-string">'/assets/js/index.js'</span>;
+      <pre class="code-pre"><code><span class="token-keyword">import</span> { JsonTool } <span class="token-keyword">from</span> <span class="token-string">'/assets/js/index.js'</span>;
 
 <span class="token-keyword">const</span> raw = <span class="token-string">`{ status: "ok", count: 12, details: { tags: ["prod", "us-east"], } }`</span>;
 
 <span class="token-comment">// 1. Repair malformed JSON</span>
-<span class="token-keyword">const</span> repaired = JsonEngine.<span class="token-fn">repair</span>(raw);
-<span class="token-keyword">const</span> parsed = JsonEngine.<span class="token-fn">parse</span>(repaired);
+<span class="token-keyword">const</span> repaired = JsonTool.<span class="token-fn">repair</span>(raw);
+<span class="token-keyword">const</span> parsed = JsonTool.<span class="token-fn">parse</span>(repaired);
 
 <span class="token-comment">// 2. Query with JSONPath</span>
-<span class="token-keyword">const</span> tags = JsonEngine.<span class="token-fn">query</span>(parsed, <span class="token-string">'$.details.tags[*]'</span>);
+<span class="token-keyword">const</span> tags = JsonTool.<span class="token-fn">query</span>(parsed, <span class="token-string">'$.details.tags[*]'</span>);
 
 <span class="token-comment">// 3. Infer Schema &amp; Diff</span>
-<span class="token-keyword">const</span> schema = JsonEngine.<span class="token-fn">inferSchema</span>(parsed);
-<span class="token-keyword">const</span> diff = JsonEngine.<span class="token-fn">diff</span>({ count: 10 }, parsed);
+<span class="token-keyword">const</span> schema = JsonTool.<span class="token-fn">inferSchema</span>(parsed);
+<span class="token-keyword">const</span> diff = JsonTool.<span class="token-fn">diff</span>({ count: 10 }, parsed);
 console.<span class="token-fn">log</span>(<span class="token-string">'Differences:'</span>, diff.differences);</code></pre>
     </div>
   </div>
