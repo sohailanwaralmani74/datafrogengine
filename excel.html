@@ -1,89 +1,42 @@
 ---
 layout: default
-title: Excel Tools — Read, Clean, Convert & Analyze XLSX
+title: Excel Tools — Clean, Sort, Compare & Convert Excel Files
 format: excel
-description: Free browser-based Excel tools for reading, cleaning, sorting, filtering, comparing, converting, and analyzing XLSX files.
+description: Free online Excel tools for working with spreadsheets, sheets, rows, columns, formulas, comparisons, and conversions.
 ---
 
 <div class="page-container" id="page-excel">
   <div class="page-header">
     <div class="page-badge-row">
-      <span class="page-badge badge-excel">ECMA-376</span>
-      <span class="page-badge badge-zero-dep">Browser-based</span>
-      <span class="page-badge badge-methods">Excel Tools</span>
+      <span class="page-badge badge-excel">EXCEL</span>
+      <span class="page-badge badge-zero-dep">Private on your device</span>
+      <span class="page-badge badge-methods">Free Tools</span>
     </div>
     <h1 class="page-title">Excel Tools</h1>
-    <p class="page-subtitle">
-      Practical tools for working with XLSX spreadsheets, including sheet inspection, sorting, filtering, formatting, formulas, comparison, and conversion.
-      Read, build, write, sort, filter, format cells, evaluate formulas, and convert across CSV, JSON, Markdown, HTML, XML, and PDF.
-    </p>
+    <p class="page-subtitle">Work with Excel spreadsheets for everyday data tasks. Review sheets, organize rows and columns, clean data, compare workbooks, and convert spreadsheet data into other useful formats.</p>
   </div>
 
   <div class="page-quick-stats">
-    <div class="quick-stat-box">
-      <span class="stat-num">.xlsx</span>
-      <span class="stat-lbl">OpenXML Format</span>
-    </div>
-    <div class="quick-stat-box">
-      <span class="stat-num">XLSX</span>
-      <span class="stat-lbl">Tool Tools</span>
-    </div>
-    <div class="quick-stat-box">
-      <span class="stat-num">7+</span>
-      <span class="stat-lbl">Export Formats</span>
-    </div>
-    <div class="quick-stat-box">
-      <span class="stat-num">100%</span>
-      <span class="stat-lbl">Browser-based</span>
-    </div>
+    <div class="quick-stat-box"><span class="stat-num">Sheets</span><span class="stat-lbl">Work with spreadsheet tabs</span></div>
+    <div class="quick-stat-box"><span class="stat-num">Rows</span><span class="stat-lbl">Sort and filter data</span></div>
+    <div class="quick-stat-box"><span class="stat-num">Compare</span><span class="stat-lbl">Find workbook changes</span></div>
+    <div class="quick-stat-box"><span class="stat-num">Convert</span><span class="stat-lbl">Use data in other formats</span></div>
   </div>
 
   <div class="page-section">
-    <h2 class="section-subheading">Core Spreadsheet Operations</h2>
+    <h2 class="section-subheading">What You Can Do With Excel</h2>
     <div class="feature-pills-grid">
-      <div class="pill-card">
-        <h4>Create &amp; edit spreadsheets</h4>
-        <p>Chain sheets, headers, typed cells, number formats, column widths, and calculated formula cells.</p>
-        <code>Create a workbook</code>
-      </div>
-      <div class="pill-card">
-        <h4>Relational Reordering</h4>
-        <p>Reorder sheets, transpose rows, sort column hierarchies, and filter rows by conditional expressions.</p>
-        <code>Sort spreadsheet rows</code>
-      </div>
-      <div class="pill-card">
-        <h4>Format Bridges</h4>
-        <p>Convert workbooks directly to multi-sheet JSON, RFC 4180 CSV, Markdown tables, styled HTML, or PDF reports.</p>
-        <code>Convert XLSX data</code>
-      </div>
-      <div class="pill-card">
-        <h4>Coordinate Diffing</h4>
-        <p>Compare two workbooks to locate cell-by-cell formula or value discrepancies with row/col coordinate maps.</p>
-        <code>Compare two workbooks</code>
-      </div>
+      <div class="pill-card"><h4>Review Spreadsheet Data</h4><p>Open workbooks, inspect sheets, and quickly review the information stored in your spreadsheet.</p></div>
+      <div class="pill-card"><h4>Clean &amp; Organize</h4><p>Arrange rows and columns, remove unwanted information, rename headings, and prepare spreadsheet data.</p></div>
+      <div class="pill-card"><h4>Sort &amp; Filter</h4><p>Find the records you need and arrange spreadsheet information in a useful order.</p></div>
+      <div class="pill-card"><h4>Compare Workbooks</h4><p>Compare two spreadsheets to identify differences in values, rows, columns, or sheets.</p></div>
+      <div class="pill-card"><h4>Work With Formulas</h4><p>Review spreadsheet formulas and supported calculated values while working with your workbook.</p></div>
+      <div class="pill-card"><h4>Convert Spreadsheet Data</h4><p>Convert spreadsheet information to supported formats such as CSV, JSON, XML, PDF, and other available formats.</p></div>
     </div>
   </div>
 
   <div class="page-section">
-    <h2 class="section-subheading">Example Excel Workflow</h2>
-    <div class="code-container">
-      <pre class="code-pre"><code><span class="token-keyword">import</span> { ExcelTool } <span class="token-keyword">from</span> <span class="token-string">'/assets/js/index.js'</span>;
-
-<span class="token-comment">// 1. Build an Excel workbook fluently</span>
-<span class="token-keyword">const</span> buffer = <span class="token-keyword">await</span> ExcelTool.<span class="token-fn">builder</span>()
-  .<span class="token-fn">addSheet</span>(<span class="token-string">'Financial Summary'</span>)
-  .<span class="token-fn">addRow</span>([<span class="token-string">'Department'</span>, <span class="token-string">'Q1 Budget'</span>, <span class="token-string">'Q1 Spend'</span>])
-  .<span class="token-fn">addRow</span>([<span class="token-string">'Toolering'</span>, 150000, 142000])
-  .<span class="token-fn">addRow</span>([<span class="token-string">'Marketing'</span>, 80000, 78500])
-  .<span class="token-fn">build</span>();
-
-<span class="token-comment">// 2. Convert directly to CSV or JSON</span>
-<span class="token-keyword">const</span> csv = ExcelTool.<span class="token-fn">toCsv</span>(buffer);
-<span class="token-keyword">const</span> json = ExcelTool.<span class="token-fn">toJson</span>(buffer);
-
-<span class="token-comment">// 3. Audit cell metrics</span>
-<span class="token-keyword">const</span> analysis = ExcelTool.<span class="token-fn">analyze</span>(buffer);
-console.<span class="token-fn">log</span>(<span class="token-string">'Total sheets:'</span>, analysis.sheetCount);</code></pre>
-    </div>
+    <h2 class="section-subheading">Your Files Stay With You</h2>
+    <p class="section-desc">Open your spreadsheet in the tool, work with the data, and save the result. Your file is handled on your device rather than uploaded to our servers.</p>
   </div>
 </div>
