@@ -1,86 +1,37 @@
 ---
 layout: default
-title: YAML Tools — Format, Validate, Convert & Clean YAML
+title: YAML Tools — Format, Check, Clean & Convert YAML
 format: yml
-description: Free browser-based YAML and YML tools for formatting, validating, converting, sorting, comparing, and cleaning YAML files.
+description: Free online YAML and YML tools for formatting, checking, converting, sorting, comparing, and cleaning YAML files.
 ---
 
 <div class="page-container" id="page-yml">
   <div class="page-header">
     <div class="page-badge-row">
-      <span class="page-badge badge-yml">YAML 1.2</span>
-      <span class="page-badge badge-zero-dep">Anchors &amp; Flow</span>
-      <span class="page-badge badge-methods">YAML Tools</span>
+      <span class="page-badge badge-yml">YAML / YML</span>
+      <span class="page-badge badge-zero-dep">Private on your device</span>
+      <span class="page-badge badge-methods">Free Tools</span>
     </div>
     <h1 class="page-title">YAML (YML) Tools</h1>
-    <p class="page-subtitle">
-      Practical YAML tools for formatting, validation, conversion, key sorting, comparison, cleanup, and common YAML structures.
-      Mappings, nested sequences, literal (|) and folded (&gt;) block scalars, anchors &amp; aliases (&amp;/*), flow styles, key reordering, and deep diffing.
-    </p>
+    <p class="page-subtitle">Format, check, clean, compare, sort, and convert YAML files. Work with your YAML data directly on your device without uploading your file to our servers.</p>
   </div>
 
   <div class="page-quick-stats">
-    <div class="quick-stat-box">
-      <span class="stat-num">YAML 1.2</span>
-      <span class="stat-lbl">Specification</span>
-    </div>
-    <div class="quick-stat-box">
-      <span class="stat-num">XML</span>
-      <span class="stat-lbl">Tool Tools</span>
-    </div>
-    <div class="quick-stat-box">
-      <span class="stat-num">&amp; / *</span>
-      <span class="stat-lbl">Anchors &amp; Aliases</span>
-    </div>
-    <div class="quick-stat-box">
-      <span class="stat-num">Flow</span>
-      <span class="stat-lbl">Compression</span>
-    </div>
+    <div class="quick-stat-box"><span class="stat-num">Format</span><span class="stat-lbl">Make YAML easier to read</span></div>
+    <div class="quick-stat-box"><span class="stat-num">Check</span><span class="stat-lbl">Find common problems</span></div>
+    <div class="quick-stat-box"><span class="stat-num">Compare</span><span class="stat-lbl">See what changed</span></div>
+    <div class="quick-stat-box"><span class="stat-num">Convert</span><span class="stat-lbl">Change file format</span></div>
   </div>
 
   <div class="page-section">
-    <h2 class="section-subheading">YAML 1.2 Capabilities</h2>
+    <h2 class="section-subheading">What You Can Do With YAML</h2>
     <div class="feature-pills-grid">
-      <div class="pill-card">
-        <h4>Anchors &amp; Aliases</h4>
-        <p>Define reusable nodes with &amp;anchor and inject references seamlessly using *alias with circular check safety.</p>
-        <code>Read YAML data</code>
-      </div>
-      <div class="pill-card">
-        <h4>Block &amp; Flow Styles</h4>
-        <p>Support both block-indented structures and compact flow collections with JSON interoperability.</p>
-        <code>Make YAML more compact</code>
-      </div>
-      <div class="pill-card">
-        <h4>Path Getters &amp; Key Reordering</h4>
-        <p>Mutate deep documents using dot-notation paths, reorder keys alphabetically or according to schema priority.</p>
-        <code>Reorder YAML keys</code>
-      </div>
-      <div class="pill-card">
-        <h4>Cross-Format Bridges</h4>
-        <p>Convert YAML directly to JSON, XML, CSV, or Markdown tables with zero information loss.</p>
-        <code>Convert YAML to JSON</code>
-      </div>
-    </div>
-  </div>
-
-  <div class="page-section">
-    <h2 class="section-subheading">Example YAML Workflow</h2>
-    <div class="code-container">
-      <pre class="code-pre"><code><span class="token-keyword">import</span> { YmlTool } <span class="token-keyword">from</span> <span class="token-string">'/assets/js/index.js'</span>;
-
-<span class="token-keyword">const</span> yaml = <span class="token-string">`service: Datafrog\nversion: 2.1\nenv:\n  - production\n  - staging`</span>;
-
-<span class="token-comment">// 1. Parse and deep mutate</span>
-<span class="token-keyword">const</span> parsed = YmlTool.<span class="token-fn">parse</span>(yaml);
-YmlTool.<span class="token-fn">set</span>(parsed, <span class="token-string">'env.2'</span>, <span class="token-string">'sandbox'</span>);
-
-<span class="token-comment">// 2. Key reordering and sorting</span>
-<span class="token-keyword">const</span> sorted = YmlTool.<span class="token-fn">sortKeys</span>(parsed);
-
-<span class="token-comment">// 3. Deep diff against source</span>
-<span class="token-keyword">const</span> diff = YmlTool.<span class="token-fn">diff</span>(yaml, sorted);
-console.<span class="token-fn">log</span>(<span class="token-string">'Diff summary:'</span>, diff.summary);</code></pre>
+      <div class="pill-card"><h4>Format YAML</h4><p>Make YAML easier to read and review by organizing its layout and spacing.</p></div>
+      <div class="pill-card"><h4>Check YAML</h4><p>Find common problems that can prevent YAML data from being used correctly.</p></div>
+      <div class="pill-card"><h4>Clean &amp; Organize</h4><p>Sort keys, clean unwanted content, and organize your YAML data.</p></div>
+      <div class="pill-card"><h4>Compare YAML Files</h4><p>Compare two YAML files and identify changes between them.</p></div>
+      <div class="pill-card"><h4>Convert YAML</h4><p>Convert YAML to supported formats such as JSON, XML, CSV, and other available formats.</p></div>
+      <div class="pill-card"><h4>Work With YAML Data</h4><p>Review and make supported changes to nested YAML information without sending the file to a server.</p></div>
     </div>
   </div>
 </div>
