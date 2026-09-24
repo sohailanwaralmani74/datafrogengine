@@ -24,14 +24,20 @@ description: Free online GeoJSON tools for checking, cleaning, comparing, simpli
   </div>
 
   <div class="page-section">
-    <h2 class="section-subheading">What You Can Do With GeoJSON</h2>
+    <h2 class="section-subheading">Available GEOJSON Tools</h2>
     <div class="feature-pills-grid">
-      <div class="pill-card"><h4>Check GeoJSON</h4><p>Check geographic data for common problems with locations, shapes, and coordinates.</p></div>
-      <div class="pill-card"><h4>Clean Coordinates</h4><p>Adjust supported coordinate data, remove unwanted information, and prepare geographic files for use.</p></div>
-      <div class="pill-card"><h4>Simplify Shapes</h4><p>Reduce unnecessary coordinate points to make geographic data smaller and easier to work with.</p></div>
-      <div class="pill-card"><h4>Compare GeoJSON</h4><p>Compare geographic files and identify changes in their data.</p></div>
-      <div class="pill-card"><h4>Convert Geographic Data</h4><p>Convert GeoJSON to supported formats such as WKT, KML, SVG, and other available formats.</p></div>
-      <div class="pill-card"><h4>Review Map Data</h4><p>Inspect geographic features, locations, properties, and other information stored in your file.</p></div>
+      {% assign category_tools = site.data.tools | where: "category", "geojson" %}
+      {% if category_tools.size > 0 %}
+        {% for tool in category_tools %}
+          <div class="pill-card">
+            <h4>{{ tool.name }}</h4>
+            {% if tool.description %}<p>{{ tool.description }}</p>{% endif %}
+            {% if tool.url %}<a href="{{ tool.url | relative_url }}" class="btn btn-secondary">Open Tool</a>{% endif %}
+          </div>
+        {% endfor %}
+      {% else %}
+        <p class="section-desc">No tools are currently listed in this category.</p>
+      {% endif %}
     </div>
   </div>
 </div>
