@@ -115,7 +115,7 @@
             type="text" 
             class="global-search-input" 
             id="global-tools-search" 
-            placeholder="Search tools, formats, APIs (e.g. PDF, Excel, GeoJSON)..." 
+            placeholder="Search available tools (e.g. PDF, Excel, GeoJSON)..." 
             aria-label="Global tools search box"
             autocomplete="off"
           />
@@ -296,6 +296,7 @@
       </div>
     </footer>
 
+    <script>window.datafrogTools = {{ site.data.tools | jsonify }};</script>
     <script src="{{ '/assets/js/main.js' | relative_url }}"></script>
   </body>
 </html>
