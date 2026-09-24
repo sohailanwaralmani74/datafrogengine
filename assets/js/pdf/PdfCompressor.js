@@ -24,10 +24,14 @@ export class PdfCompressor {
   static compressWithReport(docOrBytes, options = {}) {
     const startTime = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
 
-    let originalSize = docOrBytes instanceof Uint8Array ? docOrBytes.length : 0;
+    let originalBytes = docOrBytes instanceof Uint8Array ? new Uint8Array(docOrBytes) : null;
+    let originalSize = originalBytes ? originalBytes.length : 0;
     const doc = docOrBytes instanceof PdfDocument ? docOrBytes : PdfDocument.load(docOrBytes);
 
-    if (originalSize === 0) originalSize = doc.save().length;
+    if (!originalBytes) {
+      originalBytes = doc.save();
+      originalSize = originalBytes.length;
+    }
 
     const level = options.level || 'recommended';
     const stripMeta = options.stripMetadata !== undefined
@@ -56,8 +60,19 @@ export class PdfCompressor {
 
     if (compressStreams) PdfCompressor.#compressStreams(doc, streamStats);
 
-    const compressedBytes = doc.save();
-    const compressedSize = compressedBytes.length;
+    let compressedBytes = doc.save();
+    let compressedSize = compressedBytes.length;
+
+    // A compressor must never make the user's PDF larger. The current writer
+    // can legitimately add serialization overhead (especially when rebuilding
+    // object streams). If the rebuilt file is larger, keep the original bytes.
+    // This is a correctness safeguard until the writer has a compact rebuild
+    // path for every PDF structure.
+    const rebuiltGrew = compressedSize > originalSize;
+    if (rebuiltGrew) {
+      compressedBytes = originalBytes;
+      compressedSize = originalSize;
+    }
 
     let finalObjectCount = 0;
     try {
@@ -82,7 +97,7 @@ export class PdfCompressor {
       savedBytes,
       ratioPercent,
       reductionPercent: Math.max(0, ratioPercent),
-      grew: savedBytes < 0,
+      grew: false,
       pageCount,
       objectsPurged,
       durationMs: Math.max(1, Math.round(endTime - startTime)),
