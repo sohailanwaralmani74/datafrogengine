@@ -1,88 +1,42 @@
 ---
 layout: default
-title: CSV Tools — Clean, Convert, Validate & Analyze CSV
+title: CSV Tools — Clean, Sort, Compare & Convert CSV
 format: csv
-description: Free browser-based CSV tools for cleaning, filtering, sorting, validating, converting, comparing, and analyzing CSV files.
+description: Free online CSV tools for cleaning, filtering, sorting, validating, comparing, combining, and converting CSV files.
 ---
 
 <div class="page-container" id="page-csv">
   <div class="page-header">
     <div class="page-badge-row">
-      <span class="page-badge badge-csv">RFC 4180</span>
-      <span class="page-badge badge-zero-dep">Browser-based</span>
-      <span class="page-badge badge-methods">CSV Tools</span>
+      <span class="page-badge badge-csv">CSV</span>
+      <span class="page-badge badge-zero-dep">Private on your device</span>
+      <span class="page-badge badge-methods">Free Tools</span>
     </div>
     <h1 class="page-title">CSV Tools</h1>
-    <p class="page-subtitle">
-      Practical tools for common CSV work, from delimiter detection and validation to filtering, sorting, profiling, and conversion.
-      Automatic delimiter detection, relational joins, grouping, pivot tables, column/row reordering, schema validation, and tabular diffing.
-    </p>
+    <p class="page-subtitle">Clean, organize, check, compare, combine, and convert CSV files. Work with your data directly on your device without uploading the file to our servers.</p>
   </div>
 
   <div class="page-quick-stats">
-    <div class="quick-stat-box">
-      <span class="stat-num">RFC 4180</span>
-      <span class="stat-lbl">Specification</span>
-    </div>
-    <div class="quick-stat-box">
-      <span class="stat-num">CSV</span>
-      <span class="stat-lbl">Tool Tools</span>
-    </div>
-    <div class="quick-stat-box">
-      <span class="stat-num">Auto</span>
-      <span class="stat-lbl">Delimiter Sniffing</span>
-    </div>
-    <div class="quick-stat-box">
-      <span class="stat-num">Data</span>
-      <span class="stat-lbl">Join &amp; Group By</span>
-    </div>
+    <div class="quick-stat-box"><span class="stat-num">Clean</span><span class="stat-lbl">Remove unwanted data</span></div>
+    <div class="quick-stat-box"><span class="stat-num">Sort</span><span class="stat-lbl">Organize your rows</span></div>
+    <div class="quick-stat-box"><span class="stat-num">Compare</span><span class="stat-lbl">Find differences</span></div>
+    <div class="quick-stat-box"><span class="stat-num">Convert</span><span class="stat-lbl">Change file format</span></div>
   </div>
 
   <div class="page-section">
-    <h2 class="section-subheading">Relational Tabular Capabilities</h2>
+    <h2 class="section-subheading">What You Can Do With CSV</h2>
     <div class="feature-pills-grid">
-      <div class="pill-card">
-        <h4>Auto Delimiter Sniffing</h4>
-        <p>Instantly detect commas, tabs, semicolons, and pipes while safely parsing multiline escaped quotes.</p>
-        <code>Detect the CSV delimiter</code>
-      </div>
-      <div class="pill-card">
-        <h4>Relational Joins &amp; Grouping</h4>
-        <p>Perform inner, left, and full joins between CSV datasets, compute aggregations, and generate pivot tables.</p>
-        <code>Combine CSV data</code>
-      </div>
-      <div class="pill-card">
-        <h4>Column &amp; Row Reordering</h4>
-        <p>Reorder column sequences, drop sensitive columns, rename headers, and sort rows by multi-column comparators.</p>
-        <code>Reorder columns</code>
-      </div>
-      <div class="pill-card">
-        <h4>Data Profiling &amp; Schema</h4>
-        <p>Profile column null counts, infer column data types (dates, integers, booleans), and validate strict schemas.</p>
-        <code>Profile columns and values</code>
-      </div>
+      <div class="pill-card"><h4>Clean CSV Files</h4><p>Remove unwanted rows or columns, clean values, rename headings, and prepare a file for further use.</p></div>
+      <div class="pill-card"><h4>Filter &amp; Sort Data</h4><p>Find the records you need and arrange rows and columns in the order that makes sense for your work.</p></div>
+      <div class="pill-card"><h4>Combine CSV Data</h4><p>Bring related CSV data together and work with information from more than one file.</p></div>
+      <div class="pill-card"><h4>Check Your CSV</h4><p>Find common problems in rows, columns, headings, and values before using the file elsewhere.</p></div>
+      <div class="pill-card"><h4>Compare CSV Files</h4><p>Check two CSV files to see which records or values have changed.</p></div>
+      <div class="pill-card"><h4>Convert CSV</h4><p>Convert CSV data to supported formats such as JSON, Excel, and other available file types.</p></div>
     </div>
   </div>
 
   <div class="page-section">
-    <h2 class="section-subheading">Example CSV Workflow</h2>
-    <div class="code-container">
-      <pre class="code-pre"><code><span class="token-keyword">import</span> { CsvTool } <span class="token-keyword">from</span> <span class="token-string">'/assets/js/index.js'</span>;
-
-<span class="token-keyword">const</span> rawCsv = <span class="token-string">`id,country,sales,year\n1,USA,50000,2025\n2,Germany,34000,2025\n3,USA,62000,2026`</span>;
-
-<span class="token-comment">// 1. Reorder columns &amp; filter rows</span>
-<span class="token-keyword">const</span> filtered = CsvTool.<span class="token-fn">filter</span>(rawCsv, row =&gt; Number(row.sales) &gt; 40000);
-<span class="token-keyword">const</span> reordered = CsvTool.<span class="token-fn">reorderColumns</span>(filtered, [<span class="token-string">'country'</span>, <span class="token-string">'sales'</span>, <span class="token-string">'year'</span>]);
-
-<span class="token-comment">// 2. Group by country with aggregation</span>
-<span class="token-keyword">const</span> summary = CsvTool.<span class="token-fn">groupBy</span>(rawCsv, <span class="token-string">'country'</span>, {
-  totalSales: rows =&gt; rows.reduce((acc, r) =&gt; acc + Number(r.sales), 0)
-});
-
-<span class="token-comment">// 3. Convert to Excel or JSON</span>
-<span class="token-keyword">const</span> json = CsvTool.<span class="token-fn">toJson</span>(reordered);
-console.<span class="token-fn">log</span>(<span class="token-string">'Summary JSON:'</span>, json);</code></pre>
-    </div>
+    <h2 class="section-subheading">Your Files Stay With You</h2>
+    <p class="section-desc">Open your CSV file, make the changes you need, and save the result. Your file is handled on your device rather than uploaded to our servers.</p>
   </div>
 </div>
