@@ -1,85 +1,37 @@
 ---
 layout: default
-title: XML Tools — Format, Validate, Convert & Inspect XML
+title: XML Tools — Format, Validate, Search & Convert XML
 format: xml
-description: Free browser-based XML tools for formatting, validating, searching, editing, comparing, and converting XML data.
+description: Free online XML tools for formatting, checking, searching, editing, comparing, and converting XML files and data.
 ---
 
 <div class="page-container" id="page-xml">
   <div class="page-header">
     <div class="page-badge-row">
-      <span class="page-badge badge-xml">W3C XML 1.0</span>
-      <span class="page-badge badge-zero-dep">SAX &amp; DOM</span>
-      <span class="page-badge badge-methods">XML Tools</span>
+      <span class="page-badge badge-xml">XML</span>
+      <span class="page-badge badge-zero-dep">Private on your device</span>
+      <span class="page-badge badge-methods">Free Tools</span>
     </div>
     <h1 class="page-title">XML Tools</h1>
-    <p class="page-subtitle">
-      Practical XML tools for formatting, inspecting, searching, editing, comparing, and converting XML files and text.
-    </p>
+    <p class="page-subtitle">Format, check, search, edit, compare, and convert XML files and data. Work with your file directly on your device without uploading it to our servers.</p>
   </div>
 
   <div class="page-quick-stats">
-    <div class="quick-stat-box">
-      <span class="stat-num">XML 1.0</span>
-      <span class="stat-lbl">W3C Standard</span>
-    </div>
-    <div class="quick-stat-box">
-      <span class="stat-num">XML</span>
-      <span class="stat-lbl">Tool Tools</span>
-    </div>
-    <div class="quick-stat-box">
-      <span class="stat-num">XPath</span>
-      <span class="stat-lbl">Query Expressions</span>
-    </div>
-    <div class="quick-stat-box">
-      <span class="stat-num">SAX</span>
-      <span class="stat-lbl">Streaming Events</span>
-    </div>
+    <div class="quick-stat-box"><span class="stat-num">Format</span><span class="stat-lbl">Make XML easier to read</span></div>
+    <div class="quick-stat-box"><span class="stat-num">Check</span><span class="stat-lbl">Find common problems</span></div>
+    <div class="quick-stat-box"><span class="stat-num">Search</span><span class="stat-lbl">Find information quickly</span></div>
+    <div class="quick-stat-box"><span class="stat-num">Convert</span><span class="stat-lbl">Change file format</span></div>
   </div>
 
   <div class="page-section">
-    <h2 class="section-subheading">XML What You Can Do</h2>
+    <h2 class="section-subheading">What You Can Do With XML</h2>
     <div class="feature-pills-grid">
-      <div class="pill-card">
-        <h4>Streaming SAX &amp; DOM</h4>
-        <p>Stream massive XML feeds using lightweight event callbacks or construct full DOM trees with namespaces.</p>
-        <code>Read XML structure</code>
-      </div>
-      <div class="pill-card">
-        <h4>XPath &amp; CSS-Style Selectors</h4>
-        <p>Query nodes by tag names, attribute values, and child paths with full attribute mutation capabilities.</p>
-        <code>Find XML elements</code>
-      </div>
-      <div class="pill-card">
-        <h4>Child Permutation &amp; Reordering</h4>
-        <p>Reorder child tags, rename tag names, strip comments, and eliminate whitespace noise.</p>
-        <code>Reorder XML elements</code>
-      </div>
-      <div class="pill-card">
-        <h4>Bi-directional JSON Bridge</h4>
-        <p>Convert XML structures directly into compact JSON objects and re-serialize JSON trees into validated XML.</p>
-        <code>Convert XML to JSON</code>
-      </div>
-    </div>
-  </div>
-
-  <div class="page-section">
-    <h2 class="section-subheading">Example XML Workflow</h2>
-    <div class="code-container">
-      <pre class="code-pre"><code><span class="token-keyword">import</span> { XmlTool } <span class="token-keyword">from</span> <span class="token-string">'/assets/js/index.js'</span>;
-
-<span class="token-keyword">const</span> xml = <span class="token-string">`&lt;catalog&gt;&lt;book id="bk101"&gt;&lt;title&gt;Datafrog Manual&lt;/title&gt;&lt;price&gt;44.95&lt;/price&gt;&lt;/book&gt;&lt;/catalog&gt;`</span>;
-
-<span class="token-comment">// 1. Parse into DOM tree</span>
-<span class="token-keyword">const</span> doc = XmlTool.<span class="token-fn">parse</span>(xml);
-
-<span class="token-comment">// 2. Query nodes</span>
-<span class="token-keyword">const</span> book = XmlTool.<span class="token-fn">query</span>(doc, <span class="token-string">'book'</span>);
-XmlTool.<span class="token-fn">setAttribute</span>(book, <span class="token-string">'status'</span>, <span class="token-string">'active'</span>);
-
-<span class="token-comment">// 3. Convert to JSON</span>
-<span class="token-keyword">const</span> json = XmlTool.<span class="token-fn">toJson</span>(xml);
-console.<span class="token-fn">log</span>(<span class="token-string">'Converted JSON:'</span>, json);</code></pre>
+      <div class="pill-card"><h4>Format XML</h4><p>Turn difficult-to-read XML into a clean, organized layout that is easier to inspect.</p></div>
+      <div class="pill-card"><h4>Check XML</h4><p>Check your XML for common structural and formatting problems before using it elsewhere.</p></div>
+      <div class="pill-card"><h4>Search &amp; Edit</h4><p>Find elements and information inside an XML file and make supported changes.</p></div>
+      <div class="pill-card"><h4>Compare XML Files</h4><p>Compare two XML files to see what information has been added, removed, or changed.</p></div>
+      <div class="pill-card"><h4>Convert XML</h4><p>Convert XML data to supported formats such as JSON, CSV, and other available formats.</p></div>
+      <div class="pill-card"><h4>Clean XML</h4><p>Remove unwanted formatting or content and organize XML for easier use.</p></div>
     </div>
   </div>
 </div>
