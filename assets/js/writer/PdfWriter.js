@@ -7,6 +7,7 @@ import { PdfStream } from '../objects/PdfStream.js';
 import { PdfIndirectObject } from '../objects/PdfIndirectObject.js';
 import { PdfHexString } from '../objects/PdfHexString.js';
 import { PdfInvalidArgumentException } from '../errors/PdfInvalidArgumentException.js';
+import { FlateEncode } from '../streams/filters/FlateEncode.js';
 
 
 
@@ -21,12 +22,17 @@ export class PdfWriter {
    * @param {PdfDocument} document
    * @returns {Uint8Array}
    */
-  static write(document) {
+  static write(document, options = {}) {
     if (!document || typeof document.getCatalog !== 'function' || typeof document.getXRefTable !== 'function') {
       throw new PdfInvalidArgumentException('document', document, 'PdfDocument instance');
     }
 
     const version = document.getPdfVersion() || '1.7';
+
+    if (options.compact === true && !document.securityHandler && PdfWriter.#versionAtLeast(version, '1.5')) {
+      return PdfWriter.#writeCompact(document, version);
+    }
+
     const chunks = [];
 
     // 1. File Header
@@ -126,12 +132,157 @@ export class PdfWriter {
   }
 
 
+  static #versionAtLeast(actual, minimum) {
+    const [aMajor, aMinor] = String(actual).split('.').map(Number);
+    const [bMajor, bMinor] = String(minimum).split('.').map(Number);
+    return aMajor > bMajor || (aMajor === bMajor && aMinor >= bMinor);
+  }
+
+  static #writeCompact(document, version) {
+    const { objectList, catalogRef, infoRef } = PdfWriter.#collectObjects(document, { expandCompressed: true });
+
+    objectList.sort((a, b) => a.num - b.num);
+    const oldToNew = new Map();
+    objectList.forEach((item, index) => oldToNew.set(item.num, index + 1));
+
+    const remap = (value) => {
+      if (!value) return value;
+      if (value instanceof PdfReference) {
+        const mapped = oldToNew.get(value.objectNumber);
+        return mapped !== undefined ? PdfReference.of(mapped, 0) : value;
+      }
+      if (value instanceof PdfArray) {
+        const arr = new PdfArray();
+        for (let i = 0; i < value.size(); i++) arr.push(remap(value.get(i)));
+        return arr;
+      }
+      if (value instanceof PdfDictionary) {
+        const dict = new PdfDictionary();
+        for (const [k, v] of value.entries()) dict.set(k, remap(v));
+        return dict;
+      }
+      return value;
+    };
+
+    const mappedObjects = objectList.map((item, index) => {
+      const mapped = item.obj instanceof PdfStream
+        ? new PdfStream(remap(item.obj.dictionary), item.obj.bytes)
+        : remap(item.obj);
+      return { num: index + 1, obj: mapped };
+    });
+
+    const mappedCatalogRef = PdfReference.of(oldToNew.get(catalogRef.objectNumber), 0);
+    const mappedInfoRef = infoRef && oldToNew.has(infoRef.objectNumber)
+      ? PdfReference.of(oldToNew.get(infoRef.objectNumber), 0)
+      : null;
+
+    const packed = [];
+    const direct = [];
+    for (const item of mappedObjects) {
+      const type = item.obj instanceof PdfDictionary ? item.obj.getName('Type') : null;
+      const keepDirect = item.obj instanceof PdfStream ||
+        type === 'Catalog' || type === 'Pages' || type === 'Page';
+      if (keepDirect) direct.push(item);
+      else packed.push(item);
+    }
+
+    let nextObjectNumber = mappedObjects.length + 1;
+    const xrefEntries = new Map();
+    const chunks = [];
+    const header = new TextEncoder().encode('%PDF-' + version + '\n%\xFF\xFF\xFF\xFF\n');
+    chunks.push(header);
+    let offset = header.length;
+
+    const writeObject = (num, obj) => {
+      const head = new TextEncoder().encode(String(num) + ' 0 obj\n');
+      const body = PdfObjectWriter.serialize(obj);
+      const tail = new TextEncoder().encode('\nendobj\n');
+      xrefEntries.set(num, { type: 1, field2: offset, field3: 0 });
+      chunks.push(head, body, tail);
+      offset += head.length + body.length + tail.length;
+    };
+
+    direct.sort((a, b) => a.num - b.num);
+    for (const item of direct) writeObject(item.num, item.obj);
+
+    for (let start = 0; start < packed.length; start += 100) {
+      const group = packed.slice(start, start + 100);
+      const headers = [];
+      const bodies = [];
+      let bodyOffset = 0;
+
+      for (const item of group) {
+        const body = PdfObjectWriter.serialize(item.obj);
+        headers.push(String(item.num) + ' ' + String(bodyOffset));
+        bodies.push(body);
+        bodyOffset += body.length + 1;
+      }
+
+      const headerBytes = new TextEncoder().encode(headers.join(' ') + '\n');
+      const separator = new Uint8Array([0x20]);
+      const parts = [headerBytes];
+      for (const body of bodies) parts.push(body, separator);
+      const raw = PdfObjectWriter.concatBytes(parts);
+      const encoded = FlateEncode.encode(raw);
+      const streamNum = nextObjectNumber++;
+
+      const dict = new PdfDictionary();
+      dict.set('Type', PdfName.of('ObjStm'));
+      dict.set('N', PdfNumber.of(group.length));
+      dict.set('First', PdfNumber.of(headerBytes.length));
+      dict.set('Filter', PdfName.of('FlateDecode'));
+
+      writeObject(streamNum, new PdfStream(dict, encoded));
+
+      group.forEach((item, index) => {
+        xrefEntries.set(item.num, { type: 2, field2: streamNum, field3: index });
+      });
+    }
+
+    const xrefNum = nextObjectNumber++;
+    const size = xrefNum + 1;
+    const xrefOffset = offset;
+    const entryWidth = 7;
+    const xrefRaw = new Uint8Array(size * entryWidth);
+
+    const putBE = (value, width, position) => {
+      for (let i = width - 1; i >= 0; i--) {
+        xrefRaw[position + (width - 1 - i)] = Math.floor(value / (2 ** (i * 8))) & 0xFF;
+      }
+    };
+
+    putBE(0, 1, 0);
+    putBE(0, 4, 1);
+    putBE(0xFFFF, 2, 5);
+
+    for (let num = 1; num < size; num++) {
+      const entry = xrefEntries.get(num) || { type: 0, field2: 0, field3: 0 };
+      const p = num * entryWidth;
+      putBE(entry.type, 1, p);
+      putBE(entry.field2, 4, p + 1);
+      putBE(entry.field3, 2, p + 5);
+    }
+
+    const xrefDict = new PdfDictionary();
+    xrefDict.set('Type', PdfName.of('XRef'));
+    xrefDict.set('Size', PdfNumber.of(size));
+    xrefDict.set('W', new PdfArray([PdfNumber.of(1), PdfNumber.of(4), PdfNumber.of(2)]));
+    xrefDict.set('Root', mappedCatalogRef);
+    if (mappedInfoRef) xrefDict.set('Info', mappedInfoRef);
+    xrefDict.set('Filter', PdfName.of('FlateDecode'));
+
+    writeObject(xrefNum, new PdfStream(xrefDict, FlateEncode.encode(xrefRaw)));
+    chunks.push(new TextEncoder().encode('startxref\n' + String(xrefOffset) + '\n%%EOF\n'));
+
+    return PdfObjectWriter.concatBytes(chunks);
+  }
+
   /**
    * Traverses and collects all reachable objects from the document catalog.
    * Assigns clean sequential object numbers 1, 2, 3, ...
    * @private
    */
-  static #collectObjects(document) {
+  static #collectObjects(document, options = {}) {
     const catalog = document.getCatalog();
     const catalogDict = catalog.dictionary;
 
@@ -175,8 +326,14 @@ export class PdfWriter {
 
         const entry = xref.getEntry(val.objectNumber);
         if (entry && entry.isCompressed()) {
-          // Keep compressed-object references intact. The containing /ObjStm
-          // is copied below so its internal object numbering remains valid.
+          if (options.expandCompressed) {
+            const resolved = document.resolve(val);
+            if (!resolved) return val;
+            const assignedRef = getOrAssignDirectRef(resolved);
+            visitedOldKeys.set(oldKey, assignedRef.objectNumber);
+            return assignedRef;
+          }
+
           const streamRef = PdfReference.of(entry.streamObjectNumber, 0);
           const streamObj = document.resolve(streamRef);
           if (streamObj && !directToRef.has(streamObj)) {
