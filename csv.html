@@ -9,8 +9,8 @@ description: Free browser-based CSV tools for cleaning, filtering, sorting, vali
   <div class="page-header">
     <div class="page-badge-row">
       <span class="page-badge badge-csv">RFC 4180</span>
-      <span class="page-badge badge-zero-dep">Zero Dependencies</span>
-      <span class="page-badge badge-methods">Practical CSV Operations</span>
+      <span class="page-badge badge-zero-dep">Browser-based</span>
+      <span class="page-badge badge-methods">CSV Tools</span>
     </div>
     <h1 class="page-title">CSV Tools</h1>
     <p class="page-subtitle">
@@ -25,15 +25,15 @@ description: Free browser-based CSV tools for cleaning, filtering, sorting, vali
       <span class="stat-lbl">Specification</span>
     </div>
     <div class="quick-stat-box">
-      <span class="stat-num">34</span>
-      <span class="stat-lbl">Tool Operations</span>
+      <span class="stat-num">CSV</span>
+      <span class="stat-lbl">Tool Tools</span>
     </div>
     <div class="quick-stat-box">
       <span class="stat-num">Auto</span>
       <span class="stat-lbl">Delimiter Sniffing</span>
     </div>
     <div class="quick-stat-box">
-      <span class="stat-num">SQL-like</span>
+      <span class="stat-num">Data</span>
       <span class="stat-lbl">Join &amp; Group By</span>
     </div>
   </div>
@@ -67,21 +67,21 @@ description: Free browser-based CSV tools for cleaning, filtering, sorting, vali
   <div class="page-section">
     <h2 class="section-subheading">Example CSV Workflow</h2>
     <div class="code-container">
-      <pre class="code-pre"><code><span class="token-keyword">import</span> { CsvEngine } <span class="token-keyword">from</span> <span class="token-string">'/assets/js/index.js'</span>;
+      <pre class="code-pre"><code><span class="token-keyword">import</span> { CsvTool } <span class="token-keyword">from</span> <span class="token-string">'/assets/js/index.js'</span>;
 
 <span class="token-keyword">const</span> rawCsv = <span class="token-string">`id,country,sales,year\n1,USA,50000,2025\n2,Germany,34000,2025\n3,USA,62000,2026`</span>;
 
 <span class="token-comment">// 1. Reorder columns &amp; filter rows</span>
-<span class="token-keyword">const</span> filtered = CsvEngine.<span class="token-fn">filter</span>(rawCsv, row =&gt; Number(row.sales) &gt; 40000);
-<span class="token-keyword">const</span> reordered = CsvEngine.<span class="token-fn">reorderColumns</span>(filtered, [<span class="token-string">'country'</span>, <span class="token-string">'sales'</span>, <span class="token-string">'year'</span>]);
+<span class="token-keyword">const</span> filtered = CsvTool.<span class="token-fn">filter</span>(rawCsv, row =&gt; Number(row.sales) &gt; 40000);
+<span class="token-keyword">const</span> reordered = CsvTool.<span class="token-fn">reorderColumns</span>(filtered, [<span class="token-string">'country'</span>, <span class="token-string">'sales'</span>, <span class="token-string">'year'</span>]);
 
 <span class="token-comment">// 2. Group by country with aggregation</span>
-<span class="token-keyword">const</span> summary = CsvEngine.<span class="token-fn">groupBy</span>(rawCsv, <span class="token-string">'country'</span>, {
+<span class="token-keyword">const</span> summary = CsvTool.<span class="token-fn">groupBy</span>(rawCsv, <span class="token-string">'country'</span>, {
   totalSales: rows =&gt; rows.reduce((acc, r) =&gt; acc + Number(r.sales), 0)
 });
 
 <span class="token-comment">// 3. Convert to Excel or JSON</span>
-<span class="token-keyword">const</span> json = CsvEngine.<span class="token-fn">toJson</span>(reordered);
+<span class="token-keyword">const</span> json = CsvTool.<span class="token-fn">toJson</span>(reordered);
 console.<span class="token-fn">log</span>(<span class="token-string">'Summary JSON:'</span>, json);</code></pre>
     </div>
   </div>
