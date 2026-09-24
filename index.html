@@ -1,479 +1,55 @@
 ---
 layout: default
-title: Data Tools — Free Online File & Data Tools
+title: DataFrog — Free Online File & Data Tools
 ---
 
 <section class="hero-section" id="hero-section">
   <div class="hero-container">
-    <div class="hero-pill" id="hero-pill">
-      <span class="pill-dot"></span> Pure JavaScript &bull; Zero Native Dependencies
-    </div>
-    <h1 class="hero-title" id="hero-title">
-      High-Performance Document &amp; Data Processing Tools Suite
-    </h1>
+    <div class="hero-pill" id="hero-pill"><span class="pill-dot"></span> Free browser-based file &amp; data tools</div>
+    <h1 class="hero-title" id="hero-title">Simple Online Tools for Working With Your Files and Data</h1>
     <p class="hero-subtitle" id="hero-subtitle">
-      A growing collection of practical browser-based tools for working with JSON, CSV, Excel, PDF, XML, YAML, GeoJSON, and financial statement files.
-      Parse, query, convert, compress, edit, analyze, compare, clean, and reconcile across CSV, Microsoft Excel (.xlsx),
-      W3C XML 1.0, JSON, PDF-1.7, YAML (YML), RFC 7946 GeoJSON, and Financial formats (QIF, QFX, QBO, OFX) across any modern JavaScript runtime.
+      DataFrog provides practical tools for JSON, CSV, Excel, PDF, XML, YAML, GeoJSON, and financial statement files.
+      Open a file or paste your data, choose the task you need, and download the result directly from your browser.
     </p>
     <div class="hero-actions" id="hero-actions">
-      <a href="#quickstart" class="btn btn-primary" id="btn-get-started">Explore Tools</a>
-      <a href="#json-studio" class="btn btn-secondary" id="btn-view-json-studio">JSON Tools</a>
-      <a href="#xml-playground" class="btn btn-secondary" id="btn-view-playground">XML Tools</a>
-      <a href="#features" class="btn btn-secondary" id="btn-view-features">What You Can Do</a>
+      <a href="#features" class="btn btn-primary" id="btn-get-started">Explore Tools</a>
+      <a href="json.html" class="btn btn-secondary" id="btn-view-json-studio">JSON Tools</a>
+      <a href="xml.html" class="btn btn-secondary" id="btn-view-playground">XML Tools</a>
     </div>
-
     <div class="hero-stats" id="hero-stats">
-      <div class="stat-card" id="stat-spec">
-        <span class="stat-value">CSV &bull; XLSX &bull; XML &bull; JSON &bull; PDF &bull; YML &bull; GeoJSON &bull; QIF/QFX/QBO</span>
-        <span class="stat-label">ISO 32000 &bull; ECMA-376 &bull; W3C &bull; RFC 8259 &bull; RFC 7946 &bull; OFX 1.x/2.x</span>
-      </div>
-      <div class="stat-card" id="stat-suites">
-        <span class="stat-value">8 Categories</span>
-        <span class="stat-label">Focused file and data tools</span>
-      </div>
-      <div class="stat-card" id="stat-deps">
-        <span class="stat-value">0</span>
-        <span class="stat-label">Server uploads required</span>
-      </div>
-      <div class="stat-card" id="stat-runtime">
-        <span class="stat-value">100%</span>
-        <span class="stat-label">Runs in your browser</span>
-      </div>
+      <div class="stat-card"><span class="stat-value">8</span><span class="stat-label">File &amp; data categories</span></div>
+      <div class="stat-card"><span class="stat-value">Browser</span><span class="stat-label">Work with files on your device</span></div>
+      <div class="stat-card"><span class="stat-value">No account</span><span class="stat-label">Start using the tools directly</span></div>
+      <div class="stat-card"><span class="stat-value">Download</span><span class="stat-label">Save your finished result</span></div>
     </div>
   </div>
 </section>
 
 <section class="section-container" id="features">
   <div class="section-header">
-    <h2 class="section-title" id="features-heading">Tools by Category</h2>
-    <p class="section-desc">Choose a category below to find practical tools for common file and data tasks.</p>
+    <h2 class="section-title" id="features-heading">Choose a Tool Category</h2>
+    <p class="section-desc">Find the file or data format you are working with, then choose the specific task you want to complete.</p>
   </div>
-
   <div class="card-grid" id="features-grid">
-    <!-- Excel Engine Subsystems -->
-    <article class="feature-card" id="card-excel-wb">
-      <div class="feature-icon-wrapper">
-        <span class="feature-tag">EXCEL &bull; CORE</span>
-      </div>
-      <h3 class="feature-heading">Workbook &amp; Sheet Hierarchy</h3>
-      <p class="feature-text">
-        Multi-worksheet management with dynamic 1-based coordinate mapping (<code>A1</code> &harr; <code>(col, row)</code>),
-        custom row heights, column widths, frozen panes, gridline controls, and merged cell ranges.
-      </p>
-    </article>
-
-    <article class="feature-card" id="card-excel-formula">
-      <div class="feature-icon-wrapper">
-        <span class="feature-tag">EXCEL &bull; FORMULAS</span>
-      </div>
-      <h3 class="feature-heading">Formula Expression Engine</h3>
-      <p class="feature-text">
-        Recursive-descent expression parser supporting arithmetic, comparisons, string concatenation, and built-in functions:
-        <code>SUM</code>, <code>AVERAGE</code>, <code>MIN</code>, <code>MAX</code>, <code>COUNT</code>, <code>IF</code>, <code>ROUND</code>, and cross-sheet references.
-      </p>
-    </article>
-
-    <article class="feature-card" id="card-excel-styles">
-      <div class="feature-icon-wrapper">
-        <span class="feature-tag">EXCEL &bull; STYLING</span>
-      </div>
-      <h3 class="feature-heading">StyleSheet &amp; Formatting</h3>
-      <p class="feature-text">
-        OpenXML styles manager for custom fonts, solid/pattern fills, multi-weight borders, horizontal/vertical alignments,
-        text wrapping, and ISO number formats (currency, percentages, dates).
-      </p>
-    </article>
-
-    <article class="feature-card" id="card-excel-zip">
-      <div class="feature-icon-wrapper">
-        <span class="feature-tag">EXCEL &bull; OPENXML</span>
-      </div>
-      <h3 class="feature-heading">ZIP &amp; OpenXML Serialization</h3>
-      <p class="feature-text">
-        In-memory ZIP archive engine with IEEE 802.3 CRC-32 checksums, Deflate compression, shared strings tables (SST),
-        relationship maps, and XML builders for 100% compliant .xlsx files.
-      </p>
-    </article>
-
-    <article class="feature-card" id="card-excel-interop">
-      <div class="feature-icon-wrapper">
-        <span class="feature-tag">EXCEL &bull; INTEROP</span>
-      </div>
-      <h3 class="feature-heading">CSV, JSON &amp; HTML Tables</h3>
-      <p class="feature-text">
-        Import and export data seamlessly. Load workbooks directly from CSV with auto-type casting, export to 2D arrays,
-        structured JSON objects with header keys, or styled HTML <code>&lt;table&gt;</code> elements.
-      </p>
-    </article>
-
-    <article class="feature-card" id="card-excel-builder">
-      <div class="feature-icon-wrapper">
-        <span class="feature-tag">EXCEL &bull; BUILDER</span>
-      </div>
-      <h3 class="feature-heading">Declarative Report Builder</h3>
-      <p class="feature-text">
-        Fluent <code>ExcelBuilder</code> API for rapid reporting: branding headers, styled banner titles, auto-fitted table columns,
-        zebra-striped data rows, and automated total calculation rows.
-      </p>
-    </article>
-
-    <!-- PDF Engine Subsystems -->
-    <article class="feature-card" id="card-pdf-parser">
-      <div class="feature-icon-wrapper">
-        <span class="feature-tag">PDF &bull; CORE</span>
-      </div>
-      <h3 class="feature-heading">Lexer &amp; Object Parser</h3>
-      <p class="feature-text">
-        Tokenizes arbitrary binary streams. Handles standard PDF objects: Dictionaries, Arrays,
-        Indirect References (<code>R</code>), Hex Strings, Name objects, Booleans, and Real numbers.
-      </p>
-    </article>
-
-    <article class="feature-card" id="card-pdf-streams">
-      <div class="feature-icon-wrapper">
-        <span class="feature-tag">PDF &bull; STREAMS</span>
-      </div>
-      <h3 class="feature-heading">Filter Decompression</h3>
-      <p class="feature-text">
-        Chained multi-stage decoders including FlateDecode, ASCIIHexDecode, ASCII85Decode,
-        RunLengthDecode, and LZW with TIFF/PNG horizontal and vertical predictor inversion.
-      </p>
-    </article>
-
-    <article class="feature-card" id="card-pdf-xref">
-      <div class="feature-icon-wrapper">
-        <span class="feature-tag">PDF &bull; INDEXING</span>
-      </div>
-      <h3 class="feature-heading">Cross-Reference Tables</h3>
-      <p class="feature-text">
-        Locates <code>startxref</code> from EOF, parses classic table sections, handles multi-generation
-        free/in-use entries, and parses modern compressed Cross-Reference Streams.
-      </p>
-    </article>
-
-    <article class="feature-card" id="card-pdf-typography">
-      <div class="feature-icon-wrapper">
-        <span class="feature-tag">PDF &bull; FONTS</span>
-      </div>
-      <h3 class="feature-heading">Typography &amp; Metrics</h3>
-      <p class="feature-text">
-        Standard 14 PDF font metrics (Helvetica, Times, Courier, Symbol, ZapfDingbats)
-        with character advance width tables, kerning, and automated line wrapping algorithms.
-      </p>
-    </article>
-
-    <article class="feature-card" id="card-pdf-vector">
-      <div class="feature-icon-wrapper">
-        <span class="feature-tag">PDF &bull; GRAPHICS</span>
-      </div>
-      <h3 class="feature-heading">Vector Engine &amp; Paths</h3>
-      <p class="feature-text">
-        Affine matrix transformation pipeline (scale, rotate, translate, skew).
-        Constructs Bézier curves, straight paths, clipping paths, and fill/stroke operators.
-      </p>
-    </article>
-
-    <article class="feature-card" id="card-pdf-security">
-      <div class="feature-icon-wrapper">
-        <span class="feature-tag">PDF &bull; SECURITY</span>
-      </div>
-      <h3 class="feature-heading">Encryption &amp; Metadata</h3>
-      <p class="feature-text">
-        Standard 40-bit and 128-bit encryption handlers, user/owner password authentication,
-        permissions dictionaries, and full trailer <code>/Info</code> metadata serialization.
-      </p>
-    </article>
-
-    <!-- XML Engine Subsystems -->
-    <article class="feature-card" id="card-xml-dom">
-      <div class="feature-icon-wrapper">
-        <span class="feature-tag tag-xml">XML &bull; DOM TREE</span>
-      </div>
-      <h3 class="feature-heading">W3C DOM &amp; Tokenizer</h3>
-      <p class="feature-text">
-        Full DOM Level 3 compliant node graph: <code>XmlDocument</code>, <code>XmlElement</code>, <code>XmlText</code>,
-        <code>XmlCData</code>, <code>XmlComment</code>, and <code>XmlProcessingInstruction</code> with line/column diagnostic tracking.
-      </p>
-    </article>
-
-    <article class="feature-card" id="card-xml-query">
-      <div class="feature-icon-wrapper">
-        <span class="feature-tag tag-xml">XML &bull; QUERIES</span>
-      </div>
-      <h3 class="feature-heading">XPath &amp; CSS Selectors</h3>
-      <p class="feature-text">
-        Query document nodes effortlessly via <code>querySelector</code> and <code>querySelectorAll</code>, or evaluate XPath 1.0
-        expressions including deep axis <code>//tag</code>, predicates <code>[@attr="val"]</code>, and positional indexing.
-      </p>
-    </article>
-
-    <article class="feature-card" id="card-xml-converter">
-      <div class="feature-icon-wrapper">
-        <span class="feature-tag tag-xml">XML &bull; JSON BRIDGE</span>
-      </div>
-      <h3 class="feature-heading">Bidirectional XML &harr; JSON</h3>
-      <p class="feature-text">
-        Seamless interoperability between XML documents and JavaScript objects. Automatic array aggregation,
-        configurable attribute prefixes (<code>@attr</code>), automatic type coercion, and fluent programmatic <code>XmlBuilder</code>.
-      </p>
-    </article>
-
-    <!-- JSON Engine & Data Processing Suite Subsystems -->
-    <article class="feature-card" id="card-json-converters">
-      <div class="feature-icon-wrapper">
-        <span class="feature-tag tag-json">JSON &bull; CONVERTERS</span>
-      </div>
-      <h3 class="feature-heading">Multi-Format Data Converters</h3>
-      <p class="feature-text">
-        Bi-directional, zero-loss transformation between JSON and XML, CSV, YAML, NDJSON, Microsoft Excel (.xlsx),
-        and styled PDF data reports with automatic header inference and delimiter auto-detection.
-      </p>
-    </article>
-
-    <article class="feature-card" id="card-json-editor">
-      <div class="feature-icon-wrapper">
-        <span class="feature-tag tag-json">JSON &bull; EDITORS</span>
-      </div>
-      <h3 class="feature-heading">Path Editor &amp; RFC 6902 Patch</h3>
-      <p class="feature-text">
-        Dot-notation &amp; JSON Pointer path navigation (<code>get</code>, <code>set</code>, <code>delete</code>), full RFC 6902 JSON Patch
-        engine (<code>applyPatch</code>, <code>createPatch</code>), object flattening/unflattening, key renaming, and deep merge.
-      </p>
-    </article>
-
-    <article class="feature-card" id="card-json-validator">
-      <div class="feature-icon-wrapper">
-        <span class="feature-tag tag-json">JSON &bull; VALIDATORS</span>
-      </div>
-      <h3 class="feature-heading">Diagnostic Validator &amp; JSON Schema</h3>
-      <p class="feature-text">
-        High-precision syntax validation with line/column pointers and visual code snippets. Complete JSON Schema
-        Draft-07 validator supporting types, ranges, regex patterns, formats (email, uuid, uri, date), and required fields.
-      </p>
-    </article>
-
-    <article class="feature-card" id="card-json-analyzer">
-      <div class="feature-icon-wrapper">
-        <span class="feature-tag tag-json">JSON &bull; ANALYZERS</span>
-      </div>
-      <h3 class="feature-heading">Structural Profiler &amp; Schema Inferer</h3>
-      <p class="feature-text">
-        Profiles byte sizes (raw, formatted, gzipped estimate), total nodes, max depth, type distribution, and anomaly detection.
-        Automatically synthesizes ready-to-use JSON Schema Draft-07 contracts from arbitrary datasets.
-      </p>
-    </article>
-
-    <article class="feature-card" id="card-json-inspector">
-      <div class="feature-icon-wrapper">
-        <span class="feature-tag tag-json">JSON &bull; INSPECTORS</span>
-      </div>
-      <h3 class="feature-heading">Diff Inspector &amp; JSONPath Queries</h3>
-      <p class="feature-text">
-        Deep structural diffing comparing additions, removals, and value/type modifications across documents.
-        JSONPath query engine evaluating deep descent <code>$..price</code>, wildcards, and filter expressions <code>[?(@.active)]</code>.
-      </p>
-    </article>
-
-    <article class="feature-card" id="card-json-cleaner">
-      <div class="feature-icon-wrapper">
-        <span class="feature-tag tag-json">JSON &bull; CLEANERS</span>
-      </div>
-      <h3 class="feature-heading">Sanitizer, Minifier &amp; Auto-Repair</h3>
-      <p class="feature-text">
-        Auto-heals malformed JSON by stripping JS comments (<code>//</code>, <code>/* */</code>), fixing single quotes, quoting bare keys,
-        and stripping trailing commas. Cleans nulls, empty strings/arrays, trims values, and normalizes key ordering.
-      </p>
-    </article>
+    <article class="feature-card"><div class="feature-icon-wrapper"><span class="feature-tag">JSON</span></div><h3 class="feature-heading">JSON Tools</h3><p class="feature-text">Format, validate, repair, compare, clean, convert, search, and analyze JSON data.</p><a href="json.html" class="btn btn-secondary">Open JSON Tools</a></article>
+    <article class="feature-card"><div class="feature-icon-wrapper"><span class="feature-tag">CSV</span></div><h3 class="feature-heading">CSV Tools</h3><p class="feature-text">Clean, filter, sort, validate, compare, combine, convert, and analyze CSV files.</p><a href="csv.html" class="btn btn-secondary">Open CSV Tools</a></article>
+    <article class="feature-card"><div class="feature-icon-wrapper"><span class="feature-tag">EXCEL</span></div><h3 class="feature-heading">Excel Tools</h3><p class="feature-text">Work with XLSX spreadsheets, including sheets, rows, columns, formulas, formatting, and conversions.</p><a href="excel.html" class="btn btn-secondary">Open Excel Tools</a></article>
+    <article class="feature-card"><div class="feature-icon-wrapper"><span class="feature-tag">PDF</span></div><h3 class="feature-heading">PDF Tools</h3><p class="feature-text">Compress, split, merge, extract, reorder, clean, watermark, and work with PDF pages.</p><a href="pdf.html" class="btn btn-secondary">Open PDF Tools</a></article>
+    <article class="feature-card"><div class="feature-icon-wrapper"><span class="feature-tag">XML</span></div><h3 class="feature-heading">XML Tools</h3><p class="feature-text">Format, validate, inspect, search, edit, compare, and convert XML documents.</p><a href="xml.html" class="btn btn-secondary">Open XML Tools</a></article>
+    <article class="feature-card"><div class="feature-icon-wrapper"><span class="feature-tag">YAML</span></div><h3 class="feature-heading">YAML Tools</h3><p class="feature-text">Format, validate, convert, sort, compare, and clean YAML and YML files.</p><a href="yml.html" class="btn btn-secondary">Open YAML Tools</a></article>
+    <article class="feature-card"><div class="feature-icon-wrapper"><span class="feature-tag">GEOJSON</span></div><h3 class="feature-heading">GeoJSON Tools</h3><p class="feature-text">Validate, simplify, clean, inspect, transform, and convert geographic data.</p><a href="geojson.html" class="btn btn-secondary">Open GeoJSON Tools</a></article>
+    <article class="feature-card"><div class="feature-icon-wrapper"><span class="feature-tag">FINANCIAL</span></div><h3 class="feature-heading">QIF, QFX, QBO &amp; OFX Tools</h3><p class="feature-text">Clean, review, compare, reconcile, analyze, and convert financial statement files.</p><a href="financial.html" class="btn btn-secondary">Open Financial Tools</a></article>
   </div>
 </section>
 
 <section class="section-container" id="quickstart">
   <div class="section-header">
-    <h2 class="section-title" id="quickstart-heading">How DataFrog Tools Work</h2>
-    <p class="section-desc">Choose a tool, add your file or paste your data, make the changes you need, and download the result. The tools are designed for practical file and data tasks rather than programming work.</p>
+    <h2 class="section-title" id="quickstart-heading">How It Works</h2>
+    <p class="section-desc">The workflow is simple: choose a tool, add your file or data, make the required changes, then download the result.</p>
   </div>
-</section>
-
-<section class="section-container" id="json-studio">
-  <div class="section-header">
-    <h2 class="section-title" id="studio-heading">Interactive JSON Studio &amp; Data Processing Suite</h2>
-    <p class="section-desc">Live playground for data processing tools: clean &amp; heal broken JSON, convert across formats, validate schemas, profile metrics, and evaluate JSONPath queries.</p>
-  </div>
-
-  <div class="demo-playground" id="json-studio-card">
-    <div class="demo-header">
-      <div class="demo-title">JSON Data Processing Engine</div>
-      <button class="btn btn-primary" id="btn-run-json-studio" style="padding: 6px 16px; font-size: 0.8125rem;">Execute Tool</button>
-    </div>
-
-    <!-- Tool Selector Bar -->
-    <div class="studio-tabs" id="studio-tabs">
-      <button class="studio-tab-btn active" id="tool-btn-clean" onclick="switchJsonTool('clean')">Clean &amp; Auto-Repair</button>
-      <button class="studio-tab-btn" id="tool-btn-convert" onclick="switchJsonTool('convert')">Format Converter</button>
-      <button class="studio-tab-btn" id="tool-btn-validate" onclick="switchJsonTool('validate')">Validator &amp; Schema</button>
-      <button class="studio-tab-btn" id="tool-btn-analyze" onclick="switchJsonTool('analyze')">Analyzer &amp; Profiler</button>
-      <button class="studio-tab-btn" id="tool-btn-inspect" onclick="switchJsonTool('inspect')">JSONPath &amp; Inspect</button>
-    </div>
-
-    <!-- Tool Specific Controls -->
-    <div class="studio-controls" id="panel-json-clean">
-      <label><input type="radio" name="clean-mode" value="format" checked onchange="runJsonProcessing()"> Beautify (2 Spaces)</label>
-      <label><input type="radio" name="clean-mode" value="minify" onchange="runJsonProcessing()"> Minify</label>
-      <label><input type="checkbox" id="clean-strip-nulls" checked onchange="runJsonProcessing()"> Strip Nulls &amp; Empty</label>
-      <label><input type="checkbox" id="clean-sort-keys" checked onchange="runJsonProcessing()"> Sort Keys Alphabetically</label>
-    </div>
-
-    <div class="studio-controls" id="panel-json-convert" style="display: none;">
-      <span>Target Export:</span>
-      <select class="studio-select" id="convert-format" onchange="runJsonProcessing()">
-        <option value="xml" selected>XML 1.0 Document</option>
-        <option value="csv">CSV (Comma-Separated)</option>
-        <option value="yaml">YAML (Indented)</option>
-        <option value="ndjson">NDJSON (Newline-Delimited)</option>
-      </select>
-    </div>
-
-    <div class="studio-controls" id="panel-json-validate" style="display: none;">
-      <span>Mode: Strict RFC 8259 Syntax + Draft-07 Contract Schema Verification</span>
-    </div>
-
-    <div class="studio-controls" id="panel-json-analyze" style="display: none;">
-      <span>Metrics: Byte Profiling, Type Distribution, Depth Analysis &amp; Automatic Schema Synthesis</span>
-    </div>
-
-    <div class="studio-controls" id="panel-json-inspect" style="display: none;">
-      <span>JSONPath Query:</span>
-      <input type="text" class="studio-input" id="inspect-query-input" value="$.items[*].name" style="width: 260px;" oninput="runJsonProcessing()">
-      <span style="font-size: 0.75rem; color: #94a3b8;">Try: <code>$.items[*].price</code>, <code>$.customer.name</code></span>
-    </div>
-
-    <div class="demo-grid">
-      <div class="demo-pane">
-        <div class="demo-pane-header">
-          <span class="demo-pane-title">Input JSON Payload (Supports Lenient &amp; Malformed Syntax)</span>
-          <span class="status-pill status-valid" id="json-studio-status">Ready</span>
-        </div>
-        <textarea class="demo-textarea" id="json-studio-input" spellcheck="false">{
-  // Lenient syntax supported: comments, unquoted keys, trailing commas
-  orderId: 'ORD-9821',
-  status: 'active',
-  customer: {
-    name: 'Alex Vance',
-    email: 'alex@resistance.org',
-    notes: null
-  },
-  items: [
-    { sku: 'GRV-01', name: 'Zero Point Manipulator', price: 349.99, qty: 1 },
-    { sku: 'BAT-09', name: 'Suit Battery Pack', price: 45.00, qty: 3 },
-  ],
-  metadata: {
-    priority: 'high',
-    emptyField: ''
-  },
-}</textarea>
-      </div>
-
-      <div class="demo-pane">
-        <div class="demo-pane-header">
-          <span class="demo-pane-title">Engine Output</span>
-          <span class="feature-tag tag-json">JSON ENGINE</span>
-        </div>
-        <pre class="demo-output" id="json-studio-output">Processing...</pre>
-      </div>
-    </div>
-    <div class="tree-stats" id="json-studio-meta">
-      <div class="tree-stat"><span>Format:</span> <strong>BEAUTIFY</strong></div>
-      <div class="tree-stat"><span>Auto-Healed:</span> <strong>Yes</strong></div>
-      <div class="tree-stat"><span>Output Size:</span> <strong>Computing...</strong></div>
-    </div>
-  </div>
-</section>
-
-<section class="section-container" id="xml-playground">
-  <div class="section-header">
-    <h2 class="section-title" id="playground-heading">Interactive XML Tools &amp; JSON Bridge</h2>
-    <p class="section-desc">Test the XML processing pipeline in real time. Inspect DOM node hierarchies and instant JSON transformations.</p>
-  </div>
-
-  <div class="demo-playground" id="playground-card">
-    <div class="demo-header">
-      <div class="demo-title">Live XML Parser, Validator &amp; JSON Converter</div>
-      <button class="btn btn-primary" id="btn-run-xml-demo" style="padding: 6px 16px; font-size: 0.8125rem;">Parse &amp; Convert</button>
-    </div>
-    <div class="demo-grid">
-      <div class="demo-pane">
-        <div class="demo-pane-header">
-          <span class="demo-pane-title">Input XML Document</span>
-          <span class="status-pill status-valid" id="xml-demo-status">Ready</span>
-        </div>
-        <textarea class="demo-textarea" id="xml-demo-input" spellcheck="false">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
-&lt;order id="ORD-2026-99" status="confirmed"&gt;
-  &lt;customer id="c-42"&gt;
-    &lt;name&gt;Sarah Connor&lt;/name&gt;
-    &lt;email&gt;sarah@cyberdyne.org&lt;/email&gt;
-  &lt;/customer&gt;
-  &lt;items&gt;
-    &lt;item sku="MOD-101" quantity="2" price="49.95"&gt;Neural Net CPU&lt;/item&gt;
-    &lt;item sku="MOD-202" quantity="1" price="199.00"&gt;Titanium Chassis&lt;/item&gt;
-  &lt;/items&gt;
-  &lt;total currency="USD"&gt;298.90&lt;/total&gt;
-&lt;/order&gt;</textarea>
-      </div>
-
-      <div class="demo-pane">
-        <div class="demo-pane-header">
-          <span class="demo-pane-title">Converted JSON Object</span>
-          <span class="feature-tag">JSON OUTPUT</span>
-        </div>
-        <pre class="demo-output" id="xml-demo-output">Click Parse &amp; Convert to see output...</pre>
-      </div>
-    </div>
-    <div class="tree-stats" id="xml-demo-tree">
-      <div class="tree-stat"><span>Root Element:</span> <strong>&lt;order&gt;</strong></div>
-      <div class="tree-stat"><span>DOM Level:</span> <strong>W3C XML 1.0</strong></div>
-      <div class="tree-stat"><span>Type Coercion:</span> <strong>Active</strong></div>
-    </div>
-  </div>
-</section>
-
-<section class="section-container" id="architecture">
-  <div class="section-header">
-    <h2 class="section-title" id="arch-heading">Architecture &amp; Pipeline</h2>
-    <p class="section-desc">Unified deterministic processing pipelines adhering strictly to international document standards.</p>
-  </div>
-
-  <div class="arch-flow" id="arch-flow">
-    <div class="arch-step" id="arch-step-1">
-      <div class="arch-num">01</div>
-      <div class="arch-content">
-        <h4 class="arch-title">Universal Lexing &amp; Resilient Parsing</h4>
-        <p class="arch-desc">Parses raw bytes, OpenXML ZIP packages, W3C XML tokens, and JSON streams directly with zero external dependencies.</p>
-      </div>
-    </div>
-
-    <div class="arch-step" id="arch-step-2">
-      <div class="arch-num">02</div>
-      <div class="arch-content">
-        <h4 class="arch-title">Object Graphs, DOM &amp; AST Models</h4>
-        <p class="arch-desc">Constructs indirect PDF object maps, resolves spreadsheet relationships, maintains XML DOM trees, and indexes JSON paths.</p>
-      </div>
-    </div>
-
-    <div class="arch-step" id="arch-step-3">
-      <div class="arch-num">03</div>
-      <div class="arch-content">
-        <h4 class="arch-title">Processing, Patching &amp; Validation</h4>
-        <p class="arch-desc">Evaluates spreadsheet expressions, calculates typography, applies RFC 6902 patches, and enforces JSON Schema Draft-07 rules.</p>
-      </div>
-    </div>
-
-    <div class="arch-step" id="arch-step-4">
-      <div class="arch-num">04</div>
-      <div class="arch-content">
-        <h4 class="arch-title">Compliant Binary &amp; Multi-Format Output</h4>
-        <p class="arch-desc">Generates immutable binary PDF-1.7, standard Microsoft Excel (.xlsx), formatted W3C XML, and optimized JSON/CSV/YAML data.</p>
-      </div>
-    </div>
+  <div class="card-grid">
+    <article class="feature-card"><div class="feature-icon-wrapper"><span class="feature-tag">01</span></div><h3 class="feature-heading">Choose the task</h3><p class="feature-text">Open the category that matches your file and select the specific operation you need.</p></article>
+    <article class="feature-card"><div class="feature-icon-wrapper"><span class="feature-tag">02</span></div><h3 class="feature-heading">Add your data</h3><p class="feature-text">Upload a supported file or paste data where the selected tool accepts text input.</p></article>
+    <article class="feature-card"><div class="feature-icon-wrapper"><span class="feature-tag">03</span></div><h3 class="feature-heading">Get your result</h3><p class="feature-text">Review the result in the tool and download the processed file or data when you are finished.</p></article>
   </div>
 </section>
