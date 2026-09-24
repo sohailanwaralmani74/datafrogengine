@@ -66,22 +66,23 @@ export class PdfObjectWriter {
 
     if (obj instanceof PdfArray || (obj.isArray && obj.isArray()) || Array.isArray(obj)) {
       const items = obj instanceof PdfArray ? obj.getItems() : (Array.isArray(obj) ? obj : obj.toArray());
-      const parts = [new TextEncoder().encode('[ ')];
+      const parts = [new TextEncoder().encode('[')];
       for (let i = 0; i < items.length; i++) {
         if (i > 0) parts.push(new TextEncoder().encode(' '));
         parts.push(PdfObjectWriter.serialize(items[i], context));
       }
-      parts.push(new TextEncoder().encode(' ]'));
+      parts.push(new TextEncoder().encode(']'));
       return PdfObjectWriter.concatBytes(parts);
     }
 
     if (obj instanceof PdfDictionary || (obj.isDictionary && obj.isDictionary())) {
       const entries = Array.from(obj.entries());
-      const parts = [new TextEncoder().encode('<<\n')];
-      for (const [key, val] of entries) {
-        parts.push(new TextEncoder().encode(`  /${PdfObjectWriter.escapeName(key)} `));
+      const parts = [new TextEncoder().encode('<<')];
+      for (let i = 0; i < entries.length; i++) {
+        const [key, val] = entries[i];
+        if (i > 0) parts.push(new TextEncoder().encode(' '));
+        parts.push(new TextEncoder().encode(`/${PdfObjectWriter.escapeName(key)} `));
         parts.push(PdfObjectWriter.serialize(val, context));
-        parts.push(new TextEncoder().encode('\n'));
       }
       parts.push(new TextEncoder().encode('>>'));
       return PdfObjectWriter.concatBytes(parts);
