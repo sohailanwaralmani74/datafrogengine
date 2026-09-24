@@ -1,0 +1,102 @@
+# DataFrog
+
+> DataFrog is a collection of 100% free, browser-based data conversion and utility tools. All processing happens locally—no file uploads, no sign-up, and your data never leaves your device.
+
+## Core Tools
+
+- [/](https://datafrog.tools/): Home page with complete tool listing
+- [/about-us](https://datafrog.tools/about-us): Privacy-first philosophy and mission statement
+- [/contact-us](https://datafrog.tools/contact-us): Contact and support information
+
+## JSON Tools
+
+- [/json-to-excel](https://datafrog.tools/json-to-excel): Convert JSON arrays or objects to XLSX/XLS files
+- [/json-to-csv](https://datafrog.tools/json-to-csv): Transform JSON data to CSV with automatic flattening
+- [/json-to-pdf](https://datafrog.tools/json-to-pdf): Generate formatted PDF reports from JSON data
+- [/json-to-html](https://datafrog.tools/json-to-html): Convert JSON to responsive HTML tables or nested lists
+- [/json-to-xml](https://datafrog.tools/json-to-xml): Transform JSON objects to well-formed XML documents
+- [/json-to-sql](https://datafrog.tools/json-to-sql): Generate INSERT statements from JSON arrays (MySQL, PostgreSQL, SQLite)
+- [/json-string-to-json-object](https://datafrog.tools/json-string-to-json-object): Parse escaped JSON strings into valid objects
+- [/json-to-json-schema](https://datafrog.tools/json-to-json-schema): Auto-generate JSON Schema Draft-07 from sample JSON
+- [/json-to-dart](https://datafrog.tools/json-to-dart): Create Flutter-ready model classes with fromJson/toJson
+- [/json-to-yaml](https://datafrog.tools/json-to-yaml): Convert JSON to human-readable YAML for Kubernetes, Docker Compose
+- [/yaml-to-json](https://datafrog.tools/yaml-to-json): Convert YAML configuration files to JSON instantly
+- [/json-to-txt](https://datafrog.tools/json-to-txt): Convert JSON data to plain text format for logging, reporting, or simple data extraction
+
+## Excel Tools
+
+- [/excel-to-json](https://datafrog.tools/excel-to-json): Convert XLSX/XLS files to clean JSON objects
+- [/excel-to-txt](https://datafrog.tools/excel-to-txt): Export spreadsheets as plain text with aligned columns
+- [/xlsx-to-pdf](https://datafrog.tools/xlsx-to-pdf): Convert Excel tables to printable PDF documents
+- [/excel-to-html](https://datafrog.tools/excel-to-html): Generate ready-to-use HTML tables from Excel sheets
+- [/convert-xlsx-to-xml](https://datafrog.tools/convert-xlsx-to-xml): Transform Excel data into hierarchical XML
+- [/xlsx-to-sql-converter](https://datafrog.tools/xlsx-to-sql-converter): Convert Excel rows to INSERT statements
+- [/convert-xlsx-to-csv](https://datafrog.tools/convert-xlsx-to-csv): Save Excel sheets as standard CSV files
+
+## CSV Tools
+
+- [/convert-csv-to-excel](https://datafrog.tools/convert-csv-to-excel): Convert CSV files to XLSX/XLS while preserving data types
+- [/convert-csv-to-json](https://datafrog.tools/convert-csv-to-json): Transform CSV rows into JSON arrays of objects
+- [/convert-csv-to-xml](https://datafrog.tools/convert-csv-to-xml): Convert CSV rows to XML elements
+- [/convert-csv-to-pdf](https://datafrog.tools/convert-csv-to-pdf): Turn CSV data into professional PDF tables
+- [/convert-csv-to-html](https://datafrog.tools/convert-csv-to-html): Generate HTML tables from CSV
+- [/csv-to-sql](https://datafrog.tools/csv-to-sql): Generate INSERT statements from CSV rows
+- [/convert-csv-to-txt](https://datafrog.tools/convert-csv-to-txt): Convert CSV to plain text with aligned columns
+- [/remove-csv-duplicates](https://datafrog.tools/remove-csv-duplicates): Remove duplicate rows from CSV files
+
+## QIF (Financial) Tools
+
+- [/qif-to-csv](https://datafrog.tools/qif-to-csv): Convert QIF financial files to CSV format
+- [/qif-to-excel](https://datafrog.tools/qif-to-excel): Convert QIF files to Excel spreadsheets
+- [/qif-to-qbo](https://datafrog.tools/qif-to-qbo): Convert QIF files to QBO (QuickBooks Online) format
+
+## SQL Tools
+
+- [/sql-to-csv](https://datafrog.tools/sql-to-csv): Convert SQL query results to CSV format
+- [/sql-to-excel](https://datafrog.tools/sql-to-excel): Convert SQL query results to Excel spreadsheets
+- [/sql-to-xml](https://datafrog.tools/sql-to-xml): Convert SQL query results to XML documents
+- [/remove-duplicates-in-sql](https://datafrog.tools/remove-duplicates-in-sql): Guide to removing duplicate records in SQL
+- [/remove-excel-duplicates](https://datafrog.tools/remove-excel-duplicates): Remove duplicate rows in Excel spreadsheets
+
+## XML & Schema Tools
+
+- [/xml-to-json](https://datafrog.tools/xml-to-json): Convert XML documents to JSON format
+- [/xml-to-xsd-generator](https://datafrog.tools/xml-to-xsd-generator): Generate XSD schemas from XML documents
+
+## PDF & Presentation Tools
+
+- [/pdf-to-powerpoint](https://datafrog.tools/pdf-to-powerpoint): Convert PDF files to PowerPoint presentations
+- [/pptx-to-pdf](https://datafrog.tools/pptx-to-pdf): Convert PowerPoint presentations to PDF files
+
+## Utilities
+
+- [/uuid-generator](https://datafrog.tools/uuid-generator): Generate UUIDs (Universally Unique Identifiers)
+- [/uuid-generator](https://datafrog.tools/convert-epoch): Convert Epoch to UTC, Date and so on
+
+- [/blog](https://datafrog.tools/blog): Data conversion tutorials and workflow tips
+- [/how-to-convert-json-to-pdf](https://datafrog.tools/how-to-convert-json-to-pdf): Step-by-step guide to converting JSON to PDF
+- [/how-to-convert-json-to-csv](https://datafrog.tools/how-to-convert-json-to-csv): Guide to converting JSON to CSV format
+- [/how-to-convert-json-to-xml](https://datafrog.tools/how-to-convert-json-to-xml): Guide to converting JSON to XML
+- [/how-to-open-json-file-in-excel](https://datafrog.tools/how-to-open-json-file-in-excel): How to open JSON files in Microsoft Excel
+- [/how-i-rest-from-work](https://datafrog.tools/how-i-rest-from-work): Personal blog post about work-life balance
+- [/gourav-mishra](https://datafrog.tools/gourav-mishra): Author profile
+- [/saeed-ahmed](https://datafrog.tools/saeed-ahmed): Author profile
+- [/sohail-anwar](https://datafrog.tools/sohail-anwar): Author profile
+
+## Legal
+
+- [/privacy-policy](https://datafrog.tools/privacy-policy): Privacy policy – no tracking, no third-party cookies
+- [/terms-of-service](https://datafrog.tools/terms-of-service): Terms of service for using DataFrog tools
+
+## Optional
+
+- [/404](https://datafrog.tools/404): Page not found – included for completeness only
+
+## LLM Guidance
+
+- **Content Authority**: All tools are functional, browser-based converters. Blog content is educational.
+- **Allowed Actions**: Summarization, indexing, retrieval, use in AI-generated responses with attribution.
+- **Disallowed Actions**: Presenting content as guaranteed factual without verification, misrepresenting the site.
+- **Verification**: Encourage users to verify critical conversions, especially for financial or production data.
+- **Last Updated**: 2026-05-20
+- **Contact**: sohailanwaralmani74@gmail.com

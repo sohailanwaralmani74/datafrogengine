@@ -1,0 +1,63 @@
+<head>
+  <link rel="stylesheet" href="/assets/css/style.css">
+  <meta charset="utf-8">
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="-1" />
+  <title>{% if page.title %}{{page.title}}{% else %}{{site.title}}{% endif %}</title>
+  <meta name="referrer" content="no-referrer-when-downgrade">
+  <link rel="icon" href="/assets/img/datafrog.png" type="image/x-icon">
+  <meta name="robots" content="{% if page.robots %}{{ page.robots }}{% else %}index, follow{% endif %}">
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=6">
+  <link rel="shortcut icon" href="{{ '/assets/img/datafrog.png' | prepend: site.baseurl }}" type="image/x-icon">
+  <link rel="apple-touch-icon" href="{{ '/assets/img/datafrog.png' | prepend: site.baseurl }}">
+
+  <!-- Theme & Mobile Bar Colors -->
+  <meta name="theme-color" content="#0f172a">
+  <meta name="msapplication-navbutton-color" content="#0f172a">
+  <meta name="apple-mobile-web-app-status-bar-style" content="#0f172a">
+
+  <!-- Meta Description -->
+  {% if page.description %}
+    <meta name="description" content="{{ page.description | escape }}">
+  {% elsif site.description %}
+    <meta name="description" content="{{ site.description | escape }}">
+  {% else %}
+    <meta name="description" content="A browser-based data intelligence workspace where users can inspect, analyze, validate, compare, clean, and visualize datasets locally.">
+  {% endif %}
+
+  <!-- Meta Keywords -->
+  {% if page.keywords %}
+    <meta name="keywords" content="{{ page.keywords | escape }}">
+  {% elsif site.keywords %}
+    <meta name="keywords" content="{{ site.keywords | escape }}">
+  {% else %}
+    <meta name="keywords" content="JSON Viewer, CSV Viewer, XML Viewer, Data Tools, Browser Data Tools">
+  {% endif %}
+
+  <!-- Canonical URL -->
+  {% if page.url %}
+    <link rel="canonical" href="{{ page.url | absolute_url }}">
+  {% elsif site.url %}
+    <link rel="canonical" href="{{ site.url | absolute_url }}">
+  {% else %}
+    <link rel="canonical" href="https://datafrog.tools">
+  {% endif %}
+
+  <!-- Open Graph Tags -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="{% if page.title %}{{ page.title | escape }}{% elsif site.title %}{{ site.title | escape }}{% else %}DataFrog{% endif %}">
+  <meta property="og:description" content="{% if page.description %}{{ page.description | escape }}{% elsif site.description %}{{ site.description | escape }}{% else %}DataFrog — Privacy-First Data Intelligence Workspace{% endif %}">
+  <meta property="og:url" content="{% if page.url %}{{ page.url | absolute_url }}{% elsif site.url %}{{ site.url | absolute_url }}{% else %}https://datafrog.tools{% endif %}">
+  <meta property="og:image" content="{% if page.image %}{{ page.image | absolute_url }}{% elsif site.image %}{{ site.image | absolute_url }}{% else %}https://datafrog.tools/assets/img/datafrog.png{% endif %}">
+
+  <!-- Twitter Card Tags -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{% if page.title %}{{ page.title | escape }}{% elsif site.title %}{{ site.title | escape }}{% else %}DataFrog{% endif %}">
+  <meta name="twitter:description" content="{% if page.description %}{{ page.description | escape }}{% elsif site.description %}{{ site.description | escape }}{% else %}DataFrog — Privacy-First Data Intelligence Workspace{% endif %}">
+  <meta name="twitter:image" content="{% if page.image %}{{ page.image | absolute_url }}{% elsif site.image %}{{ site.image | absolute_url }}{% else %}https://datafrog.tools/assets/img/datafrog.png{% endif %}">
+  <script src="https://analytics.ahrefs.com/analytics.js" data-key="rcwqWZs4F7TML/u0B6Sk9g" async></script>
+  <!-- AUTOMATED GOOGLE-FRIENDLY JSON-LD STRUCTURED DATA -->
+  {% include schema.html %}
+</head>

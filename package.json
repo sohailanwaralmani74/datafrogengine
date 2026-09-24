@@ -1,28 +1,20 @@
 {
-  "name": "pdf-engine",
-  "version": "0.1.0",
-  "description": "Pure JavaScript PDF processing engine from scratch",
-  "type": "module",
-  "main": "assets/js/index.js",
-  "scripts": {
-    "dev": "node server.js",
-    "build": "node build.js",
-    "start": "node server.js",
-    "lint": "node -c server.js build.js assets/js/index.js"
-  },
-  "keywords": [
-    "pdf",
-    "engine",
-    "parser",
-    "pure-javascript"
-  ],
-  "author": "",
+  "name": "Jekyll-Gulp-Sass-Autoprefixer-Imagemin-BrowserSync",
+  "version": "1.0.0",
+  "description": "A starter project for Jekyll",
+  "main": "index.js",
+  "repository": "https://github.com/artemsheludko/Jekyll-Gulp-Sass-Autoprefixer-Imagemin-BrowserSync",
+  "author": "Artem Sheludko",
   "license": "MIT",
   "dependencies": {
-    "js-yaml": "^5.4.2",
-    "liquidjs": "^10.29.0",
-    "lucide-react": "^1.47.0",
-    "react": "^19.3.0",
-    "react-dom": "^19.3.0"
+    "browser-sync": "^2.18.13",
+    "child_process": "^1.0.2",
+    "gulp": "^3.9.1",
+    "gulp-autoprefixer": "^4.0.0",
+    "gulp-cache": "^0.4.6",
+    "gulp-imagemin": "^3.2.0",
+    "gulp-sass": "^3.1.0",
+    "imagemin-pngquant": "^5.0.0",
+    "Jekyll-Gulp-Sass-Autoprefixer-Imagemin-BrowserSync": "file:"
   }
 }

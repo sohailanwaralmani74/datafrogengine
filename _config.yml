@@ -1,15 +1,44 @@
-title: Document & Data Processing Engine Suite (PDF, Excel, XML, JSON)
-email: info@example.com
-description: >-
-  A lightweight, zero-dependency, pure JavaScript document and data processing engine suite.
-  Parse, query, validate, edit, clean, analyze, and convert across PDF-1.7, Microsoft Excel (.xlsx), W3C XML 1.0, and JSON formats.
+title: "DataFrog — Free Online Tools for JSON, CSV, XML & Excel Conversion"
+description: "Convert, format, and manage your data easily with DataFrog. Free browser-based tools for JSON, CSV, XML, and Excel — secure, accurate, and fast."
+permalink: ':title'
 baseurl: ""
-url: ""
-github_username: pdf-engine
+url: "https://datafrog.tools" # the base hostname & protocol for your site, e.g. http://example.com
+site-twitter: #if your site has a twitter account, enter it here
+image: 
+# Author Settings
+author: DataFrog # add your name
+author-img: datafrog.png # add your photo
+about-author: "Explore The Right Productivity Tools For JSON, XML, CSV And Excel to Skyrocket Your Workflow"
+social-twitter: # add your Twitter handle
+social-facebook: # add your Facebook handle
+social-github: sohailanwaralmani74 # add your Github handle
+social-linkedin: # add your Linkedin handle
+social-email: # add your Email address
 
-# Build settings
-permalink: /:categories/:basename
-theme: minima
+# Disqus
+discus-identifier: sohail-anwar # add your discus identifier
+
+# Tracker
+analytics: # Google Analytics
+
+# Build Settings
+markdown: kramdown
+kramdown:
+  input: Kramdown
+  
 plugins:
-  - jekyll-feed
-  - jekyll-seo-tag
+  - jekyll-sitemap
+  - jekyll-paginate
+  - jemoji
+  - jekyll-toc
+  - jekyll-livereload
+  - jekyll-redirect-from
+toc:
+  min_level: 2  # Adjust if you want to skip h1
+  max_level: 6
+  list_class: toc
+  list_class: toc__list
+  sublist_class: toc__sublist
+
+
+exclude: ["node_modules", "gulpfile.js", "package.json", "yarn.lock"]

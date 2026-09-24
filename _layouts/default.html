@@ -18,22 +18,8 @@
         
         <!-- 1. Left: Logo -->
         <a class="site-logo" id="site-logo-link" href="{{ '/' | relative_url }}">
-          <div class="logo-mark" id="logo-mark">
             <!-- Geometric Frog / Data Node Icon -->
-            <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect width="32" height="32" rx="8" fill="#10b981" />
-              <circle cx="10" cy="11" r="4.5" fill="#064e3b" />
-              <circle cx="10" cy="11" r="2.2" fill="#ffffff" />
-              <circle cx="22" cy="11" r="4.5" fill="#064e3b" />
-              <circle cx="22" cy="11" r="2.2" fill="#ffffff" />
-              <path d="M9 20C11.5 23.5 20.5 23.5 23 20" stroke="#064e3b" stroke-width="2.5" stroke-linecap="round" />
-              <circle cx="16" cy="15" r="1.5" fill="#064e3b" />
-            </svg>
-          </div>
-          <div class="logo-text-group" id="logo-text-group">
-            <span class="logo-brand-name" id="logo-brand-name">Datafrog</span>
-            <span class="logo-subtext" id="logo-subtext">Tools Suite</span>
-          </div>
+            <img src="/assets/img/datafrog.png" style="width: 50px; height: 50px; border-radius: 50px;"/>
         </a>
 
         <!-- 2. Mega Menu -->
@@ -52,7 +38,7 @@
               <rect x="14" y="14" width="7" height="7"></rect>
               <rect x="3" y="14" width="7" height="7"></rect>
             </svg>
-            <span>Tools &amp; Formats</span>
+            <span>All Tools</span>
             <svg class="chevron-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="6 9 12 15 18 9"></polyline>
             </svg>
@@ -66,15 +52,11 @@
               <div class="mega-col">
                 <div class="mega-col-heading">Documents &amp; Spreadsheets</div>
                 <div class="mega-links-list">
-                  <a href="{{ '/pages/compress-pdf' | relative_url }}" class="mega-item-link {% if page.tool == 'compress-pdf' %}active{% endif %}">
+                  <a href="{{ '/pdf' | relative_url }}" class="mega-item-link {% if page.format == 'pdf' and page.tool != 'compress-pdf' %}active{% endif %}">
                     <span class="format-badge format-badge-pdf">PDF</span>
-                    <span class="mega-item-name">Compress PDF</span>
+                    <span class="mega-item-name">PDF Tools</span>
                   </a>
-                  <a href="{{ '/pages/pdf' | relative_url }}" class="mega-item-link {% if page.format == 'pdf' and page.tool != 'compress-pdf' %}active{% endif %}">
-                    <span class="format-badge format-badge-pdf">PDF</span>
-                    <span class="mega-item-name">PDF Tools Suite</span>
-                  </a>
-                  <a href="{{ '/pages/excel' | relative_url }}" class="mega-item-link {% if page.format == 'excel' %}active{% endif %}">
+                  <a href="{{ '/excel' | relative_url }}" class="mega-item-link {% if page.format == 'excel' %}active{% endif %}">
                     <span class="format-badge format-badge-excel">XLS</span>
                     <span class="mega-item-name">Excel Tools</span>
                   </a>
@@ -85,19 +67,19 @@
               <div class="mega-col">
                 <div class="mega-col-heading">Structured Data</div>
                 <div class="mega-links-list">
-                  <a href="{{ '/pages/csv' | relative_url }}" class="mega-item-link {% if page.format == 'csv' %}active{% endif %}">
+                  <a href="{{ '/csv' | relative_url }}" class="mega-item-link {% if page.format == 'csv' %}active{% endif %}">
                     <span class="format-badge format-badge-csv">CSV</span>
                     <span class="mega-item-name">CSV Tools</span>
                   </a>
-                  <a href="{{ '/pages/json' | relative_url }}" class="mega-item-link {% if page.format == 'json' %}active{% endif %}">
+                  <a href="{{ '/json' | relative_url }}" class="mega-item-link {% if page.format == 'json' %}active{% endif %}">
                     <span class="format-badge format-badge-json">JSON</span>
                     <span class="mega-item-name">JSON Tools</span>
                   </a>
-                  <a href="{{ '/pages/xml' | relative_url }}" class="mega-item-link {% if page.format == 'xml' %}active{% endif %}">
+                  <a href="{{ '/xml' | relative_url }}" class="mega-item-link {% if page.format == 'xml' %}active{% endif %}">
                     <span class="format-badge format-badge-xml">XML</span>
                     <span class="mega-item-name">XML Tools</span>
                   </a>
-                  <a href="{{ '/pages/yml' | relative_url }}" class="mega-item-link {% if page.format == 'yml' %}active{% endif %}">
+                  <a href="{{ '/yml' | relative_url }}" class="mega-item-link {% if page.format == 'yml' %}active{% endif %}">
                     <span class="format-badge format-badge-yml">YML</span>
                     <span class="mega-item-name">YAML Tools</span>
                   </a>
@@ -108,11 +90,11 @@
               <div class="mega-col">
                 <div class="mega-col-heading">Spatial &amp; Financial</div>
                 <div class="mega-links-list">
-                  <a href="{{ '/pages/geojson' | relative_url }}" class="mega-item-link {% if page.format == 'geojson' %}active{% endif %}">
+                  <a href="{{ '/geojson' | relative_url }}" class="mega-item-link {% if page.format == 'geojson' %}active{% endif %}">
                     <span class="format-badge format-badge-geojson">GEO</span>
                     <span class="mega-item-name">GeoJSON Tools</span>
                   </a>
-                  <a href="{{ '/pages/financial' | relative_url }}" class="mega-item-link {% if page.format == 'financial' %}active{% endif %}">
+                  <a href="{{ '/financial' | relative_url }}" class="mega-item-link {% if page.format == 'financial' %}active{% endif %}">
                     <span class="format-badge format-badge-fin">QBO</span>
                     <span class="mega-item-name">Financial Tools</span>
                   </a>
@@ -298,15 +280,16 @@
           </p>
         </div>
         <div class="footer-col-meta" id="footer-col-meta">
-          <div class="footer-links-row">
-            <a href="{{ '/pages/pdf' | relative_url }}" class="footer-link">PDF</a>
-            <a href="{{ '/pages/excel' | relative_url }}" class="footer-link">Excel</a>
-            <a href="{{ '/pages/csv' | relative_url }}" class="footer-link">CSV</a>
-            <a href="{{ '/pages/json' | relative_url }}" class="footer-link">JSON</a>
-            <a href="{{ '/pages/xml' | relative_url }}" class="footer-link">XML</a>
-            <a href="{{ '/pages/yml' | relative_url }}" class="footer-link">YAML</a>
-            <a href="{{ '/pages/geojson' | relative_url }}" class="footer-link">GeoJSON</a>
-            <a href="{{ '/pages/financial' | relative_url }}" class="footer-link">Financial</a>
+          <span>Tools</span>
+          <div class="column">
+            <a href="{{ '/pdf' | relative_url }}" class="footer-link">PDF</a>
+            <a href="{{ '/excel' | relative_url }}" class="footer-link">Excel</a>
+            <a href="{{ '/csv' | relative_url }}" class="footer-link">CSV</a>
+            <a href="{{ '/json' | relative_url }}" class="footer-link">JSON</a>
+            <a href="{{ '/xml' | relative_url }}" class="footer-link">XML</a>
+            <a href="{{ '/yml' | relative_url }}" class="footer-link">YAML</a>
+            <a href="{{ '/geojson' | relative_url }}" class="footer-link">GeoJSON</a>
+            <a href="{{ '/financial' | relative_url }}" class="footer-link">Financial</a>
           </div>
           <p class="footer-copy">&copy; 2026 Datafrog Inc. Open source under the MIT License.</p>
         </div>

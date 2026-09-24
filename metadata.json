@@ -1,6 +1,0 @@
-{
-  "name": "PDF Engine - Jekyll",
-  "description": "Documentation and interactive studio for the Pure JavaScript Document & Data Processing Engines (CSV, Excel, XML, JSON, PDF, YAML, GeoJSON, Financial QIF/QFX/QBO/OFX)",
-  "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
-}

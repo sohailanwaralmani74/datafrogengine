@@ -1,0 +1,25 @@
+---
+layout: default
+---
+
+<article class="article-page">
+  <div class="page-content">
+    {% if page.img %}
+    <div class="page-cover-image" style="margin-bottom: 1.5rem;">
+      <figure style="margin: 0;">
+        <img class="page-image" src={{ "/assets/img/" | prepend: site.baseurl | append : page.img}} alt="{{page.title}}" style="max-width: 100%; border-radius: 12px;">
+        {% if page.fig-caption %}
+          <figcaption style="font-size: 0.85rem; color: #64748b; margin-top: 0.5rem; text-align: center;">{{page.fig-caption}}</figcaption>
+        {% endif %}
+      </figure>
+    </div> <!-- End Page Cover Image -->
+    {% endif %}
+    <div class="wrap-content">
+        <h1 class="page-title" style="font-size: 2rem; font-weight: 800; color: #0f172a; margin-bottom: 0.5rem;">{{page.headline | default: page.title}}</h1>
+        <div class="page-date" style="color: #64748b; font-size: 0.875rem; margin-bottom: 1.5rem;"><span>Published: {{page.date | date: '%B %d, %Y'}}</span></div>
+        <div class="article-body" style="line-height: 1.75; font-size: 1rem; color: #334155;">
+           {{content}}
+        </div>
+    </div> <!-- End Wrap Content -->
+  </div> <!-- End Page Content -->
+</article>
