@@ -1,8 +1,8 @@
 ---
 layout: default
-title: Financial Tools
+title: QIF, QFX, QBO & OFX Tools — Clean, Convert & Reconcile
 format: financial
-description: High-Performance QIF, QFX, QBO & OFX Financial Statements & Reconciliation Tools
+description: Free browser-based tools for working with QIF, QFX, QBO, and OFX financial statement files, including cleaning, analysis, conversion, and reconciliation.
 ---
 
 <div class="page-container" id="page-financial">
@@ -10,11 +10,11 @@ description: High-Performance QIF, QFX, QBO & OFX Financial Statements & Reconci
     <div class="page-badge-row">
       <span class="page-badge badge-fin">QIF &bull; QFX &bull; QBO &bull; OFX</span>
       <span class="page-badge badge-zero-dep">Zero Dependencies</span>
-      <span class="page-badge badge-methods">26 API Methods</span>
+      <span class="page-badge badge-methods">Practical Financial Operations</span>
     </div>
     <h1 class="page-title">Financial Tools</h1>
     <p class="page-subtitle">
-      A unified, zero-dependency financial statement tools suite supporting Quicken (QIF), Quicken Financial Exchange (QFX), QuickBooks Online (QBO), and OFX 1.x/2.x.
+      Practical tools for working with QIF, QFX, QBO, and OFX files. Check statement data, clean transaction details, compare records, review cashflow, and convert data.
       Automated format detection, statement reconciliation, auto-categorization, anonymization, and cashflow analytics.
     </p>
   </div>
@@ -44,28 +44,28 @@ description: High-Performance QIF, QFX, QBO & OFX Financial Statements & Reconci
       <div class="pill-card">
         <h4>Auto-Detection &amp; SGML Normalization</h4>
         <p>Distinguish QIF, QFX, QBO, and OFX files automatically, repairing unclosed SGML tag hierarchies into validated trees.</p>
-        <code>FinancialEngine.parse(statementString)</code>
+        <code>Read a financial statement</code>
       </div>
       <div class="pill-card">
         <h4>Bank Reconciliation</h4>
         <p>Reconcile bank statement exports against accounting ledgers with amount, date window, and FITID matching.</p>
-        <code>FinancialEngine.reconcile(bankQbo, ledgerQif)</code>
+        <code>Reconcile two records</code>
       </div>
       <div class="pill-card">
         <h4>Cashflow Analytics &amp; Profiling</h4>
         <p>Compute inflows, outflows, net balances, category spending shares, and monthly transaction velocities.</p>
-        <code>FinancialEngine.analyze(parsedStatement)</code>
+        <code>Review transaction data</code>
       </div>
       <div class="pill-card">
         <h4>Payee Cleaning &amp; Anonymization</h4>
         <p>Strip POS terminal junk, masked account numbers, eliminate duplicates, and export cleanly into Excel workbooks.</p>
-        <code>FinancialEngine.toExcel(statement)</code>
+        <code>Export statement data</code>
       </div>
     </div>
   </div>
 
   <div class="page-section">
-    <h2 class="section-subheading">Interactive Code Example</h2>
+    <h2 class="section-subheading">Example Statement Workflow</h2>
     <div class="code-container">
       <pre class="code-pre"><code><span class="token-keyword">import</span> { FinancialEngine } <span class="token-keyword">from</span> <span class="token-string">'/assets/js/index.js'</span>;
 

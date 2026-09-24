@@ -1,8 +1,8 @@
 ---
 layout: default
-title: CSV Tools
+title: CSV Tools — Clean, Convert, Validate & Analyze CSV
 format: csv
-description: High-Performance RFC 4180 Delimited Tabular Data Tools
+description: Free browser-based CSV tools for cleaning, filtering, sorting, validating, converting, comparing, and analyzing CSV files.
 ---
 
 <div class="page-container" id="page-csv">
@@ -10,11 +10,11 @@ description: High-Performance RFC 4180 Delimited Tabular Data Tools
     <div class="page-badge-row">
       <span class="page-badge badge-csv">RFC 4180</span>
       <span class="page-badge badge-zero-dep">Zero Dependencies</span>
-      <span class="page-badge badge-methods">34 API Methods</span>
+      <span class="page-badge badge-methods">Practical CSV Operations</span>
     </div>
     <h1 class="page-title">CSV Tools</h1>
     <p class="page-subtitle">
-      A fast, zero-dependency tabular data tools suite.
+      Practical tools for common CSV work, from delimiter detection and validation to filtering, sorting, profiling, and conversion.
       Automatic delimiter detection, relational joins, grouping, pivot tables, column/row reordering, schema validation, and tabular diffing.
     </p>
   </div>
@@ -44,28 +44,28 @@ description: High-Performance RFC 4180 Delimited Tabular Data Tools
       <div class="pill-card">
         <h4>Auto Delimiter Sniffing</h4>
         <p>Instantly detect commas, tabs, semicolons, and pipes while safely parsing multiline escaped quotes.</p>
-        <code>CsvEngine.detectDelimiter(text)</code>
+        <code>Detect the CSV delimiter</code>
       </div>
       <div class="pill-card">
         <h4>Relational Joins &amp; Grouping</h4>
         <p>Perform inner, left, and full joins between CSV datasets, compute aggregations, and generate pivot tables.</p>
-        <code>CsvEngine.join(csvA, csvB, 'id')</code>
+        <code>Combine CSV data</code>
       </div>
       <div class="pill-card">
         <h4>Column &amp; Row Reordering</h4>
         <p>Reorder column sequences, drop sensitive columns, rename headers, and sort rows by multi-column comparators.</p>
-        <code>CsvEngine.reorderColumns(csv, ['id', 'name'])</code>
+        <code>Reorder columns</code>
       </div>
       <div class="pill-card">
         <h4>Data Profiling &amp; Schema</h4>
         <p>Profile column null counts, infer column data types (dates, integers, booleans), and validate strict schemas.</p>
-        <code>CsvEngine.profile(csvText)</code>
+        <code>Profile columns and values</code>
       </div>
     </div>
   </div>
 
   <div class="page-section">
-    <h2 class="section-subheading">Interactive Code Example</h2>
+    <h2 class="section-subheading">Example CSV Workflow</h2>
     <div class="code-container">
       <pre class="code-pre"><code><span class="token-keyword">import</span> { CsvEngine } <span class="token-keyword">from</span> <span class="token-string">'/assets/js/index.js'</span>;
 

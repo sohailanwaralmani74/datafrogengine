@@ -1,8 +1,8 @@
 ---
 layout: default
-title: Excel Tools
+title: Excel Tools — Read, Clean, Convert & Analyze XLSX
 format: excel
-description: High-Performance Pure JavaScript OpenXML (.xlsx) Spreadsheet Tools
+description: Free browser-based Excel tools for reading, cleaning, sorting, filtering, comparing, converting, and analyzing XLSX files.
 ---
 
 <div class="page-container" id="page-excel">
@@ -10,11 +10,11 @@ description: High-Performance Pure JavaScript OpenXML (.xlsx) Spreadsheet Tools
     <div class="page-badge-row">
       <span class="page-badge badge-excel">ECMA-376</span>
       <span class="page-badge badge-zero-dep">Zero Dependencies</span>
-      <span class="page-badge badge-methods">30 API Methods</span>
+      <span class="page-badge badge-methods">Practical Excel Operations</span>
     </div>
     <h1 class="page-title">Excel Tools</h1>
     <p class="page-subtitle">
-      A fast, zero-dependency OpenXML (.xlsx) spreadsheet processing tools suite.
+      Practical tools for working with XLSX spreadsheets, including sheet inspection, sorting, filtering, formatting, formulas, comparison, and conversion.
       Read, build, write, sort, filter, format cells, evaluate formulas, and convert across CSV, JSON, Markdown, HTML, XML, and PDF.
     </p>
   </div>
@@ -44,28 +44,28 @@ description: High-Performance Pure JavaScript OpenXML (.xlsx) Spreadsheet Tools
       <div class="pill-card">
         <h4>Fluent Workbook Builder</h4>
         <p>Chain sheets, headers, typed cells, number formats, column widths, and calculated formula cells.</p>
-        <code>ExcelEngine.builder().addSheet('Q1')...</code>
+        <code>Create a workbook</code>
       </div>
       <div class="pill-card">
         <h4>Relational Reordering</h4>
         <p>Reorder sheets, transpose rows, sort column hierarchies, and filter rows by conditional expressions.</p>
-        <code>ExcelEngine.sortRows(buf, 'Revenue', false)</code>
+        <code>Sort spreadsheet rows</code>
       </div>
       <div class="pill-card">
         <h4>Format Bridges</h4>
         <p>Convert workbooks directly to multi-sheet JSON, RFC 4180 CSV, Markdown tables, styled HTML, or PDF reports.</p>
-        <code>ExcelEngine.toJson(xlsxBuffer)</code>
+        <code>Convert XLSX data</code>
       </div>
       <div class="pill-card">
         <h4>Coordinate Diffing</h4>
         <p>Compare two workbooks to locate cell-by-cell formula or value discrepancies with row/col coordinate maps.</p>
-        <code>ExcelEngine.diff(bufA, bufB)</code>
+        <code>Compare two workbooks</code>
       </div>
     </div>
   </div>
 
   <div class="page-section">
-    <h2 class="section-subheading">Interactive Code Example</h2>
+    <h2 class="section-subheading">Example Excel Workflow</h2>
     <div class="code-container">
       <pre class="code-pre"><code><span class="token-keyword">import</span> { ExcelEngine } <span class="token-keyword">from</span> <span class="token-string">'/assets/js/index.js'</span>;
 
