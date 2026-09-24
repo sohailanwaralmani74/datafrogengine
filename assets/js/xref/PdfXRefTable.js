@@ -191,11 +191,11 @@ export class PdfXRefTable {
         offset += w2;
 
         if (type === 0) {
-          xrefTable.addEntry(new PdfXRefEntry(objectNumber, field2, field3, 'free'), true);
+          xrefTable.addEntry(PdfXRefEntry.createFree(objectNumber, field2, field3), true);
         } else if (type === 1) {
-          xrefTable.addEntry(new PdfXRefEntry(objectNumber, field2, field3, 'in-use'), true);
+          xrefTable.addEntry(PdfXRefEntry.createInUse(objectNumber, field2, field3), true);
         } else if (type === 2) {
-          xrefTable.addEntry(new PdfXRefEntry(objectNumber, field2, field3, 'compressed'), true);
+          xrefTable.addEntry(PdfXRefEntry.createCompressed(objectNumber, field2, field3), true);
         }
       }
     }
@@ -231,12 +231,11 @@ export class PdfXRefTable {
         throw new PdfXRefException('Invalid xref entry', reader.position());
       }
       const inUse = flagToken.raw === 'n';
-      xrefTable.addEntry(new PdfXRefEntry(
-        startObject + i,
-        offsetToken.value,
-        generationToken.value,
-        inUse ? 'in-use' : 'free'
-      ), true);
+      const objectNumber = startObject + i;
+      const entry = inUse
+        ? PdfXRefEntry.createInUse(objectNumber, offsetToken.value, generationToken.value)
+        : PdfXRefEntry.createFree(objectNumber, offsetToken.value, generationToken.value);
+      xrefTable.addEntry(entry, true);
     }
 
     let token = lexer.nextToken();
