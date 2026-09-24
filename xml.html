@@ -24,14 +24,20 @@ description: Free online XML tools for formatting, checking, searching, editing,
   </div>
 
   <div class="page-section">
-    <h2 class="section-subheading">What You Can Do With XML</h2>
+    <h2 class="section-subheading">Available XML Tools</h2>
     <div class="feature-pills-grid">
-      <div class="pill-card"><h4>Format XML</h4><p>Turn difficult-to-read XML into a clean, organized layout that is easier to inspect.</p></div>
-      <div class="pill-card"><h4>Check XML</h4><p>Check your XML for common structural and formatting problems before using it elsewhere.</p></div>
-      <div class="pill-card"><h4>Search &amp; Edit</h4><p>Find elements and information inside an XML file and make supported changes.</p></div>
-      <div class="pill-card"><h4>Compare XML Files</h4><p>Compare two XML files to see what information has been added, removed, or changed.</p></div>
-      <div class="pill-card"><h4>Convert XML</h4><p>Convert XML data to supported formats such as JSON, CSV, and other available formats.</p></div>
-      <div class="pill-card"><h4>Clean XML</h4><p>Remove unwanted formatting or content and organize XML for easier use.</p></div>
+      {% assign category_tools = site.data.tools | where: "category", "xml" %}
+      {% if category_tools.size > 0 %}
+        {% for tool in category_tools %}
+          <div class="pill-card">
+            <h4>{{ tool.name }}</h4>
+            {% if tool.description %}<p>{{ tool.description }}</p>{% endif %}
+            {% if tool.url %}<a href="{{ tool.url | relative_url }}" class="btn btn-secondary">Open Tool</a>{% endif %}
+          </div>
+        {% endfor %}
+      {% else %}
+        <p class="section-desc">No tools are currently listed in this category.</p>
+      {% endif %}
     </div>
   </div>
 </div>
