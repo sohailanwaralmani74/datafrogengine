@@ -10,7 +10,7 @@ description: Free browser-based GeoJSON tools for validating, converting, simpli
     <div class="page-badge-row">
       <span class="page-badge badge-geojson">RFC 7946</span>
       <span class="page-badge badge-zero-dep">WKT &amp; KML</span>
-      <span class="page-badge badge-methods">Practical GeoJSON Operations</span>
+      <span class="page-badge badge-methods">GeoJSON Tools</span>
     </div>
     <h1 class="page-title">GeoJSON Tools</h1>
     <p class="page-subtitle">
@@ -25,8 +25,8 @@ description: Free browser-based GeoJSON tools for validating, converting, simpli
       <span class="stat-lbl">Spatial Spec</span>
     </div>
     <div class="quick-stat-box">
-      <span class="stat-num">25</span>
-      <span class="stat-lbl">Tool Operations</span>
+      <span class="stat-num">XML</span>
+      <span class="stat-lbl">Tool Tools</span>
     </div>
     <div class="quick-stat-box">
       <span class="stat-num">WKT/KML/SVG</span>
@@ -67,7 +67,7 @@ description: Free browser-based GeoJSON tools for validating, converting, simpli
   <div class="page-section">
     <h2 class="section-subheading">Example GeoJSON Workflow</h2>
     <div class="code-container">
-      <pre class="code-pre"><code><span class="token-keyword">import</span> { GeoJsonEngine } <span class="token-keyword">from</span> <span class="token-string">'/assets/js/index.js'</span>;
+      <pre class="code-pre"><code><span class="token-keyword">import</span> { GeoJsonTool } <span class="token-keyword">from</span> <span class="token-string">'/assets/js/index.js'</span>;
 
 <span class="token-keyword">const</span> point = {
   type: <span class="token-string">'Feature'</span>,
@@ -76,14 +76,14 @@ description: Free browser-based GeoJSON tools for validating, converting, simpli
 };
 
 <span class="token-comment">// 1. Validate RFC 7946 bounds</span>
-<span class="token-keyword">const</span> isValid = GeoJsonEngine.<span class="token-fn">isValid</span>(point);
+<span class="token-keyword">const</span> isValid = GeoJsonTool.<span class="token-fn">isValid</span>(point);
 
 <span class="token-comment">// 2. Convert to WKT or KML</span>
-<span class="token-keyword">const</span> wkt = GeoJsonEngine.<span class="token-fn">toWkt</span>(point);
-<span class="token-keyword">const</span> kml = GeoJsonEngine.<span class="token-fn">toKml</span>(point);
+<span class="token-keyword">const</span> wkt = GeoJsonTool.<span class="token-fn">toWkt</span>(point);
+<span class="token-keyword">const</span> kml = GeoJsonTool.<span class="token-fn">toKml</span>(point);
 
 <span class="token-comment">// 3. Calculate Bounding Box</span>
-<span class="token-keyword">const</span> bbox = GeoJsonEngine.<span class="token-fn">calculateBBox</span>(point);
+<span class="token-keyword">const</span> bbox = GeoJsonTool.<span class="token-fn">calculateBBox</span>(point);
 console.<span class="token-fn">log</span>(<span class="token-string">'WKT representation:'</span>, wkt);</code></pre>
     </div>
   </div>
