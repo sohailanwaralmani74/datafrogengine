@@ -9,8 +9,8 @@ description: Free browser-based tools for working with QIF, QFX, QBO, and OFX fi
   <div class="page-header">
     <div class="page-badge-row">
       <span class="page-badge badge-fin">QIF &bull; QFX &bull; QBO &bull; OFX</span>
-      <span class="page-badge badge-zero-dep">Zero Dependencies</span>
-      <span class="page-badge badge-methods">Practical Financial Operations</span>
+      <span class="page-badge badge-zero-dep">Browser-based</span>
+      <span class="page-badge badge-methods">Financial Tools</span>
     </div>
     <h1 class="page-title">Financial Tools</h1>
     <p class="page-subtitle">
@@ -25,8 +25,8 @@ description: Free browser-based tools for working with QIF, QFX, QBO, and OFX fi
       <span class="stat-lbl">QIF/QFX/QBO/OFX</span>
     </div>
     <div class="quick-stat-box">
-      <span class="stat-num">26</span>
-      <span class="stat-lbl">Tool Operations</span>
+      <span class="stat-num">QIF/QFX/QBO/OFX</span>
+      <span class="stat-lbl">Tool Tools</span>
     </div>
     <div class="quick-stat-box">
       <span class="stat-num">Auto</span>
@@ -67,23 +67,23 @@ description: Free browser-based tools for working with QIF, QFX, QBO, and OFX fi
   <div class="page-section">
     <h2 class="section-subheading">Example Statement Workflow</h2>
     <div class="code-container">
-      <pre class="code-pre"><code><span class="token-keyword">import</span> { FinancialEngine } <span class="token-keyword">from</span> <span class="token-string">'/assets/js/index.js'</span>;
+      <pre class="code-pre"><code><span class="token-keyword">import</span> { FinancialTool } <span class="token-keyword">from</span> <span class="token-string">'/assets/js/index.js'</span>;
 
 <span class="token-comment">// 1. Parse QBO / QFX or QIF</span>
-<span class="token-keyword">const</span> statement = FinancialEngine.<span class="token-fn">parse</span>(qboString);
+<span class="token-keyword">const</span> statement = FinancialTool.<span class="token-fn">parse</span>(qboString);
 
 <span class="token-comment">// 2. Auto-categorize transactions</span>
-FinancialEngine.<span class="token-fn">autoCategorize</span>(statement, [
+FinancialTool.<span class="token-fn">autoCategorize</span>(statement, [
   { pattern: <span class="token-string">'Amazon'</span>, category: <span class="token-string">'Office Supplies'</span> },
   { pattern: <span class="token-string">'Payroll'</span>, category: <span class="token-string">'Income'</span> }
 ]);
 
 <span class="token-comment">// 3. Reconcile against source records</span>
-<span class="token-keyword">const</span> report = FinancialEngine.<span class="token-fn">reconcile</span>(statement, internalLedger);
+<span class="token-keyword">const</span> report = FinancialTool.<span class="token-fn">reconcile</span>(statement, internalLedger);
 console.<span class="token-fn">log</span>(<span class="token-string">'Reconciliation Discrepancy:'</span>, report.discrepancy);
 
 <span class="token-comment">// 4. Export to Excel or CSV</span>
-<span class="token-keyword">const</span> excelWorkbook = FinancialEngine.<span class="token-fn">toExcel</span>(statement);</code></pre>
+<span class="token-keyword">const</span> excelWorkbook = FinancialTool.<span class="token-fn">toExcel</span>(statement);</code></pre>
     </div>
   </div>
 </div>
