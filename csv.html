@@ -24,14 +24,20 @@ description: Free online CSV tools for cleaning, filtering, sorting, validating,
   </div>
 
   <div class="page-section">
-    <h2 class="section-subheading">What You Can Do With CSV</h2>
+    <h2 class="section-subheading">Available CSV Tools</h2>
     <div class="feature-pills-grid">
-      <div class="pill-card"><h4>Clean CSV Files</h4><p>Remove unwanted rows or columns, clean values, rename headings, and prepare a file for further use.</p></div>
-      <div class="pill-card"><h4>Filter &amp; Sort Data</h4><p>Find the records you need and arrange rows and columns in the order that makes sense for your work.</p></div>
-      <div class="pill-card"><h4>Combine CSV Data</h4><p>Bring related CSV data together and work with information from more than one file.</p></div>
-      <div class="pill-card"><h4>Check Your CSV</h4><p>Find common problems in rows, columns, headings, and values before using the file elsewhere.</p></div>
-      <div class="pill-card"><h4>Compare CSV Files</h4><p>Check two CSV files to see which records or values have changed.</p></div>
-      <div class="pill-card"><h4>Convert CSV</h4><p>Convert CSV data to supported formats such as JSON, Excel, and other available file types.</p></div>
+      {% assign category_tools = site.data.tools | where: "category", "csv" %}
+      {% if category_tools.size > 0 %}
+        {% for tool in category_tools %}
+          <div class="pill-card">
+            <h4>{{ tool.name }}</h4>
+            {% if tool.description %}<p>{{ tool.description }}</p>{% endif %}
+            {% if tool.url %}<a href="{{ tool.url | relative_url }}" class="btn btn-secondary">Open Tool</a>{% endif %}
+          </div>
+        {% endfor %}
+      {% else %}
+        <p class="section-desc">No tools are currently listed in this category.</p>
+      {% endif %}
     </div>
   </div>
 
