@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Home
+title: Data Tools — Free Online File & Data Tools
 ---
 
 <section class="hero-section" id="hero-section">
@@ -12,15 +12,15 @@ title: Home
       High-Performance Document &amp; Data Processing Tools Suite
     </h1>
     <p class="hero-subtitle" id="hero-subtitle">
-      Eight full-featured, spec-compliant document, data, spatial &amp; financial processing tools written completely from scratch in pure JavaScript.
+      A growing collection of practical browser-based tools for working with JSON, CSV, Excel, PDF, XML, YAML, GeoJSON, and financial statement files.
       Parse, query, convert, compress, edit, analyze, compare, clean, and reconcile across CSV, Microsoft Excel (.xlsx),
       W3C XML 1.0, JSON, PDF-1.7, YAML (YML), RFC 7946 GeoJSON, and Financial formats (QIF, QFX, QBO, OFX) across any modern JavaScript runtime.
     </p>
     <div class="hero-actions" id="hero-actions">
-      <a href="#quickstart" class="btn btn-primary" id="btn-get-started">Explore Quickstart</a>
-      <a href="#json-studio" class="btn btn-secondary" id="btn-view-json-studio">JSON Data Tools</a>
-      <a href="#xml-playground" class="btn btn-secondary" id="btn-view-playground">XML Inspector</a>
-      <a href="#features" class="btn btn-secondary" id="btn-view-features">Core Capabilities</a>
+      <a href="#quickstart" class="btn btn-primary" id="btn-get-started">Explore Tools</a>
+      <a href="#json-studio" class="btn btn-secondary" id="btn-view-json-studio">JSON Tools</a>
+      <a href="#xml-playground" class="btn btn-secondary" id="btn-view-playground">XML Tools</a>
+      <a href="#features" class="btn btn-secondary" id="btn-view-features">What You Can Do</a>
     </div>
 
     <div class="hero-stats" id="hero-stats">
@@ -29,16 +29,16 @@ title: Home
         <span class="stat-label">ISO 32000 &bull; ECMA-376 &bull; W3C &bull; RFC 8259 &bull; RFC 7946 &bull; OFX 1.x/2.x</span>
       </div>
       <div class="stat-card" id="stat-suites">
-        <span class="stat-value">8 Tools</span>
-        <span class="stat-label">Unified Zero-Dep Suite</span>
+        <span class="stat-value">8 Categories</span>
+        <span class="stat-label">Focused file and data tools</span>
       </div>
       <div class="stat-card" id="stat-deps">
         <span class="stat-value">0</span>
-        <span class="stat-label">External Runtime Deps</span>
+        <span class="stat-label">Server uploads required</span>
       </div>
       <div class="stat-card" id="stat-runtime">
         <span class="stat-value">100%</span>
-        <span class="stat-label">Universal JS (ESM)</span>
+        <span class="stat-label">Runs in your browser</span>
       </div>
     </div>
   </div>
@@ -46,8 +46,8 @@ title: Home
 
 <section class="section-container" id="features">
   <div class="section-header">
-    <h2 class="section-title" id="features-heading">Tools Subsystems</h2>
-    <p class="section-desc">Modular, zero-dependency architectures built for speed, safety, and specification fidelity.</p>
+    <h2 class="section-title" id="features-heading">Tools by Category</h2>
+    <p class="section-desc">Choose a category below to find practical tools for common file and data tasks.</p>
   </div>
 
   <div class="card-grid" id="features-grid">
@@ -290,174 +290,8 @@ title: Home
 
 <section class="section-container" id="quickstart">
   <div class="section-header">
-    <h2 class="section-title" id="quickstart-heading">Quickstart API Guide</h2>
-    <p class="section-desc">Intuitive, fluent TypeScript/JavaScript APIs designed for seamless document workflows.</p>
-  </div>
-
-  <div class="code-showcase" id="code-showcase">
-    <div class="code-tabs" id="code-tabs">
-      <button class="code-tab active" id="tab-btn-excel" onclick="switchCodeTab('excel')">Excel Engine (XLSX)</button>
-      <button class="code-tab" id="tab-btn-excel-builder" onclick="switchCodeTab('excel-builder')">Excel Builder (Reports)</button>
-      <button class="code-tab" id="tab-btn-pdf" onclick="switchCodeTab('pdf')">PDF Engine (PDF-1.7)</button>
-      <button class="code-tab" id="tab-btn-xml" onclick="switchCodeTab('xml')">XML Engine (DOM &amp; JSON)</button>
-      <button class="code-tab" id="tab-btn-json" onclick="switchCodeTab('json')">JSON Engine &amp; Data Tools</button>
-    </div>
-
-
-    <!-- Excel Engine Code -->
-    <div class="code-block" id="block-excel">
-      <pre><code><span class="tok-kw">import</span> { ExcelWorkbook, ExcelStyle } <span class="tok-kw">from</span> <span class="tok-str">'./assets/js/index.js'</span>;
-
-<span class="tok-comment">// 1. Create a new workbook and worksheet</span>
-<span class="tok-kw">const</span> wb = <span class="tok-kw">new</span> <span class="tok-fn">ExcelWorkbook</span>();
-wb.properties.title = <span class="tok-str">'Q3 Financial Summary'</span>;
-<span class="tok-kw">const</span> ws = wb.<span class="tok-fn">addWorksheet</span>(<span class="tok-str">'Revenue'</span>);
-
-<span class="tok-comment">// 2. Configure column widths & headers</span>
-ws.<span class="tok-fn">setColumnWidth</span>(<span class="tok-str">'A'</span>, <span class="tok-num">24</span>);
-ws.<span class="tok-fn">setColumnWidth</span>(<span class="tok-str">'B'</span>, <span class="tok-num">16</span>);
-ws.<span class="tok-fn">setColumnWidth</span>(<span class="tok-str">'C'</span>, <span class="tok-num">16</span>);
-
-<span class="tok-kw">const</span> headerStyle = <span class="tok-kw">new</span> <span class="tok-fn">ExcelStyle</span>({
-  font: { name: <span class="tok-str">'Arial'</span>, size: <span class="tok-num">11</span>, bold: <span class="tok-kw">true</span>, color: <span class="tok-str">'FFFFFF'</span> },
-  fill: { fgColor: <span class="tok-str">'0055A5'</span> },
-  alignment: { horizontal: <span class="tok-str">'center'</span> }
-});
-
-<span class="tok-kw">const</span> header = ws.<span class="tok-fn">addRow</span>([<span class="tok-str">'Product'</span>, <span class="tok-str">'Units Sold'</span>, <span class="tok-str">'Unit Price'</span>, <span class="tok-str">'Total Revenue'</span>]);
-[<span class="tok-num">1</span>, <span class="tok-num">2</span>, <span class="tok-num">3</span>, <span class="tok-num">4</span>].<span class="tok-fn">forEach</span>(c =&gt; header.<span class="tok-fn">getCell</span>(c).<span class="tok-fn">setStyle</span>(headerStyle));
-
-<span class="tok-comment">// 3. Add data rows with formula references</span>
-ws.<span class="tok-fn">addRow</span>([<span class="tok-str">'DataFrog Core'</span>, <span class="tok-num">1200</span>, <span class="tok-num">49.99</span>, <span class="tok-str">'=B2*C2'</span>]);
-ws.<span class="tok-fn">addRow</span>([<span class="tok-str">'Excel Engine Pro'</span>, <span class="tok-num">850</span>, <span class="tok-num">79.99</span>, <span class="tok-str">'=B3*C3'</span>]);
-ws.<span class="tok-fn">addRow</span>([<span class="tok-str">'Total'</span>, <span class="tok-str">'=SUM(B2:B3)'</span>, <span class="tok-str">''</span>, <span class="tok-str">'=SUM(D2:D3)'</span>]);
-
-<span class="tok-comment">// 4. Calculate formulas in-memory</span>
-wb.<span class="tok-fn">calculateAllFormulas</span>();
-console.<span class="tok-fn">log</span>(<span class="tok-str">'Calculated total:'</span>, ws.<span class="tok-fn">getCell</span>(<span class="tok-str">'D4'</span>).value);
-
-<span class="tok-comment">// 5. Save as standard XLSX binary or export to CSV/JSON</span>
-<span class="tok-kw">const</span> xlsxBytes = wb.<span class="tok-fn">save</span>(); <span class="tok-comment">// Uint8Array</span>
-<span class="tok-kw">const</span> csvString = ws.<span class="tok-fn">toCsv</span>();
-<span class="tok-kw">const</span> jsonRows = ws.<span class="tok-fn">toJson</span>();
-
-<span class="tok-comment">// 6. Read back from XLSX bytes</span>
-<span class="tok-kw">const</span> loadedWb = ExcelWorkbook.<span class="tok-fn">open</span>(xlsxBytes);
-<span class="tok-kw">const</span> sheet = loadedWb.<span class="tok-fn">getWorksheet</span>(<span class="tok-str">'Revenue'</span>);
-console.<span class="tok-fn">log</span>(sheet.<span class="tok-fn">getCell</span>(<span class="tok-str">'A2'</span>).value); <span class="tok-comment">// 'DataFrog Core'</span></code></pre>
-    </div>
-
-    <!-- Excel Builder Code -->
-    <div class="code-block" id="block-excel-builder" style="display: none;">
-      <pre><code><span class="tok-kw">import</span> { ExcelBuilder } <span class="tok-kw">from</span> <span class="tok-str">'./assets/js/index.js'</span>;
-
-<span class="tok-comment">// Declarative report generation with styled titles and tables</span>
-<span class="tok-kw">const</span> builder = <span class="tok-kw">new</span> <span class="tok-fn">ExcelBuilder</span>({
-  title: <span class="tok-str">'Executive Operations Report'</span>,
-  creator: <span class="tok-str">'DataFrog Analytics'</span>,
-  themeColor: <span class="tok-str">'0A58CA'</span>
-});
-
-builder
-  .<span class="tok-fn">sheet</span>(<span class="tok-str">'Operations'</span>)
-  .<span class="tok-fn">title</span>(<span class="tok-str">'Operations Performance Summary'</span>, { subtitle: <span class="tok-str">'Generated Autumn 2026'</span> })
-  .<span class="tok-fn">table</span>({
-    headers: [<span class="tok-str">'Department'</span>, <span class="tok-str">'Allocated Budget'</span>, <span class="tok-str">'Actual Spent'</span>, <span class="tok-str">'Variance'</span>],
-    rows: [
-      [<span class="tok-str">'Core Platform'</span>, <span class="tok-num">500000</span>, <span class="tok-num">475000</span>, <span class="tok-num">25000</span>],
-      [<span class="tok-str">'Document Rendering'</span>, <span class="tok-num">280000</span>, <span class="tok-num">265000</span>, <span class="tok-num">15000</span>],
-      [<span class="tok-str">'Infrastructure &amp; Cloud'</span>, <span class="tok-num">190000</span>, <span class="tok-num">205000</span>, <span class="tok-num">-15000</span>]
-    ],
-    totalRow: <span class="tok-kw">true</span>,
-    totalLabels: [<span class="tok-str">'Total'</span>, <span class="tok-str">'SUM'</span>, <span class="tok-str">'SUM'</span>, <span class="tok-str">'SUM'</span>]
-  });
-
-<span class="tok-kw">const</span> reportBytes = builder.<span class="tok-fn">save</span>(); <span class="tok-comment">// Serializes directly to Uint8Array</span></code></pre>
-    </div>
-
-    <!-- PDF Engine Code -->
-    <div class="code-block" id="block-pdf" style="display: none;">
-      <pre><code><span class="tok-kw">import</span> { PdfDocumentBuilder, PdfDocument } <span class="tok-kw">from</span> <span class="tok-str">'./assets/js/index.js'</span>;
-
-<span class="tok-comment">// 1. Build a structured PDF document</span>
-<span class="tok-kw">const</span> builder = <span class="tok-kw">new</span> <span class="tok-fn">PdfDocumentBuilder</span>({ pageSize: <span class="tok-str">'A4'</span>, margins: <span class="tok-num">40</span> });
-
-builder.<span class="tok-fn">addHeading</span>(<span class="tok-str">'Quarterly Performance Report'</span>, <span class="tok-num">1</span>);
-builder.<span class="tok-fn">addParagraph</span>(<span class="tok-str">'Generated directly with pure JavaScript engine.'</span>);
-
-builder.<span class="tok-fn">addTable</span>({
-  headers: [<span class="tok-str">'Metric'</span>, <span class="tok-str">'Q3 Actual'</span>, <span class="tok-str">'Target'</span>, <span class="tok-str">'Variance'</span>],
-  rows: [
-    [<span class="tok-str">'Total Ingestion'</span>, <span class="tok-str">'1.24 GB'</span>, <span class="tok-str">'1.00 GB'</span>, <span class="tok-str">'+24%'</span>],
-    [<span class="tok-str">'Processing Latency'</span>, <span class="tok-str">'4.2 ms'</span>, <span class="tok-str">'10.0 ms'</span>, <span class="tok-str">'-58%'</span>],
-    [<span class="tok-str">'Render Fidelity'</span>, <span class="tok-str">'100%'</span>, <span class="tok-str">'99.9%'</span>, <span class="tok-str">'+0.1%'</span>]
-  ]
-});
-
-<span class="tok-comment">// 2. Serialize to compliant binary Uint8Array</span>
-<span class="tok-kw">const</span> pdfBytes = builder.<span class="tok-fn">save</span>();
-
-<span class="tok-comment">// 3. Re-open, inspect, and extract text</span>
-<span class="tok-kw">const</span> doc = <span class="tok-kw">await</span> PdfDocument.<span class="tok-fn">open</span>(pdfBytes);
-console.<span class="tok-fn">log</span>(<span class="tok-str">`Pages: ${doc.pageCount}`</span>);
-<span class="tok-kw">const</span> text = doc.<span class="tok-fn">getPage</span>(<span class="tok-num">0</span>).<span class="tok-fn">extractText</span>();
-console.<span class="tok-fn">log</span>(text);</code></pre>
-    <!-- XML Engine Code -->
-    <div class="code-block" id="block-xml" style="display: none;">
-      <pre><code><span class="tok-kw">import</span> { XmlParser, XmlBuilder, XmlConverter, XmlQuery, XmlValidator } <span class="tok-kw">from</span> <span class="tok-str">'./assets/js/index.js'</span>;
-
-<span class="tok-comment">// 1. Parse XML into W3C DOM tree</span>
-<span class="tok-kw">const</span> doc = XmlParser.<span class="tok-fn">parse</span>(<span class="tok-str">`&lt;catalog name="Store"&gt;&lt;item id="i1" inStock="true"&gt;&lt;title&gt;Notebook&lt;/title&gt;&lt;price&gt;29.99&lt;/price&gt;&lt;/item&gt;&lt;/catalog&gt;`</span>);
-
-<span class="tok-comment">// 2. CSS &amp; XPath queries</span>
-<span class="tok-kw">const</span> item = doc.<span class="tok-fn">querySelector</span>(<span class="tok-str">'#i1'</span>);
-<span class="tok-kw">const</span> title = item.<span class="tok-fn">querySelector</span>(<span class="tok-str">'title'</span>).textContent; <span class="tok-comment">// 'Notebook'</span>
-<span class="tok-kw">const</span> inStockItems = XmlQuery.<span class="tok-fn">evaluateXPath</span>(doc, <span class="tok-str">'//item[@inStock="true"]'</span>);
-
-<span class="tok-comment">// 3. Bidirectional JSON conversion</span>
-<span class="tok-kw">const</span> json = XmlConverter.<span class="tok-fn">toJson</span>(doc);
-<span class="tok-kw">const</span> xmlStr = XmlConverter.<span class="tok-fn">fromJson</span>(json, <span class="tok-str">'catalog'</span>, { indent: <span class="tok-num">2</span> });
-
-<span class="tok-comment">// 4. Fluent XML Builder</span>
-<span class="tok-kw">const</span> builder = <span class="tok-kw">new</span> <span class="tok-fn">XmlBuilder</span>(<span class="tok-str">'feed'</span>, { xmlns: <span class="tok-str">'http://www.w3.org/2005/Atom'</span> });
-builder
-  .<span class="tok-fn">element</span>(<span class="tok-str">'title'</span>, <span class="tok-str">'Tech Updates'</span>)
-  .<span class="tok-fn">element</span>(<span class="tok-str">'entry'</span>, { id: <span class="tok-str">'1'</span> })
-    .<span class="tok-fn">element</span>(<span class="tok-str">'summary'</span>, <span class="tok-str">'XML Engine Launched'</span>)
-    .<span class="tok-fn">cdata</span>(<span class="tok-str">'&lt;p&gt;Full W3C spec compliance.&lt;/p&gt;'</span>);
-
-console.<span class="tok-fn">log</span>(builder.<span class="tok-fn">toString</span>({ indent: <span class="tok-num">2</span> }));</code></pre>
-    </div>
-
-    <!-- JSON Engine Code -->
-    <div class="code-block" id="block-json" style="display: none;">
-      <pre><code><span class="tok-kw">import</span> { JsonEngine, JsonConverter, JsonEditor, JsonValidator, JsonAnalyzer, JsonCleaner } <span class="tok-kw">from</span> <span class="tok-str">'./assets/js/index.js'</span>;
-
-<span class="tok-comment">// 1. Lenient parse &amp; auto-repair (handles single quotes, unquoted keys, comments &amp; trailing commas)</span>
-<span class="tok-kw">const</span> raw = <span class="tok-str">`{ name: 'Quantum Processor', price: 899.95, /* in stock */ inStock: true, }`</span>;
-<span class="tok-kw">const</span> data = JsonEngine.<span class="tok-fn">parse</span>(raw, { lenient: <span class="tok-kw">true</span> });
-
-<span class="tok-comment">// 2. Multi-Format Data Converters (XML, CSV, YAML, NDJSON, Excel, PDF)</span>
-<span class="tok-kw">const</span> xml = JsonEngine.<span class="tok-fn">toXml</span>(data, <span class="tok-str">'product'</span>);
-<span class="tok-kw">const</span> csv = JsonEngine.<span class="tok-fn">toCsv</span>([data]);
-<span class="tok-kw">const</span> yaml = JsonEngine.<span class="tok-fn">toYaml</span>(data);
-<span class="tok-kw">const</span> xlsxBytes = JsonEngine.<span class="tok-fn">toExcel</span>([data], { sheetName: <span class="tok-str">'Catalog'</span> });
-<span class="tok-kw">const</span> pdfBytes = JsonEngine.<span class="tok-fn">toPdf</span>([data], { title: <span class="tok-str">'Hardware Catalog'</span> });
-
-<span class="tok-comment">// 3. Path-based mutations &amp; RFC 6902 JSON Patch</span>
-JsonEngine.<span class="tok-fn">set</span>(data, <span class="tok-str">'specs.cores'</span>, <span class="tok-num">128</span>);
-<span class="tok-kw">const</span> patch = JsonEngine.<span class="tok-fn">createPatch</span>({ inStock: <span class="tok-kw">true</span> }, { inStock: <span class="tok-kw">false</span>, discount: <span class="tok-num">0.15</span> });
-<span class="tok-kw">const</span> updated = JsonEngine.<span class="tok-fn">applyPatch</span>(data, patch);
-
-<span class="tok-comment">// 4. Full JSON Schema Draft-07 Validation &amp; Automatic Inference</span>
-<span class="tok-kw">const</span> schema = JsonEngine.<span class="tok-fn">inferSchema</span>(data);
-<span class="tok-kw">const</span> report = JsonEngine.<span class="tok-fn">validateSchema</span>(data, schema);
-console.<span class="tok-fn">log</span>(<span class="tok-str">'Schema conforms:'</span>, report.valid);
-
-<span class="tok-comment">// 5. Sanitizer, Sorting &amp; Formatting</span>
-<span class="tok-kw">const</span> sanitized = JsonEngine.<span class="tok-fn">clean</span>(data, { stripNulls: <span class="tok-kw">true</span>, sortKeys: <span class="tok-kw">true</span> });
-console.<span class="tok-fn">log</span>(JsonEngine.<span class="tok-fn">format</span>(sanitized, { indent: <span class="tok-num">2</span> }));</code></pre>
-    </div>
+    <h2 class="section-title" id="quickstart-heading">How DataFrog Tools Work</h2>
+    <p class="section-desc">Choose a tool, add your file or paste your data, make the changes you need, and download the result. The tools are designed for practical file and data tasks rather than programming work.</p>
   </div>
 </section>
 
@@ -558,7 +392,7 @@ console.<span class="tok-fn">log</span>(JsonEngine.<span class="tok-fn">format</
 
 <section class="section-container" id="xml-playground">
   <div class="section-header">
-    <h2 class="section-title" id="playground-heading">Interactive XML Inspector &amp; JSON Bridge</h2>
+    <h2 class="section-title" id="playground-heading">Interactive XML Tools &amp; JSON Bridge</h2>
     <p class="section-desc">Test the XML processing pipeline in real time. Inspect DOM node hierarchies and instant JSON transformations.</p>
   </div>
 
