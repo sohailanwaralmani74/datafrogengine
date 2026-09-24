@@ -1,87 +1,44 @@
 ---
 layout: default
-title: JSON Tools — Validate, Format, Convert & Analyze JSON
+title: JSON Tools — Format, Validate, Clean & Convert JSON
 format: json
-description: Free browser-based JSON tools for formatting, validating, repairing, converting, comparing, cleaning, and analyzing JSON files and text.
+description: Free online JSON tools for formatting, validating, repairing, comparing, cleaning, searching, and converting JSON files and data.
 ---
 
 <div class="page-container" id="page-json">
   <div class="page-header">
     <div class="page-badge-row">
-      <span class="page-badge badge-json">RFC 8259</span>
-      <span class="page-badge badge-zero-dep">RFC 6902 Patch</span>
-      <span class="page-badge badge-methods">JSON Tools</span>
+      <span class="page-badge badge-json">JSON</span>
+      <span class="page-badge badge-zero-dep">Private on your device</span>
+      <span class="page-badge badge-methods">Free Tools</span>
     </div>
     <h1 class="page-title">JSON Tools</h1>
     <p class="page-subtitle">
-      Practical tools for common JSON tasks, including validation, formatting, repair, conversion, comparison, searching, and cleanup.
-      JSONPath queries, RFC 6902 JSON Patching, schema inference, syntax repair, anomaly detection, deep diffing, and key reordering.
+      Work with JSON files and data without sending your files to a server. Format messy JSON, check for errors, repair common problems, compare two files, clean unwanted data, and convert JSON to other useful formats.
     </p>
   </div>
 
   <div class="page-quick-stats">
-    <div class="quick-stat-box">
-      <span class="stat-num">RFC 8259</span>
-      <span class="stat-lbl">Specification</span>
-    </div>
-    <div class="quick-stat-box">
-      <span class="stat-num">JSON</span>
-      <span class="stat-lbl">Tool Tools</span>
-    </div>
-    <div class="quick-stat-box">
-      <span class="stat-num">RFC 6902</span>
-      <span class="stat-lbl">JSON Patch</span>
-    </div>
-    <div class="quick-stat-box">
-      <span class="stat-num">Self-Healing</span>
-      <span class="stat-lbl">Syntax Repair</span>
-    </div>
+    <div class="quick-stat-box"><span class="stat-num">Format</span><span class="stat-lbl">Make JSON easier to read</span></div>
+    <div class="quick-stat-box"><span class="stat-num">Check</span><span class="stat-lbl">Find JSON errors</span></div>
+    <div class="quick-stat-box"><span class="stat-num">Compare</span><span class="stat-lbl">See what changed</span></div>
+    <div class="quick-stat-box"><span class="stat-num">Convert</span><span class="stat-lbl">Change file format</span></div>
   </div>
 
   <div class="page-section">
-    <h2 class="section-subheading">Advanced Data Transformation</h2>
+    <h2 class="section-subheading">What You Can Do With JSON</h2>
     <div class="feature-pills-grid">
-      <div class="pill-card">
-        <h4>RFC 6902 JSON Patch</h4>
-        <p>Generate precise delta patches between two documents and atomically apply patch sets across complex objects.</p>
-        <code>Compare two JSON documents</code>
-      </div>
-      <div class="pill-card">
-        <h4>Schema Inference &amp; Anomaly Detection</h4>
-        <p>Infer JSON Schema definitions automatically and detect type shifts, outlier keys, and inconsistent collections.</p>
-        <code>Infer structure from JSON data</code>
-      </div>
-      <div class="pill-card">
-        <h4>Key Permutation &amp; Reordering</h4>
-        <p>Reorder keys based on priority arrays, sort keys recursively, and flatten/unflatten nested dictionaries.</p>
-        <code>Reorder JSON keys</code>
-      </div>
-      <div class="pill-card">
-        <h4>Self-Healing Repair</h4>
-        <p>Heal malformed JSON strings containing trailing commas, unquoted keys, single quotes, or unclosed brackets.</p>
-        <code>Repair common JSON formatting errors</code>
-      </div>
+      <div class="pill-card"><h4>Format JSON</h4><p>Turn compact or difficult-to-read JSON into a clean, organized format that is easier to review.</p></div>
+      <div class="pill-card"><h4>Check &amp; Repair JSON</h4><p>Find common formatting problems and repair supported errors so your JSON is easier to work with.</p></div>
+      <div class="pill-card"><h4>Compare JSON Files</h4><p>Compare two JSON files and identify added, removed, or changed information.</p></div>
+      <div class="pill-card"><h4>Clean &amp; Organize</h4><p>Search data, remove unwanted information, reorder keys, and organize nested JSON data.</p></div>
+      <div class="pill-card"><h4>Convert JSON</h4><p>Convert JSON data into useful formats such as CSV, XML, Excel, YAML, and other supported formats.</p></div>
+      <div class="pill-card"><h4>Review Your Data</h4><p>Inspect the contents of a JSON file and work with large or nested data more comfortably.</p></div>
     </div>
   </div>
 
   <div class="page-section">
-    <h2 class="section-subheading">Example Data Workflow</h2>
-    <div class="code-container">
-      <pre class="code-pre"><code><span class="token-keyword">import</span> { JsonTool } <span class="token-keyword">from</span> <span class="token-string">'/assets/js/index.js'</span>;
-
-<span class="token-keyword">const</span> raw = <span class="token-string">`{ status: "ok", count: 12, details: { tags: ["prod", "us-east"], } }`</span>;
-
-<span class="token-comment">// 1. Repair malformed JSON</span>
-<span class="token-keyword">const</span> repaired = JsonTool.<span class="token-fn">repair</span>(raw);
-<span class="token-keyword">const</span> parsed = JsonTool.<span class="token-fn">parse</span>(repaired);
-
-<span class="token-comment">// 2. Query with JSONPath</span>
-<span class="token-keyword">const</span> tags = JsonTool.<span class="token-fn">query</span>(parsed, <span class="token-string">'$.details.tags[*]'</span>);
-
-<span class="token-comment">// 3. Infer Schema &amp; Diff</span>
-<span class="token-keyword">const</span> schema = JsonTool.<span class="token-fn">inferSchema</span>(parsed);
-<span class="token-keyword">const</span> diff = JsonTool.<span class="token-fn">diff</span>({ count: 10 }, parsed);
-console.<span class="token-fn">log</span>(<span class="token-string">'Differences:'</span>, diff.differences);</code></pre>
-    </div>
+    <h2 class="section-subheading">Your Files Stay With You</h2>
+    <p class="section-desc">Open your JSON file in the tool, make the changes you need, and save the result. Your file is handled on your device rather than uploaded to our servers.</p>
   </div>
 </div>
