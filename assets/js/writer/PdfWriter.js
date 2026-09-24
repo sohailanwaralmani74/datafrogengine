@@ -78,7 +78,7 @@ export class PdfWriter {
 
     // 4. Cross-Reference Table (xref)
     const startXRefOffset = currentOffset;
-    const totalObjects = objectList.length + 1; // including object 0
+    const totalObjects = Math.max(1, ...objectList.map(item => item.num)) + 1;
 
     const xrefLines = [
       'xref\n',
@@ -87,8 +87,13 @@ export class PdfWriter {
     ];
 
     for (let num = 1; num < totalObjects; num++) {
-      const off = offsets.get(num) || 0;
-      const paddedOff = String(off).padStart(10, '0');
+      const off = offsets.get(num);
+      if (off === undefined) {
+        xrefLines.push('0000000000 65535 f \\n');
+      } else {
+        const paddedOff = String(off).padStart(10, '0');
+        xrefLines.push(paddedOff + ' 00000 n \\n');
+      }
       xrefLines.push(`${paddedOff} 00000 n \n`);
     }
 
@@ -134,11 +139,15 @@ export class PdfWriter {
     const objectList = []; // { num, obj }
     const visitedOldKeys = new Map(); // oldKey -> newObjNum
     const directToRef = new Map(); // Object -> PdfReference
-    let nextNum = 1;
+    const xref = document.getXRefTable();
+    const reservedNumbers = new Set(xref.getEntries().map(entry => entry.objectNumber));
+    let nextNum = Math.max(1, xref.getHighestObjectNumber() + 1);
 
-    // We will assign object number 1 to Catalog
-    const catalogNum = nextNum++;
-    const catalogRef = PdfReference.of(catalogNum, 0);
+    // Preserve the original catalog object number so references to compressed
+    // objects and existing object streams remain valid after rewriting.
+    const rootRef = xref.getTrailer() ? xref.getTrailer().getRoot() : null;
+    const catalogNum = rootRef && rootRef.isReference && rootRef.isReference() ? rootRef.objectNumber : nextNum++;
+    const catalogRef = PdfReference.of(catalogNum, rootRef && rootRef.isReference && rootRef.isReference() ? rootRef.generationNumber : 0);
     directToRef.set(catalogDict, catalogRef);
 
     const queue = [{ num: catalogNum, obj: catalogDict }];
@@ -147,6 +156,7 @@ export class PdfWriter {
       if (directToRef.has(obj)) {
         return directToRef.get(obj);
       }
+      while (reservedNumbers.has(nextNum) || [...directToRef.values()].some(ref => ref.objectNumber === nextNum)) nextNum++;
       const num = nextNum++;
       const ref = PdfReference.of(num, 0);
       directToRef.set(obj, ref);
@@ -164,13 +174,27 @@ export class PdfWriter {
           return PdfReference.of(visitedOldKeys.get(oldKey), 0);
         }
 
+        const entry = xref.getEntry(val.objectNumber);
+        if (entry && entry.isCompressed()) {
+          // Keep compressed-object references intact. The containing /ObjStm
+          // is copied below so its internal object numbering remains valid.
+          const streamRef = PdfReference.of(entry.streamObjectNumber, 0);
+          const streamObj = document.resolve(streamRef);
+          if (streamObj && !directToRef.has(streamObj)) {
+            directToRef.set(streamObj, streamRef);
+            queue.push({ num: entry.streamObjectNumber, obj: streamObj });
+          }
+          visitedOldKeys.set(oldKey, val.objectNumber);
+          return PdfReference.of(val.objectNumber, val.generationNumber);
+        }
+
         const resolved = document.resolve(val);
         if (!resolved) {
           return val;
         }
 
-        const assignedNum = nextNum++;
-        const assignedRef = PdfReference.of(assignedNum, 0);
+        const assignedNum = val.objectNumber;
+        const assignedRef = PdfReference.of(assignedNum, val.generationNumber);
         visitedOldKeys.set(oldKey, assignedNum);
         if (typeof resolved === 'object' && resolved !== null) {
           directToRef.set(resolved, assignedRef);
