@@ -240,6 +240,8 @@ export class PdfXRefTable {
     while (token && token.type !== PdfTokenType.DICT_START) token = lexer.nextToken();
     if (!token) throw new PdfXRefException('Missing trailer dictionary', reader.position());
 
+    // Rewind to the dictionary start because the search loop consumed <<.
+    lexer.seek(token.offset);
     const parser = new PdfParser(lexer);
     const trailerDict = parser.parseObject();
     return new PdfTrailer(trailerDict);
