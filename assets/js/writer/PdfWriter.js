@@ -94,7 +94,6 @@ export class PdfWriter {
         const paddedOff = String(off).padStart(10, '0');
         xrefLines.push(paddedOff + ' 00000 n \\n');
       }
-      xrefLines.push(`${paddedOff} 00000 n \n`);
     }
 
     const xrefChunk = new TextEncoder().encode(xrefLines.join(''));
