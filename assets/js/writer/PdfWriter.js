@@ -242,6 +242,7 @@ export class PdfWriter {
     const xrefNum = nextObjectNumber++;
     const size = xrefNum + 1;
     const xrefOffset = offset;
+    xrefEntries.set(xrefNum, { type: 1, field2: xrefOffset, field3: 0 });
     const entryWidth = 7;
     const xrefRaw = new Uint8Array(size * entryWidth);
 
