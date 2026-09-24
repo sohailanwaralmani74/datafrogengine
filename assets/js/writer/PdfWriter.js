@@ -1,5 +1,4 @@
 import { PdfObjectWriter } from './PdfObjectWriter.js';
-import { PdfDocument } from '../document/PdfDocument.js';
 import { pageExtractionHelper } from '../document/PdfPage.js';
 import { PdfDictionary } from '../objects/PdfDictionary.js';
 import { PdfReference } from '../objects/PdfReference.js';
@@ -24,8 +23,8 @@ export class PdfWriter {
    * @returns {Uint8Array}
    */
   static write(document) {
-    if (!(document instanceof PdfDocument)) {
-      throw new PdfInvalidArgumentException('document', document, 'PdfDocument');
+    if (!document || typeof document.getCatalog !== 'function' || typeof document.getXRefTable !== 'function') {
+      throw new PdfInvalidArgumentException('document', document, 'PdfDocument instance');
     }
 
     const version = document.getPdfVersion() || '1.7';
