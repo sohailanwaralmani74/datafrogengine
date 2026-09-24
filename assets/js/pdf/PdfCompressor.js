@@ -49,7 +49,7 @@ export class PdfCompressor {
     let originalObjectCount = 0;
     try {
       const xref = doc.getXRefTable();
-      if (xref && xref.entries) originalObjectCount = xref.entries.size;
+      if (xref && typeof xref.getEntries === 'function') originalObjectCount = xref.getEntries().length;
     } catch (_) {}
 
     const streamStats = { scanned: 0, compressed: 0, bytesSaved: 0, skipped: 0 };
@@ -63,7 +63,7 @@ export class PdfCompressor {
     try {
       const reloaded = PdfDocument.load(compressedBytes);
       const xref = reloaded.getXRefTable();
-      if (xref && xref.entries) finalObjectCount = xref.entries.size;
+      if (xref && typeof xref.getEntries === 'function') finalObjectCount = xref.getEntries().length;
     } catch (_) {}
 
     const objectsPurged = Math.max(0, originalObjectCount - finalObjectCount);
@@ -93,9 +93,10 @@ export class PdfCompressor {
 
   static #compressStreams(doc, stats) {
     const xref = doc.getXRefTable();
-    if (!xref || !xref.entries) return;
+    if (!xref || typeof xref.getEntries !== 'function') return;
 
-    for (const [objectNumber, entry] of xref.entries) {
+    for (const entry of xref.getEntries()) {
+      const objectNumber = entry.objectNumber;
       if (!entry || (entry.isFree && entry.isFree()) || (entry.isCompressed && entry.isCompressed())) continue;
 
       let object;
