@@ -105,50 +105,22 @@ description: Free browser-based PDF tools for compressing, splitting, merging, e
   </div>
 
   <div class="page-section">
-    <h2 class="section-subheading">Core PDF Operations</h2>
+    <h2 class="section-subheading">Available PDF Tools</h2>
     <div class="feature-pills-grid">
-      <div class="pill-card">
-        <h4>Document Manipulation</h4>
-        <p>Rotate pages, delete page ranges, reorder page indices, split documents into single pages or merge multiple PDF buffers.</p>
-        <code>PdfTool.split(pdfBuffer)</code>
-      </div>
-      <div class="pill-card">
-        <h4>Text &amp; Data Extraction</h4>
-        <p>Extract structured text, parse operator streams, convert content trees to JSON metadata or structured XML.</p>
-        <code>PdfTool.toText(pdfBuffer)</code>
-      </div>
-      <div class="pill-card">
-        <h4>Security &amp; Anonymization</h4>
-        <p>Mask sensitive text coordinates, redact metadata, and stamp diagonal watermark layers across all pages.</p>
-        <code>PdfTool.anonymize(buffer)</code>
-      </div>
-      <div class="pill-card">
-        <h4>Structural Diffing</h4>
-        <p>Compare two PDF documents across object catalogues, font dictionaries, and page count trees.</p>
-        <code>PdfTool.diff(bufA, bufB)</code>
-      </div>
+      {% assign category_tools = site.data.tools | where: "category", "pdf" %}
+      {% if category_tools.size > 0 %}
+        {% for tool in category_tools %}
+          <div class="pill-card">
+            <h4>{{ tool.name }}</h4>
+            {% if tool.description %}<p>{{ tool.description }}</p>{% endif %}
+            {% if tool.url %}<a href="{{ tool.url | relative_url }}" class="btn btn-secondary">Open Tool</a>{% endif %}
+          </div>
+        {% endfor %}
+      {% else %}
+        <p class="section-desc">No tools are currently listed in this category.</p>
+      {% endif %}
     </div>
   </div>
 
-  <div class="page-section">
-    <h2 class="section-subheading">Example PDF Workflow</h2>
-    <div class="code-container">
-      <pre class="code-pre"><code><span class="token-keyword">import</span> { PdfTool } <span class="token-keyword">from</span> <span class="token-string">'/assets/js/index.js'</span>;
 
-<span class="token-comment">// 1. Load an existing PDF document</span>
-<span class="token-keyword">const</span> pdfDoc = <span class="token-keyword">await</span> PdfTool.<span class="token-fn">load</span>(pdfBuffer);
-
-<span class="token-comment">// 2. Reorder pages and rotate orientation</span>
-<span class="token-keyword">const</span> reordered = PdfTool.<span class="token-fn">reorderPages</span>(pdfBuffer, [2, 0, 1]);
-<span class="token-keyword">const</span> rotated = PdfTool.<span class="token-fn">rotateAll</span>(reordered, 90);
-
-<span class="token-comment">// 3. Add diagonal watermark and anonymize</span>
-<span class="token-keyword">const</span> watermarked = PdfTool.<span class="token-fn">addWatermark</span>(rotated, <span class="token-string">'CONFIDENTIAL'</span>);
-<span class="token-keyword">const</span> sanitized = PdfTool.<span class="token-fn">anonymize</span>(watermarked);
-
-<span class="token-comment">// 4. Split or extract text</span>
-<span class="token-keyword">const</span> text = PdfTool.<span class="token-fn">toText</span>(sanitized);
-console.<span class="token-fn">log</span>(<span class="token-string">'Extracted text:'</span>, text);</code></pre>
-    </div>
-  </div>
 </div>
