@@ -1,8 +1,8 @@
 ---
 layout: default
-title: JSON Tools
+title: JSON Tools — Validate, Format, Convert & Analyze JSON
 format: json
-description: High-Performance JSON Query, Patch, Schema & Anomaly Detection Tools
+description: Free browser-based JSON tools for formatting, validating, repairing, converting, comparing, cleaning, and analyzing JSON files and text.
 ---
 
 <div class="page-container" id="page-json">
@@ -10,11 +10,11 @@ description: High-Performance JSON Query, Patch, Schema & Anomaly Detection Tool
     <div class="page-badge-row">
       <span class="page-badge badge-json">RFC 8259</span>
       <span class="page-badge badge-zero-dep">RFC 6902 Patch</span>
-      <span class="page-badge badge-methods">35 API Methods</span>
+      <span class="page-badge badge-methods">Practical JSON Operations</span>
     </div>
     <h1 class="page-title">JSON Tools</h1>
     <p class="page-subtitle">
-      A comprehensive, zero-dependency JSON processing tools suite.
+      Practical tools for common JSON tasks, including validation, formatting, repair, conversion, comparison, searching, and cleanup.
       JSONPath queries, RFC 6902 JSON Patching, schema inference, syntax repair, anomaly detection, deep diffing, and key reordering.
     </p>
   </div>
@@ -44,28 +44,28 @@ description: High-Performance JSON Query, Patch, Schema & Anomaly Detection Tool
       <div class="pill-card">
         <h4>RFC 6902 JSON Patch</h4>
         <p>Generate precise delta patches between two documents and atomically apply patch sets across complex objects.</p>
-        <code>JsonEngine.createPatch(docA, docB)</code>
+        <code>Compare two JSON documents</code>
       </div>
       <div class="pill-card">
         <h4>Schema Inference &amp; Anomaly Detection</h4>
         <p>Infer JSON Schema definitions automatically and detect type shifts, outlier keys, and inconsistent collections.</p>
-        <code>JsonEngine.inferSchema(dataset)</code>
+        <code>Infer structure from JSON data</code>
       </div>
       <div class="pill-card">
         <h4>Key Permutation &amp; Reordering</h4>
         <p>Reorder keys based on priority arrays, sort keys recursively, and flatten/unflatten nested dictionaries.</p>
-        <code>JsonEngine.reorderKeys(obj, ['id', 'name'])</code>
+        <code>Reorder JSON keys</code>
       </div>
       <div class="pill-card">
         <h4>Self-Healing Repair</h4>
         <p>Heal malformed JSON strings containing trailing commas, unquoted keys, single quotes, or unclosed brackets.</p>
-        <code>JsonEngine.repair('{name: "Datafrog",}')</code>
+        <code>Repair common JSON formatting errors</code>
       </div>
     </div>
   </div>
 
   <div class="page-section">
-    <h2 class="section-subheading">Interactive Code Example</h2>
+    <h2 class="section-subheading">Example Data Workflow</h2>
     <div class="code-container">
       <pre class="code-pre"><code><span class="token-keyword">import</span> { JsonEngine } <span class="token-keyword">from</span> <span class="token-string">'/assets/js/index.js'</span>;
 
