@@ -8,6 +8,7 @@ import { PdfIndirectObject } from '../objects/PdfIndirectObject.js';
 import { PdfHexString } from '../objects/PdfHexString.js';
 import { PdfInvalidArgumentException } from '../errors/PdfInvalidArgumentException.js';
 import { FlateEncode } from '../streams/filters/FlateEncode.js';
+import { PdfXRefTable } from '../xref/PdfXRefTable.js';
 
 
 
@@ -132,6 +133,73 @@ export class PdfWriter {
   }
 
 
+  /** Writes only changed objects as a PDF incremental update. */
+  static writeIncremental(document, originalBytes, changedObjectNumbers = []) {
+    if (!(originalBytes instanceof Uint8Array)) {
+      throw new PdfInvalidArgumentException('originalBytes', originalBytes, 'Uint8Array');
+    }
+    if (!changedObjectNumbers.length) return new Uint8Array(originalBytes);
+    if (document.securityHandler) {
+      throw new PdfInvalidArgumentException('document', document, 'unencrypted document for incremental writing');
+    }
+    const xref = document.getXRefTable();
+    const reader = document.getReader();
+    const previousXref = PdfXRefTable.findStartXRefOffset(reader);
+    const uniqueNumbers = [...new Set(changedObjectNumbers)].filter(num => Number.isInteger(num) && num > 0).sort((a, b) => a - b);
+    if (!uniqueNumbers.length) return new Uint8Array(originalBytes);
+    const chunks = [];
+    const newline = originalBytes.length && originalBytes[originalBytes.length - 1] === 0x0A ? new Uint8Array(0) : new TextEncoder().encode('\n');
+    chunks.push(new Uint8Array(originalBytes), newline);
+    let offset = originalBytes.length + newline.length;
+    const offsets = new Map();
+    for (const objectNumber of uniqueNumbers) {
+      const entry = xref.getEntry(objectNumber);
+      if (!entry || entry.isFree()) continue;
+      const object = document.resolveObject(objectNumber, entry.generationNumber || 0);
+      if (!object) continue;
+      const head = new TextEncoder().encode(String(objectNumber) + ' ' + String(entry.generationNumber || 0) + ' obj\n');
+      const body = PdfObjectWriter.serialize(object, { objNum: objectNumber });
+      const tail = new TextEncoder().encode('\nendobj\n');
+      offsets.set(objectNumber, offset);
+      chunks.push(head, body, tail);
+      offset += head.length + body.length + tail.length;
+    }
+    if (!offsets.size) return new Uint8Array(originalBytes);
+    const xrefOffset = offset;
+    const xrefChunks = ['xref\n'];
+    let rangeStart = null;
+    let rangeEnd = null;
+    const flushRange = () => {
+      if (rangeStart === null) return;
+      const count = rangeEnd - rangeStart + 1;
+      xrefChunks.push(String(rangeStart) + ' ' + String(count) + '\n');
+      for (let num = rangeStart; num <= rangeEnd; num++) {
+        const entry = xref.getEntry(num);
+        const generation = entry ? entry.generationNumber : 0;
+        xrefChunks.push(String(offsets.get(num)).padStart(10, '0') + ' ' + String(generation).padStart(5, '0') + ' n \n');
+      }
+      rangeStart = null;
+      rangeEnd = null;
+    };
+    for (const num of offsets.keys()) {
+      if (rangeStart === null) { rangeStart = rangeEnd = num; }
+      else if (num === rangeEnd + 1) rangeEnd = num;
+      else { flushRange(); rangeStart = rangeEnd = num; }
+    }
+    flushRange();
+    const trailer = xref.getTrailer();
+    if (!trailer || !trailer.dictionary) throw new PdfInvalidArgumentException('document', document, 'PDF with a trailer dictionary');
+    const trailerDict = new PdfDictionary();
+    for (const [key, value] of trailer.dictionary.entries()) trailerDict.set(key, value);
+    const size = Math.max(trailer.dictionary.getNumber('Size') || 0, xref.getHighestObjectNumber() + 1, Math.max(...offsets.keys()) + 1);
+    trailerDict.set('Size', PdfNumber.of(size));
+    trailerDict.set('Prev', PdfNumber.of(previousXref));
+    const xrefText = xrefChunks.join('') + 'trailer\n';
+    chunks.push(new TextEncoder().encode(xrefText));
+    chunks.push(PdfObjectWriter.serialize(trailerDict));
+    chunks.push(new TextEncoder().encode('\nstartxref\n' + String(xrefOffset) + '\n%%EOF\n'));
+    return PdfObjectWriter.concatBytes(chunks);
+  }
   static #versionAtLeast(actual, minimum) {
     const [aMajor, aMinor] = String(actual).split('.').map(Number);
     const [bMajor, bMinor] = String(minimum).split('.').map(Number);
