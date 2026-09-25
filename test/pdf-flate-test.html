@@ -74,10 +74,14 @@
           compression: {
             original: formatBytes(result.originalSize),
             compressed: formatBytes(result.compressedSize),
+            rebuilt: formatBytes(result.rebuiltSize),
             saved: formatBytes(result.savedBytes),
             reductionPercent: result.reductionPercent,
             grew: result.grew,
-            streams: result.streams
+            fallbackUsed: result.fallbackUsed,
+            writerMode: result.writerMode,
+            streams: result.streams,
+            images: result.images
           }
         }, null, 2);
       } catch (error) {
