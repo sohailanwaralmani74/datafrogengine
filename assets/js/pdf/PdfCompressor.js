@@ -7,6 +7,9 @@ import { PdfCleaner } from './PdfCleaner.js';
 import { PdfStream } from '../objects/PdfStream.js';
 import { PdfArray } from '../objects/PdfArray.js';
 import { PdfName } from '../objects/PdfName.js';
+import { PdfNumber } from '../objects/PdfNumber.js';
+import { PdfColorSpace } from '../images/PdfColorSpace.js';
+import { PdfStreamDecoder } from '../streams/PdfStreamDecoder.js';
 import { FlateDecode } from '../streams/filters/FlateDecode.js';
 import { FlateEncode } from '../streams/filters/FlateEncode.js';
 
@@ -43,6 +46,12 @@ export class PdfCompressor {
     const compressStreams = options.compressStreams !== undefined
       ? options.compressStreams
       : true;
+    const optimizeImages = options.optimizeImages !== undefined
+      ? options.optimizeImages
+      : (level === 'recommended' || level === 'extreme');
+    const imageQuality = options.imageQuality !== undefined
+      ? Math.max(0.1, Math.min(1, Number(options.imageQuality)))
+      : (level === 'extreme' ? 0.6 : 0.75);
 
     if (stripMeta) {
       PdfCleaner.clean(doc, { stripMetadata: true, stripAnnotations: stripAnnots });
@@ -57,19 +66,22 @@ export class PdfCompressor {
     } catch (_) {}
 
     const streamStats = { scanned: 0, compressed: 0, bytesSaved: 0, skipped: 0 };
+    const imageStats = { scanned: 0, optimized: 0, bytesSaved: 0, skipped: 0 };
 
     if (compressStreams) PdfCompressor.#compressStreams(doc, streamStats);
+    if (optimizeImages) PdfCompressor.#optimizeImages(doc, imageStats, imageQuality);
 
     let compressedBytes = doc.save({ compact: true });
-    let compressedSize = compressedBytes.length;
+    const rebuiltSize = compressedBytes.length;
+    let compressedSize = rebuiltSize;
 
     // A compressor must never make the user's PDF larger. The current writer
     // can legitimately add serialization overhead (especially when rebuilding
     // object streams). If the rebuilt file is larger, keep the original bytes.
     // This is a correctness safeguard until the writer has a compact rebuild
     // path for every PDF structure.
-    const rebuiltGrew = compressedSize > originalSize;
-    if (rebuiltGrew) {
+    const fallbackUsed = compressedSize > originalSize;
+    if (fallbackUsed) {
       compressedBytes = originalBytes;
       compressedSize = originalSize;
     }
@@ -97,12 +109,15 @@ export class PdfCompressor {
       savedBytes,
       ratioPercent,
       reductionPercent: Math.max(0, ratioPercent),
-      grew: false,
+      grew: rebuiltSize > originalSize,
+      rebuiltSize,
+      fallbackUsed,
       pageCount,
       objectsPurged,
       durationMs: Math.max(1, Math.round(endTime - startTime)),
       level,
-      streams: streamStats
+      streams: streamStats,
+      images: imageStats
     };
   }
 
@@ -156,6 +171,99 @@ export class PdfCompressor {
         stats.skipped++;
       }
     }
+  }
+
+
+  static #optimizeImages(doc, stats, quality) {
+    if (typeof document === 'undefined' || typeof document.createElement !== 'function') return;
+
+    const xref = doc.getXRefTable();
+    if (!xref || typeof xref.getEntries !== 'function') return;
+
+    for (const entry of xref.getEntries()) {
+      if (!entry || (entry.isFree && entry.isFree()) || (entry.isCompressed && entry.isCompressed())) continue;
+
+      let object;
+      try {
+        object = doc.resolveObject(entry.objectNumber, entry.generationNumber || 0);
+      } catch (_) {
+        continue;
+      }
+
+      if (!(object instanceof PdfStream)) continue;
+      const dict = object.dictionary;
+      if (dict.getName('Subtype') !== 'Image') continue;
+
+      stats.scanned++;
+
+      if (dict.has('SMask') || dict.has('Mask') || PdfCompressor.#filterNames(dict.get('Filter')).includes('DCTDecode')) {
+        stats.skipped++;
+        continue;
+      }
+
+      const width = dict.getNumber('Width');
+      const height = dict.getNumber('Height');
+      if (!width || !height || width < 1 || height < 1) {
+        stats.skipped++;
+        continue;
+      }
+
+      try {
+        const colorSpace = PdfColorSpace.parseColorSpace(dict.get('ColorSpace'), doc);
+        const bits = dict.getNumber('BitsPerComponent') || 8;
+        const decode = PdfCompressor.#parseDecodeArray(dict.get('Decode'));
+        const decoded = PdfStreamDecoder.decode(object);
+        const rgba = PdfColorSpace.toRgba(decoded, width, height, colorSpace, bits, decode, null);
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          stats.skipped++;
+          continue;
+        }
+
+        const imageData = new ImageData(new Uint8ClampedArray(rgba), width, height);
+        ctx.putImageData(imageData, 0, 0);
+
+        const dataUrl = canvas.toDataURL('image/jpeg', quality);
+        const comma = dataUrl.indexOf(',');
+        if (comma < 0) {
+          stats.skipped++;
+          continue;
+        }
+
+        const binary = atob(dataUrl.slice(comma + 1));
+        const jpegBytes = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i++) jpegBytes[i] = binary.charCodeAt(i);
+
+        const oldLength = object.bytes.length;
+        if (jpegBytes.length >= oldLength) {
+          stats.skipped++;
+          continue;
+        }
+
+        object.setBytes(jpegBytes);
+        dict.set('Width', PdfNumber.of(width));
+        dict.set('Height', PdfNumber.of(height));
+        dict.set('ColorSpace', PdfName.of('DeviceRGB'));
+        dict.set('BitsPerComponent', PdfNumber.of(8));
+        dict.set('Filter', PdfName.of('DCTDecode'));
+        dict.delete('Decode');
+        dict.delete('DecodeParms');
+
+        stats.optimized++;
+        stats.bytesSaved += oldLength - jpegBytes.length;
+      } catch (_) {
+        stats.skipped++;
+      }
+    }
+  }
+
+  static #parseDecodeArray(value) {
+    if (!value || !(value.isArray && value.isArray())) return null;
+    return value.asArray ? value.asArray().map(item => item.value) : null;
   }
 
   static #filterNames(filter) {
