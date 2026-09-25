@@ -71,20 +71,32 @@ export class PdfCompressor {
     if (compressStreams) PdfCompressor.#compressStreams(doc, streamStats);
     if (optimizeImages) PdfCompressor.#optimizeImages(doc, imageStats, imageQuality);
 
-    let compressedBytes = doc.save({ compact: true });
-    const rebuiltSize = compressedBytes.length;
-    let compressedSize = rebuiltSize;
+    // Build both writer variants and keep the smallest valid candidate.
+    // Compact mode is not universally smaller: PDFs with few indirect objects
+    // or already-efficient object streams can gain overhead when rebuilt.
+    const compactBytes = doc.save({ compact: true });
+    let compressedBytes = compactBytes;
+    let writerMode = 'compact';
 
-    // A compressor must never make the user's PDF larger. The current writer
-    // can legitimately add serialization overhead (especially when rebuilding
-    // object streams). If the rebuilt file is larger, keep the original bytes.
-    // This is a correctness safeguard until the writer has a compact rebuild
-    // path for every PDF structure.
-    const fallbackUsed = compressedSize > originalSize;
+    try {
+      const standardBytes = doc.save();
+      if (standardBytes.length < compressedBytes.length) {
+        compressedBytes = standardBytes;
+        writerMode = 'standard';
+      }
+    } catch (_) {
+      // Compact output remains the candidate if the standard writer cannot
+      // serialize this document.
+    }
+
+    const rebuiltSize = compressedBytes.length;
+
+    // Never return a larger PDF as the "compressed" result.
+    const fallbackUsed = rebuiltSize > originalSize;
     if (fallbackUsed) {
       compressedBytes = originalBytes;
-      compressedSize = originalSize;
     }
+    const compressedSize = compressedBytes.length;
 
     let finalObjectCount = 0;
     try {
@@ -112,6 +124,7 @@ export class PdfCompressor {
       grew: rebuiltSize > originalSize,
       rebuiltSize,
       fallbackUsed,
+      writerMode,
       pageCount,
       objectsPurged,
       durationMs: Math.max(1, Math.round(endTime - startTime)),
