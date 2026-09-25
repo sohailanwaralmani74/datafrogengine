@@ -9,6 +9,9 @@ import { PdfHexString } from '../objects/PdfHexString.js';
 import { PdfInvalidArgumentException } from '../errors/PdfInvalidArgumentException.js';
 import { FlateEncode } from '../streams/filters/FlateEncode.js';
 import { PdfXRefTable } from '../xref/PdfXRefTable.js';
+import { PdfBinaryReader } from '../core/PdfBinaryReader.js';
+import { PdfLexer } from '../core/PdfLexer.js';
+import { PdfParser } from '../core/PdfParser.js';
 
 
 
@@ -133,73 +136,132 @@ export class PdfWriter {
   }
 
 
-  /** Writes only changed objects as a PDF incremental update. */
+  /**
+   * Rewrites the original PDF while preserving every unchanged byte.
+   * Changed direct objects replace their original object ranges; the final
+   * xref/trailer is regenerated. This is fundamentally different from an
+   * incremental update: the old objects are not retained, so real stream
+   * savings survive in the output size.
+   */
   static writeIncremental(document, originalBytes, changedObjectNumbers = []) {
     if (!(originalBytes instanceof Uint8Array)) {
       throw new PdfInvalidArgumentException('originalBytes', originalBytes, 'Uint8Array');
     }
     if (!changedObjectNumbers.length) return new Uint8Array(originalBytes);
     if (document.securityHandler) {
-      throw new PdfInvalidArgumentException('document', document, 'unencrypted document for incremental writing');
+      throw new PdfInvalidArgumentException('document', document, 'unencrypted document for preservation writing');
     }
+
     const xref = document.getXRefTable();
     const reader = document.getReader();
-    const previousXref = PdfXRefTable.findStartXRefOffset(reader);
-    const uniqueNumbers = [...new Set(changedObjectNumbers)].filter(num => Number.isInteger(num) && num > 0).sort((a, b) => a - b);
-    if (!uniqueNumbers.length) return new Uint8Array(originalBytes);
-    const chunks = [];
-    const newline = originalBytes.length && originalBytes[originalBytes.length - 1] === 0x0A ? new Uint8Array(0) : new TextEncoder().encode('\n');
-    chunks.push(new Uint8Array(originalBytes), newline);
-    let offset = originalBytes.length + newline.length;
-    const offsets = new Map();
-    for (const objectNumber of uniqueNumbers) {
-      const entry = xref.getEntry(objectNumber);
-      if (!entry || entry.isFree()) continue;
-      const object = document.resolveObject(objectNumber, entry.generationNumber || 0);
-      if (!object) continue;
-      const head = new TextEncoder().encode(String(objectNumber) + ' ' + String(entry.generationNumber || 0) + ' obj\n');
-      const body = PdfObjectWriter.serialize(object, { objNum: objectNumber });
-      const tail = new TextEncoder().encode('\nendobj\n');
-      offsets.set(objectNumber, offset);
-      chunks.push(head, body, tail);
-      offset += head.length + body.length + tail.length;
+    const startXref = PdfXRefTable.findStartXRefOffset(reader);
+    const entries = xref.getEntries();
+
+    // A compressed object has no standalone byte range to replace. Do not
+    // guess: the caller can safely fall back to the original PDF instead.
+    if (entries.some(entry => entry && entry.isCompressed && entry.isCompressed())) {
+      throw new PdfInvalidArgumentException('document', document, 'PDF without compressed object-stream entries for preservation writing');
     }
-    if (!offsets.size) return new Uint8Array(originalBytes);
-    const xrefOffset = offset;
-    const xrefChunks = ['xref\n'];
-    let rangeStart = null;
-    let rangeEnd = null;
-    const flushRange = () => {
-      if (rangeStart === null) return;
-      const count = rangeEnd - rangeStart + 1;
-      xrefChunks.push(String(rangeStart) + ' ' + String(count) + '\n');
-      for (let num = rangeStart; num <= rangeEnd; num++) {
-        const entry = xref.getEntry(num);
-        const generation = entry ? entry.generationNumber : 0;
-        xrefChunks.push(String(offsets.get(num)).padStart(10, '0') + ' ' + String(generation).padStart(5, '0') + ' n \n');
+
+    const changed = new Set(changedObjectNumbers);
+    const directEntries = entries
+      .filter(entry => entry && entry.isInUse && entry.isInUse())
+      .sort((x, y) => x.offset - y.offset);
+
+    const replacements = [];
+    const newOffsets = new Map();
+    let outputParts = [];
+    let sourceCursor = 0;
+    let outputOffset = 0;
+    const encoder = new TextEncoder();
+
+    for (const entry of directEntries) {
+      const start = entry.offset;
+      if (start < sourceCursor || start >= startXref) continue;
+
+      // Parse the original object solely to obtain its exact end boundary.
+      // This avoids searching for 'endobj' inside arbitrary stream bytes.
+      reader.seek(start);
+      const parser = new PdfParser(new PdfLexer(reader));
+      parser.parseObject();
+      const end = reader.position();
+      if (end <= start || end > startXref) {
+        throw new PdfInvalidArgumentException('document', document, 'valid indirect-object boundaries');
       }
-      rangeStart = null;
-      rangeEnd = null;
-    };
-    for (const num of offsets.keys()) {
-      if (rangeStart === null) { rangeStart = rangeEnd = num; }
-      else if (num === rangeEnd + 1) rangeEnd = num;
-      else { flushRange(); rangeStart = rangeEnd = num; }
+
+      if (changed.has(entry.objectNumber)) {
+        const object = document.resolveObject(entry.objectNumber, entry.generationNumber || 0);
+        if (!object) throw new PdfInvalidArgumentException('document', document, 'resolvable changed objects');
+        const head = encoder.encode(String(entry.objectNumber) + ' ' + String(entry.generationNumber || 0) + ' obj\n');
+        const body = PdfObjectWriter.serialize(object, { objNum: entry.objectNumber });
+        const tail = encoder.encode('\nendobj\n');
+        const replacement = PdfObjectWriter.concatBytes([head, body, tail]);
+
+        // Preserve all bytes before this object exactly as they appeared.
+        const prefix = originalBytes.slice(sourceCursor, start);
+        if (prefix.length) {
+          outputParts.push(prefix);
+          outputOffset += prefix.length;
+        }
+        newOffsets.set(entry.objectNumber, outputOffset);
+        outputParts.push(replacement);
+        outputOffset += replacement.length;
+        sourceCursor = end;
+      } else {
+        // Unchanged object: copy its complete original range verbatim.
+        const bytes = originalBytes.slice(sourceCursor, end);
+        if (bytes.length) {
+          outputParts.push(bytes);
+          outputOffset += bytes.length;
+        }
+        newOffsets.set(entry.objectNumber, outputOffset - (end - sourceCursor));
+        sourceCursor = end;
+      }
     }
-    flushRange();
+
+    // Keep any non-object bytes between the last object and the original xref.
+    // This retains comments/whitespace and unusual PDF constructs.
+    if (sourceCursor < startXref) {
+      const tail = originalBytes.slice(sourceCursor, startXref);
+      outputParts.push(tail);
+      outputOffset += tail.length;
+    }
+
+    const xrefOffset = outputOffset;
+    const size = Math.max(xref.getHighestObjectNumber() + 1, xref.getTrailer()?.dictionary?.getNumber('Size') || 0);
+    const xrefParts = [encoder.encode('xref\n0 ' + String(size) + '\n')];
+
+    for (let num = 0; num < size; num++) {
+      const entry = xref.getEntry(num);
+      if (num === 0) {
+        xrefParts.push(encoder.encode('0000000000 65535 f \n'));
+      } else if (entry && entry.isInUse && entry.isInUse() && newOffsets.has(num)) {
+        xrefParts.push(encoder.encode(String(newOffsets.get(num)).padStart(10, '0') + ' ' + String(entry.generationNumber).padStart(5, '0') + ' n \n'));
+      } else if (entry && entry.isFree && entry.isFree()) {
+        xrefParts.push(encoder.encode(String(entry.nextFreeObject || 0).padStart(10, '0') + ' ' + String(entry.generationNumber).padStart(5, '0') + ' f \n'));
+      } else {
+        // An entry without a rewritten direct byte range is not safe to expose
+        // as an in-use object in a traditional xref table.
+        throw new PdfInvalidArgumentException('document', document, 'complete direct-object xref coverage');
+      }
+    }
+
     const trailer = xref.getTrailer();
-    if (!trailer || !trailer.dictionary) throw new PdfInvalidArgumentException('document', document, 'PDF with a trailer dictionary');
+    if (!trailer || !trailer.dictionary) {
+      throw new PdfInvalidArgumentException('document', document, 'PDF with a trailer dictionary');
+    }
     const trailerDict = new PdfDictionary();
     for (const [key, value] of trailer.dictionary.entries()) trailerDict.set(key, value);
-    const size = Math.max(trailer.dictionary.getNumber('Size') || 0, xref.getHighestObjectNumber() + 1, Math.max(...offsets.keys()) + 1);
     trailerDict.set('Size', PdfNumber.of(size));
-    trailerDict.set('Prev', PdfNumber.of(previousXref));
-    const xrefText = xrefChunks.join('') + 'trailer\n';
-    chunks.push(new TextEncoder().encode(xrefText));
-    chunks.push(PdfObjectWriter.serialize(trailerDict));
-    chunks.push(new TextEncoder().encode('\nstartxref\n' + String(xrefOffset) + '\n%%EOF\n'));
-    return PdfObjectWriter.concatBytes(chunks);
+
+    xrefParts.push(encoder.encode('trailer\n'));
+    xrefParts.push(PdfObjectWriter.serialize(trailerDict));
+    xrefParts.push(encoder.encode('\nstartxref\n' + String(xrefOffset) + '\n%%EOF\n'));
+
+    outputParts.push(PdfObjectWriter.concatBytes(xrefParts));
+    return PdfObjectWriter.concatBytes(outputParts);
   }
+
   static #versionAtLeast(actual, minimum) {
     const [aMajor, aMinor] = String(actual).split('.').map(Number);
     const [bMajor, bMinor] = String(minimum).split('.').map(Number);
