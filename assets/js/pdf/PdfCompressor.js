@@ -12,6 +12,8 @@ import { PdfColorSpace } from '../images/PdfColorSpace.js';
 import { PdfStreamDecoder } from '../streams/PdfStreamDecoder.js';
 import { FlateDecode } from '../streams/filters/FlateDecode.js';
 import { FlateEncode } from '../streams/filters/FlateEncode.js';
+import { PdfObjectWriter } from '../writer/PdfObjectWriter.js';
+import { PdfWriter } from '../writer/PdfWriter.js';
 
 export class PdfCompressor {
   static compress(docOrBytes, options = {}) {
@@ -53,6 +55,8 @@ export class PdfCompressor {
       ? Math.max(0.1, Math.min(1, Number(options.imageQuality)))
       : (level === 'extreme' ? 0.6 : 0.75);
 
+    const originalObjectStates = PdfCompressor.#captureObjectStates(doc);
+
     if (stripMeta) {
       PdfCleaner.clean(doc, { stripMetadata: true, stripAnnotations: stripAnnots });
     } else if (stripAnnots) {
@@ -71,30 +75,25 @@ export class PdfCompressor {
     if (compressStreams) PdfCompressor.#compressStreams(doc, streamStats);
     if (optimizeImages) PdfCompressor.#optimizeImages(doc, imageStats, imageQuality);
 
-    // Build both writer variants and keep the smallest valid candidate.
-    // Compact mode is not universally smaller: PDFs with few indirect objects
-    // or already-efficient object streams can gain overhead when rebuilt.
-    const compactBytes = doc.save({ compact: true });
-    let compressedBytes = compactBytes;
-    let writerMode = 'compact';
+    const changedObjects = PdfCompressor.#findChangedObjects(doc, originalObjectStates);
+    let compressedBytes = originalBytes;
+    let writerMode = 'preserved';
+    let rebuiltSize = originalSize;
+    let fallbackUsed = false;
 
-    try {
-      const standardBytes = doc.save();
-      if (standardBytes.length < compressedBytes.length) {
-        compressedBytes = standardBytes;
-        writerMode = 'standard';
+    if (changedObjects.length && !doc.securityHandler) {
+      try {
+        const incrementalBytes = PdfWriter.writeIncremental(doc, originalBytes, changedObjects);
+        rebuiltSize = incrementalBytes.length;
+        if (incrementalBytes.length < originalSize) {
+          compressedBytes = incrementalBytes;
+          writerMode = 'incremental';
+        } else {
+          fallbackUsed = true;
+        }
+      } catch (_) {
+        fallbackUsed = true;
       }
-    } catch (_) {
-      // Compact output remains the candidate if the standard writer cannot
-      // serialize this document.
-    }
-
-    const rebuiltSize = compressedBytes.length;
-
-    // Never return a larger PDF as the "compressed" result.
-    const fallbackUsed = rebuiltSize > originalSize;
-    if (fallbackUsed) {
-      compressedBytes = originalBytes;
     }
     const compressedSize = compressedBytes.length;
 
@@ -132,6 +131,43 @@ export class PdfCompressor {
       streams: streamStats,
       images: imageStats
     };
+  }
+
+  static #captureObjectStates(doc) {
+    const states = new Map();
+    const xref = doc.getXRefTable();
+    if (!xref || typeof xref.getEntries !== 'function') return states;
+    for (const entry of xref.getEntries()) {
+      if (!entry || (entry.isFree && entry.isFree())) continue;
+      try {
+        const object = doc.resolveObject(entry.objectNumber, entry.generationNumber || 0);
+        if (object) states.set(entry.objectNumber, PdfObjectWriter.serialize(object));
+      } catch (_) {}
+    }
+    return states;
+  }
+
+  static #findChangedObjects(doc, originalStates) {
+    const changed = [];
+    const xref = doc.getXRefTable();
+    if (!xref || typeof xref.getEntries !== 'function') return changed;
+    for (const entry of xref.getEntries()) {
+      if (!entry || (entry.isFree && entry.isFree())) continue;
+      try {
+        const object = doc.resolveObject(entry.objectNumber, entry.generationNumber || 0);
+        if (!object) continue;
+        const before = originalStates.get(entry.objectNumber);
+        const after = PdfObjectWriter.serialize(object);
+        if (!before || !PdfCompressor.#sameBytes(before, after)) changed.push(entry.objectNumber);
+      } catch (_) {}
+    }
+    return changed;
+  }
+
+  static #sameBytes(a, b) {
+    if (!a || !b || a.length !== b.length) return false;
+    for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return false;
+    return true;
   }
 
   static #compressStreams(doc, stats) {
