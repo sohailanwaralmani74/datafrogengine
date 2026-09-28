@@ -4,3 +4,9 @@
   description: Reduce PDF file size in your browser while preserving the document and showing what changed.
   icon: compress
   color: emerald
+- name: Edit PDF
+  category: pdf
+  url: /pdf/edit-pdf
+  description: Edit supported PDF text, add content, manage pages, and save the result in your browser.
+  icon: edit
+  color: blue
