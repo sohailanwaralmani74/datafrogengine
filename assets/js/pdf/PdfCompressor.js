@@ -86,7 +86,9 @@ export class PdfCompressor {
       durationMs: 0, level,
       streams: { scanned: 0, compressed: 0, bytesSaved: 0, skipped: 0 },
       images: { discovered: 0, scanned: 0, optimized: 0, bytesSaved: 0, skipped: 0 },
-      validationErrors: []
+      validationErrors: [],
+      pageSnapshot: this.#capturePageSnapshot(doc),
+      pageDetails: []
     };
   }
 
@@ -318,7 +320,11 @@ export class PdfCompressor {
     report.writerMode = selected.mode;
     report.fallbackUsed = selected.bytes === original;
     report.rebuiltSize = report.compressedSize;
-    try { report.finalObjectCount = PdfDocument.load(selected.bytes).getXRefTable().getEntries().length; } catch (_) {}
+    try {
+      const finalDoc = PdfDocument.load(selected.bytes);
+      report.finalObjectCount = finalDoc.getXRefTable().getEntries().length;
+      report.pageDetails = this.#comparePageSnapshots(report.pageSnapshot, finalDoc);
+    } catch (_) {}
     report.objectsPurged = Math.max(0, report.originalObjectCount - report.finalObjectCount);
     report.savedBytes = report.originalSize - report.compressedSize;
     report.ratioPercent = report.originalSize ? Number(((report.savedBytes / report.originalSize) * 100).toFixed(1)) : 0;
@@ -326,6 +332,61 @@ export class PdfCompressor {
     report.grew = report.compressedSize > report.originalSize;
     report.durationMs = Math.max(1, Math.round(this.#now() - start));
     return report;
+  }
+
+  static #capturePageSnapshot(doc) {
+    const pages = doc.getCatalog().getPageTree().getAllPages();
+    return pages.map((page, index) => {
+      let contentBytes = 0;
+      try {
+        for (const stream of page.getContents()) {
+          if (stream instanceof PdfStream) contentBytes += stream.bytes.length;
+        }
+      } catch (_) {}
+
+      let imageBytes = 0;
+      let imageCount = 0;
+      try {
+        const images = PdfImageExtractor.extractImages(page);
+        imageCount = images.length;
+        for (const image of images) imageBytes += image?.bytes?.length || 0;
+      } catch (_) {}
+
+      return { pageNumber: index + 1, contentBytes, imageBytes, imageCount };
+    });
+  }
+
+  static #comparePageSnapshots(before, doc) {
+    const after = this.#capturePageSnapshot(doc);
+    return after.map((page, index) => {
+      const prior = before[index] || {
+        pageNumber: page.pageNumber,
+        contentBytes: 0,
+        imageBytes: 0,
+        imageCount: 0
+      };
+      const contentSaved = Math.max(0, prior.contentBytes - page.contentBytes);
+      const imageSaved = Math.max(0, prior.imageBytes - page.imageBytes);
+      const changes = [];
+      if (contentSaved > 0) changes.push({
+        type: 'content',
+        label: 'Page content',
+        savedBytes: contentSaved
+      });
+      if (imageSaved > 0) changes.push({
+        type: 'images',
+        label: page.imageCount === 1 ? 'Image data' : 'Images',
+        savedBytes: imageSaved
+      });
+      return {
+        pageNumber: page.pageNumber,
+        imageCount: page.imageCount,
+        contentSavedBytes: contentSaved,
+        imageSavedBytes: imageSaved,
+        savedBytes: contentSaved + imageSaved,
+        changes
+      };
+    }).filter(page => page.savedBytes > 0 || page.imageCount > 0);
   }
 
   static #filters(filter) {
