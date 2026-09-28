@@ -100,10 +100,10 @@ export class PdfWriter {
     for (let num = 1; num < totalObjects; num++) {
       const off = offsets.get(num);
       if (off === undefined) {
-        xrefLines.push('0000000000 65535 f \\n');
+        xrefLines.push('0000000000 65535 f \n');
       } else {
         const paddedOff = String(off).padStart(10, '0');
-        xrefLines.push(paddedOff + ' 00000 n \\n');
+        xrefLines.push(paddedOff + ' 00000 n \n');
       }
     }
 
