@@ -92,7 +92,7 @@ export class PdfCompressor {
   static #compressStreams(doc, stats) {
     const xref = doc.getXRefTable();
     for (const entry of xref.getEntries()) {
-      if (!entry || entry.isFree?.() || entry.isCompressed?.()) continue;
+      if (!entry || entry.isFree?.()) continue;
       let stream;
       try { stream = doc.resolveObject(entry.objectNumber, entry.generationNumber || 0); } catch (_) { continue; }
       if (!(stream instanceof PdfStream)) continue;
@@ -119,7 +119,7 @@ export class PdfCompressor {
   static async #compressStreamsAsync(doc, stats) {
     const xref = doc.getXRefTable();
     for (const entry of xref.getEntries()) {
-      if (!entry || entry.isFree?.() || entry.isCompressed?.()) continue;
+      if (!entry || entry.isFree?.()) continue;
       let stream;
       try { stream = doc.resolveObject(entry.objectNumber, entry.generationNumber || 0); } catch (_) { continue; }
       if (!(stream instanceof PdfStream)) continue;
@@ -158,7 +158,7 @@ export class PdfCompressor {
     if (typeof document === 'undefined' || !document.createElement) return;
     const xref = doc.getXRefTable();
     for (const entry of xref.getEntries()) {
-      if (!entry || entry.isFree?.() || entry.isCompressed?.()) continue;
+      if (!entry || entry.isFree?.()) continue;
       let image;
       try { image = doc.resolveObject(entry.objectNumber, entry.generationNumber || 0); } catch (_) { continue; }
       if (!(image instanceof PdfStream) || image.dictionary.getName('Subtype') !== 'Image') continue;
@@ -196,7 +196,7 @@ export class PdfCompressor {
     if (typeof document === 'undefined' || !document.createElement || typeof createImageBitmap !== 'function') return;
     const xref = doc.getXRefTable();
     for (const entry of xref.getEntries()) {
-      if (!entry || entry.isFree?.() || entry.isCompressed?.()) continue;
+      if (!entry || entry.isFree?.()) continue;
       let image;
       try { image = doc.resolveObject(entry.objectNumber, entry.generationNumber || 0); } catch (_) { continue; }
       if (!(image instanceof PdfStream) || image.dictionary.getName('Subtype') !== 'Image') continue;
@@ -275,7 +275,7 @@ export class PdfCompressor {
   }
 
   static #candidates(doc, original) {
-    const out = [{ bytes: original, mode: 'original' }];
+    const out = [];
     try { out.push({ bytes: PdfWriter.write(doc), mode: 'standard' }); } catch (_) {}
     try { out.push({ bytes: PdfWriter.write(doc, { compact: true }), mode: 'compact' }); } catch (_) {}
     return out;
@@ -292,10 +292,7 @@ export class PdfCompressor {
       } catch (_) {}
     }
     valid.sort((a, b) => a.bytes.length - b.bytes.length);
-    if (!valid.length || valid[0].bytes.length >= original.length) {
-      return { bytes: original, mode: 'original' };
-    }
-    return valid[0];
+    return valid[0] || { bytes: original, mode: 'original' };
   }
 
   static #finish(report, selected, original, start) {
