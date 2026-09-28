@@ -163,10 +163,59 @@ description: Compress PDF files in your browser. Reduce PDF size, preview the re
       <li>Reduce the size of image-heavy PDFs and scans when safe compression is possible.</li>
     </ul>
 
-    <h2>PDF compression questions</h2>
-    <p><strong>How do I reduce PDF size?</strong> Open the compressor, select your PDF, review the original preview, and choose Compress PDF. The tool handles the compression automatically.</p>
-    <p><strong>Will my PDF look different?</strong> The compressor validates the rebuilt PDF and avoids changes that do not produce a useful size reduction. You can compare the original and compressed previews before downloading.</p>
-    <p><strong>Why did my PDF stay the same size?</strong> The file may already be efficiently compressed, or the remaining possible changes may not safely make it smaller. The tool provides additional details when this happens.</p>
+    <section class="pdf-faq" aria-labelledby="pdf-faq-heading">
+      <h2 id="pdf-faq-heading">Frequently Asked Questions About PDF Compression</h2>
+
+      <details>
+        <summary>How do I compress a PDF file?</summary>
+        <p>To compress a PDF file, choose your PDF, review the original preview, and select <strong>Compress PDF</strong>. The tool automatically checks the document and applies safe size-reduction methods before showing the result.</p>
+      </details>
+
+      <details>
+        <summary>How can I reduce the size of a PDF document?</summary>
+        <p>You can reduce the size of a PDF document by compressing its internal streams, images, and other parts that can be safely made smaller. This tool checks the PDF automatically and keeps changes that produce a valid, smaller document.</p>
+      </details>
+
+      <details>
+        <summary>Does this PDF compressor upload my file?</summary>
+        <p>No. Your PDF is processed in your browser on your device. The document does not need to be uploaded to a server for compression.</p>
+      </details>
+
+      <details>
+        <summary>Will compressing a PDF reduce its quality?</summary>
+        <p>PDF compression can affect quality when image data has to be changed, so no compressor should promise zero quality loss for every PDF. This tool prioritizes safe size reduction and preserves document content and functionality wherever possible.</p>
+      </details>
+
+      <details>
+        <summary>Why did my PDF file not become smaller?</summary>
+        <p>A PDF may already be efficiently compressed, or the remaining parts may not have a safe way to become smaller. When no useful reduction is found, the tool tells you that the PDF is already optimized instead of claiming a successful reduction.</p>
+      </details>
+
+      <details>
+        <summary>Can I compress an already optimized PDF?</summary>
+        <p>Yes. You can check an already optimized PDF, but the file may not become smaller. If further safe compression is not available, the tool reports that no useful reduction was found.</p>
+      </details>
+
+      <details>
+        <summary>Can I preview a PDF before and after compression?</summary>
+        <p>Yes. The compressor provides an original PDF preview and a compressed PDF preview so you can inspect the document before downloading the result.</p>
+      </details>
+
+      <details>
+        <summary>How does the PDF compressor show what changed?</summary>
+        <p>The results show the original size, compressed size, amount saved, and percentage reduction. When page-level changes can be measured, the tool also lists the affected pages so you can open them in the preview.</p>
+      </details>
+
+      <details>
+        <summary>Can I compress a large or image-heavy PDF?</summary>
+        <p>Yes. Large and image-heavy PDFs can be processed in the browser. The amount saved depends on how the PDF was created and how efficiently its images and other data are already stored.</p>
+      </details>
+
+      <details>
+        <summary>Is the compressed file still a normal PDF?</summary>
+        <p>Yes. When compression succeeds, the result is a rebuilt PDF that is validated before it is offered for download. You can preview the compressed document and download it as a PDF file.</p>
+      </details>
+    </section>
   </section>
 </div>
 
