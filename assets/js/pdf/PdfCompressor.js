@@ -1,7 +1,6 @@
 /**
- * PdfCompressor - File size reduction and stream optimization for PDF documents.
+ * PDF compressor built on the existing PDF engine.
  */
-
 import { PdfDocument } from '../document/PdfDocument.js';
 import { PdfCleaner } from './PdfCleaner.js';
 import { PdfStream } from '../objects/PdfStream.js';
@@ -9,274 +8,332 @@ import { PdfArray } from '../objects/PdfArray.js';
 import { PdfName } from '../objects/PdfName.js';
 import { PdfNumber } from '../objects/PdfNumber.js';
 import { PdfColorSpace } from '../images/PdfColorSpace.js';
+import { PdfImageExtractor } from '../images/PdfImageExtractor.js';
 import { PdfStreamDecoder } from '../streams/PdfStreamDecoder.js';
-import { FlateDecode } from '../streams/filters/FlateDecode.js';
 import { FlateEncode } from '../streams/filters/FlateEncode.js';
-import { PdfObjectWriter } from '../writer/PdfObjectWriter.js';
 import { PdfWriter } from '../writer/PdfWriter.js';
 
 export class PdfCompressor {
   static compress(docOrBytes, options = {}) {
-    return PdfCompressor.compressWithReport(docOrBytes, options).bytes;
+    return this.compressWithReport(docOrBytes, options).bytes;
   }
 
   static compressWithReport(docOrBytes, options = {}) {
-    const startTime = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
-    let originalBytes = docOrBytes instanceof Uint8Array ? new Uint8Array(docOrBytes) : null;
-    let originalSize = originalBytes ? originalBytes.length : 0;
-    const doc = docOrBytes instanceof PdfDocument ? docOrBytes : PdfDocument.load(docOrBytes);
-
-    if (!originalBytes) {
-      originalBytes = doc.save();
-      originalSize = originalBytes.length;
-    }
-
+    const start = this.#now();
+    const original = docOrBytes instanceof Uint8Array
+      ? new Uint8Array(docOrBytes)
+      : PdfDocument.load(docOrBytes).save();
+    const doc = PdfDocument.load(original);
     const level = options.level || 'recommended';
-    const stripMeta = options.stripMetadata !== undefined ? options.stripMetadata : (level === 'extreme' || level === 'recommended');
-    const stripAnnots = options.stripAnnotations !== undefined ? options.stripAnnotations : (level === 'extreme');
-    const compressStreams = options.compressStreams !== undefined ? options.compressStreams : true;
-    const optimizeImages = options.optimizeImages !== undefined ? options.optimizeImages : (level === 'recommended' || level === 'extreme');
-    const imageQuality = options.imageQuality !== undefined ? Math.max(0.1, Math.min(1, Number(options.imageQuality))) : (level === 'extreme' ? 0.6 : 0.75);
+    const report = this.#report(original.length, level, doc);
 
-    const originalObjectStates = PdfCompressor.#captureObjectStates(doc);
+    try { report.images.discovered = PdfImageExtractor.extractAllImages(doc).length; } catch (_) {}
 
-    if (stripMeta) {
-      PdfCleaner.clean(doc, { stripMetadata: true, stripAnnotations: stripAnnots });
-    } else if (stripAnnots) {
-      PdfCleaner.clean(doc, { stripMetadata: false, stripAnnotations: true });
+    const stripMetadata = options.stripMetadata !== undefined ? options.stripMetadata : level !== 'lossless';
+    const stripAnnotations = options.stripAnnotations !== undefined ? options.stripAnnotations : level === 'extreme';
+    if (stripMetadata || stripAnnotations) {
+      PdfCleaner.clean(doc, { stripMetadata, stripAnnotations });
     }
 
-    let originalObjectCount = 0;
-    try {
-      const xref = doc.getXRefTable();
-      if (xref && typeof xref.getEntries === 'function') originalObjectCount = xref.getEntries().length;
-    } catch (_) {}
+    if (options.compressStreams !== false) this.#compressStreams(doc, report.streams);
 
-    const streamStats = { scanned: 0, compressed: 0, bytesSaved: 0, skipped: 0 };
-    const imageStats = { scanned: 0, optimized: 0, bytesSaved: 0, skipped: 0 };
-
-    if (compressStreams) PdfCompressor.#compressStreams(doc, streamStats);
-    if (optimizeImages) PdfCompressor.#optimizeImages(doc, imageStats, imageQuality);
-
-    const changedObjects = PdfCompressor.#findChangedObjects(doc, originalObjectStates);
-    let compressedBytes = originalBytes;
-    let writerMode = 'preserved';
-    let rebuiltSize = originalSize;
-    let fallbackUsed = false;
-
-    if (changedObjects.length && !doc.securityHandler) {
-      const candidates = [];
-      try {
-        const incrementalBytes = PdfWriter.writeIncremental(doc, originalBytes, changedObjects);
-        candidates.push({ bytes: incrementalBytes, mode: 'incremental' });
-        rebuiltSize = Math.min(rebuiltSize, incrementalBytes.length);
-      } catch (_) {}
-      try {
-        const standardBytes = PdfWriter.write(doc);
-        candidates.push({ bytes: standardBytes, mode: 'standard' });
-        rebuiltSize = Math.min(rebuiltSize, standardBytes.length);
-      } catch (_) {}
-      try {
-        const compactBytes = PdfWriter.write(doc, { compact: true });
-        candidates.push({ bytes: compactBytes, mode: 'compact' });
-        rebuiltSize = Math.min(rebuiltSize, compactBytes.length);
-      } catch (_) {}
-      for (const candidate of candidates) {
-        if (candidate.bytes.length < compressedBytes.length) {
-          compressedBytes = candidate.bytes;
-          writerMode = candidate.mode;
-        }
-      }
-      fallbackUsed = compressedBytes === originalBytes;
+    // The synchronous API can safely optimize decoded/raw images. JPEG/JPX
+    // decoding is browser-asynchronous and is handled by compressWithReportAsync.
+    if (options.optimizeImages !== false && level !== 'lossless') {
+      this.#optimizeRawImages(doc, report.images, this.#quality(level, options));
     }
 
-    const compressedSize = compressedBytes.length;
-    let finalObjectCount = 0;
-    try {
-      const reloaded = PdfDocument.load(compressedBytes);
-      const xref = reloaded.getXRefTable();
-      if (xref && typeof xref.getEntries === 'function') finalObjectCount = xref.getEntries().length;
-    } catch (_) {}
+    const selected = this.#select(this.#candidates(doc, original), original, report.pageCount);
+    return this.#finish(report, selected, original, start);
+  }
 
-    const objectsPurged = Math.max(0, originalObjectCount - finalObjectCount);
-    const savedBytes = originalSize - compressedSize;
-    const ratioPercent = originalSize > 0 ? Number(((savedBytes / originalSize) * 100).toFixed(1)) : 0;
-    const pageCount = doc.getPageCount ? doc.getPageCount() : 1;
-    const endTime = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+  static async compressWithReportAsync(docOrBytes, options = {}) {
+    const start = this.#now();
+    const original = docOrBytes instanceof Uint8Array
+      ? new Uint8Array(docOrBytes)
+      : PdfDocument.load(docOrBytes).save();
+    const doc = PdfDocument.load(original);
+    const level = options.level || 'recommended';
+    const report = this.#report(original.length, level, doc);
 
+    try { report.images.discovered = PdfImageExtractor.extractAllImages(doc).length; } catch (_) {}
+
+    const stripMetadata = options.stripMetadata !== undefined ? options.stripMetadata : level !== 'lossless';
+    const stripAnnotations = options.stripAnnotations !== undefined ? options.stripAnnotations : level === 'extreme';
+    if (stripMetadata || stripAnnotations) PdfCleaner.clean(doc, { stripMetadata, stripAnnotations });
+
+    if (options.compressStreams !== false) await this.#compressStreamsAsync(doc, report.streams);
+
+    if (options.optimizeImages !== false && level !== 'lossless') {
+      await this.#optimizeImagesAsync(doc, report.images, {
+        quality: this.#quality(level, options),
+        maxDimension: options.maxImageDimension || (level === 'extreme' ? 1600 : 2400)
+      });
+    }
+
+    const selected = this.#select(this.#candidates(doc, original), original, report.pageCount);
+    return this.#finish(report, selected, original, start);
+  }
+
+  static #report(size, level, doc) {
+    let objects = 0;
+    try { objects = doc.getXRefTable().getEntries().length; } catch (_) {}
     return {
-      bytes: compressedBytes,
-      originalSize,
-      compressedSize,
-      savedBytes,
-      ratioPercent,
-      reductionPercent: Math.max(0, ratioPercent),
-      grew: rebuiltSize > originalSize,
-      rebuiltSize,
-      fallbackUsed,
-      writerMode,
-      pageCount,
-      objectsPurged,
-      durationMs: Math.max(1, Math.round(endTime - startTime)),
-      level,
-      streams: streamStats,
-      images: imageStats
+      bytes: null, originalSize: size, compressedSize: size, savedBytes: 0,
+      ratioPercent: 0, reductionPercent: 0, grew: false, rebuiltSize: size,
+      fallbackUsed: false, writerMode: 'original', pageCount: doc.getPageCount(),
+      originalObjectCount: objects, finalObjectCount: objects, objectsPurged: 0,
+      durationMs: 0, level,
+      streams: { scanned: 0, compressed: 0, bytesSaved: 0, skipped: 0 },
+      images: { discovered: 0, scanned: 0, optimized: 0, bytesSaved: 0, skipped: 0 }
     };
-  }
-
-  static #captureObjectStates(doc) {
-    const states = new Map();
-    const xref = doc.getXRefTable();
-    if (!xref || typeof xref.getEntries !== 'function') return states;
-    for (const entry of xref.getEntries()) {
-      if (!entry || (entry.isFree && entry.isFree())) continue;
-      try {
-        const object = doc.resolveObject(entry.objectNumber, entry.generationNumber || 0);
-        if (object) states.set(entry.objectNumber, PdfObjectWriter.serialize(object));
-      } catch (_) {}
-    }
-    return states;
-  }
-
-  static #findChangedObjects(doc, originalStates) {
-    const changed = [];
-    const xref = doc.getXRefTable();
-    if (!xref || typeof xref.getEntries !== 'function') return changed;
-    for (const entry of xref.getEntries()) {
-      if (!entry || (entry.isFree && entry.isFree())) continue;
-      try {
-        const object = doc.resolveObject(entry.objectNumber, entry.generationNumber || 0);
-        if (!object) continue;
-        const before = originalStates.get(entry.objectNumber);
-        const after = PdfObjectWriter.serialize(object);
-        if (!before || !PdfCompressor.#sameBytes(before, after)) changed.push(entry.objectNumber);
-      } catch (_) {}
-    }
-    return changed;
-  }
-
-  static #sameBytes(a, b) {
-    if (!a || !b || a.length !== b.length) return false;
-    for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return false;
-    return true;
   }
 
   static #compressStreams(doc, stats) {
     const xref = doc.getXRefTable();
-    if (!xref || typeof xref.getEntries !== 'function') return;
-
     for (const entry of xref.getEntries()) {
-      if (!entry || (entry.isFree && entry.isFree()) || (entry.isCompressed && entry.isCompressed())) continue;
-
-      let object;
-      try {
-        object = doc.resolveObject(entry.objectNumber, entry.generationNumber || 0);
-      } catch (_) {
+      if (!entry || entry.isFree?.() || entry.isCompressed?.()) continue;
+      let stream;
+      try { stream = doc.resolveObject(entry.objectNumber, entry.generationNumber || 0); } catch (_) { continue; }
+      if (!(stream instanceof PdfStream)) continue;
+      stats.scanned++;
+      const filters = this.#filters(stream.getFilter());
+      if (stream.dictionary.getName('Subtype') === 'Image' &&
+          filters.some(f => f === 'DCTDecode' || f === 'DCT' || f === 'JPXDecode')) {
+        stats.skipped++;
         continue;
       }
-
-      if (!(object instanceof PdfStream)) continue;
-      stats.scanned++;
-
-      const filterNames = PdfCompressor.#filterNames(object.getFilter());
       try {
-        // Decode the complete filter chain first. This is important for PDFs
-        // using combinations such as ASCII85Decode + FlateDecode. Recompressing
-        // only a single Flate layer cannot remove the ASCII85 overhead.
-        const rawBytes = filterNames.length
-          ? PdfStreamDecoder.decode(object)
-          : object.bytes;
-
-        const encoded = FlateEncode.encode(rawBytes);
-        if (encoded.length >= object.bytes.length) {
-          stats.skipped++;
-          continue;
-        }
-
-        const oldLength = object.bytes.length;
-        object.setBytes(encoded);
-        object.dictionary.set('Filter', PdfName.of('FlateDecode'));
-        object.dictionary.delete('DecodeParms');
-
+        const raw = filters.length ? PdfStreamDecoder.decode(stream) : stream.bytes;
+        const encoded = FlateEncode.encode(raw);
+        if (encoded.length >= stream.bytes.length) { stats.skipped++; continue; }
+        stats.bytesSaved += stream.bytes.length - encoded.length;
         stats.compressed++;
-        stats.bytesSaved += oldLength - encoded.length;
-      } catch (_) {
-        // Native compressed image formats (JPEG/JPX) and unsupported filters
-        // are intentionally left untouched.
-        stats.skipped++;
-      }
-    }
-  }
-
-  static #optimizeImages(doc, stats, quality) {
-    if (typeof document === 'undefined' || typeof document.createElement !== 'function') return;
-    const xref = doc.getXRefTable();
-    if (!xref || typeof xref.getEntries !== 'function') return;
-
-    for (const entry of xref.getEntries()) {
-      if (!entry || (entry.isFree && entry.isFree()) || (entry.isCompressed && entry.isCompressed())) continue;
-      let object;
-      try { object = doc.resolveObject(entry.objectNumber, entry.generationNumber || 0); } catch (_) { continue; }
-      if (!(object instanceof PdfStream)) continue;
-      const dict = object.dictionary;
-      if (dict.getName('Subtype') !== 'Image') continue;
-      stats.scanned++;
-
-      if (dict.has('SMask') || dict.has('Mask') || PdfCompressor.#filterNames(dict.get('Filter')).includes('DCTDecode')) {
-        stats.skipped++;
-        continue;
-      }
-
-      const width = dict.getNumber('Width');
-      const height = dict.getNumber('Height');
-      if (!width || !height || width < 1 || height < 1) { stats.skipped++; continue; }
-
-      try {
-        const colorSpace = PdfColorSpace.parseColorSpace(dict.get('ColorSpace'), doc);
-        const bits = dict.getNumber('BitsPerComponent') || 8;
-        const decode = PdfCompressor.#parseDecodeArray(dict.get('Decode'));
-        const decoded = PdfStreamDecoder.decode(object);
-        const rgba = PdfColorSpace.toRgba(decoded, width, height, colorSpace, bits, decode, null);
-        const canvas = document.createElement('canvas');
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        if (!ctx) { stats.skipped++; continue; }
-        const imageData = new ImageData(new Uint8ClampedArray(rgba), width, height);
-        ctx.putImageData(imageData, 0, 0);
-        const dataUrl = canvas.toDataURL('image/jpeg', quality);
-        const comma = dataUrl.indexOf(',');
-        if (comma < 0) { stats.skipped++; continue; }
-        const binary = atob(dataUrl.slice(comma + 1));
-        const jpegBytes = new Uint8Array(binary.length);
-        for (let i = 0; i < binary.length; i++) jpegBytes[i] = binary.charCodeAt(i);
-        const oldLength = object.bytes.length;
-        if (jpegBytes.length >= oldLength) { stats.skipped++; continue; }
-        object.setBytes(jpegBytes);
-        dict.set('Width', PdfNumber.of(width));
-        dict.set('Height', PdfNumber.of(height));
-        dict.set('ColorSpace', PdfName.of('DeviceRGB'));
-        dict.set('BitsPerComponent', PdfNumber.of(8));
-        dict.set('Filter', PdfName.of('DCTDecode'));
-        dict.delete('Decode');
-        dict.delete('DecodeParms');
-        stats.optimized++;
-        stats.bytesSaved += oldLength - jpegBytes.length;
+        stream.setBytes(encoded);
+        stream.dictionary.set('Filter', PdfName.of('FlateDecode'));
+        stream.dictionary.delete('DecodeParms');
       } catch (_) { stats.skipped++; }
     }
   }
 
-  static #parseDecodeArray(value) {
-    if (!value || !(value.isArray && value.isArray())) return null;
-    return value.asArray ? value.asArray().map(item => item.value) : null;
+  static async #compressStreamsAsync(doc, stats) {
+    const xref = doc.getXRefTable();
+    for (const entry of xref.getEntries()) {
+      if (!entry || entry.isFree?.() || entry.isCompressed?.()) continue;
+      let stream;
+      try { stream = doc.resolveObject(entry.objectNumber, entry.generationNumber || 0); } catch (_) { continue; }
+      if (!(stream instanceof PdfStream)) continue;
+      stats.scanned++;
+      const filters = this.#filters(stream.getFilter());
+      if (stream.dictionary.getName('Subtype') === 'Image' &&
+          filters.some(f => f === 'DCTDecode' || f === 'DCT' || f === 'JPXDecode')) {
+        stats.skipped++;
+        continue;
+      }
+      try {
+        const raw = filters.length ? PdfStreamDecoder.decode(stream) : stream.bytes;
+        const encoded = await this.#deflate(raw);
+        if (encoded.length >= stream.bytes.length) { stats.skipped++; continue; }
+        stats.bytesSaved += stream.bytes.length - encoded.length;
+        stats.compressed++;
+        stream.setBytes(encoded);
+        stream.dictionary.set('Filter', PdfName.of('FlateDecode'));
+        stream.dictionary.delete('DecodeParms');
+      } catch (_) { stats.skipped++; }
+    }
   }
 
-  static #filterNames(filter) {
-    if (!filter) return [];
-    if (filter.isName && filter.isName()) return [filter.value];
-    if (filter instanceof PdfArray) {
-      return filter.asArray().filter(item => item && item.isName && item.isName()).map(item => item.value);
+  static async #deflate(bytes) {
+    if (typeof CompressionStream !== 'undefined') {
+      const cs = new CompressionStream('deflate');
+      const writer = cs.writable.getWriter();
+      await writer.write(bytes);
+      await writer.close();
+      return new Uint8Array(await new Response(cs.readable).arrayBuffer());
     }
+    return FlateEncode.encode(bytes);
+  }
+
+  static #optimizeRawImages(doc, stats, quality) {
+    if (typeof document === 'undefined' || !document.createElement) return;
+    const xref = doc.getXRefTable();
+    for (const entry of xref.getEntries()) {
+      if (!entry || entry.isFree?.() || entry.isCompressed?.()) continue;
+      let image;
+      try { image = doc.resolveObject(entry.objectNumber, entry.generationNumber || 0); } catch (_) { continue; }
+      if (!(image instanceof PdfStream) || image.dictionary.getName('Subtype') !== 'Image') continue;
+      stats.scanned++;
+      const filters = this.#filters(image.getFilter());
+      if (filters.some(f => f === 'DCTDecode' || f === 'DCT' || f === 'JPXDecode') ||
+          image.dictionary.has('Mask') || image.dictionary.has('SMask')) {
+        stats.skipped++;
+        continue;
+      }
+      try {
+        const width = image.dictionary.getNumber('Width');
+        const height = image.dictionary.getNumber('Height');
+        const cs = PdfColorSpace.parseColorSpace(image.dictionary.get('ColorSpace'), doc);
+        const bits = image.dictionary.getNumber('BitsPerComponent') || 8;
+        const decode = this.#decodeArray(image.dictionary.get('Decode'));
+        const raw = PdfStreamDecoder.decode(image);
+        const rgba = PdfColorSpace.toRgba(raw, width, height, cs, bits, decode, null);
+        const jpeg = this.#canvasJpeg(rgba, width, height, quality);
+        if (!jpeg || jpeg.length >= image.bytes.length) { stats.skipped++; continue; }
+        const saved = image.bytes.length - jpeg.length;
+        image.setBytes(jpeg);
+        image.dictionary.set('Filter', PdfName.of('DCTDecode'));
+        image.dictionary.set('ColorSpace', PdfName.of('DeviceRGB'));
+        image.dictionary.set('BitsPerComponent', PdfNumber.of(8));
+        image.dictionary.delete('Decode');
+        image.dictionary.delete('DecodeParms');
+        stats.optimized++;
+        stats.bytesSaved += saved;
+      } catch (_) { stats.skipped++; }
+    }
+  }
+
+  static async #optimizeImagesAsync(doc, stats, options) {
+    if (typeof document === 'undefined' || !document.createElement || typeof createImageBitmap !== 'function') return;
+    const xref = doc.getXRefTable();
+    for (const entry of xref.getEntries()) {
+      if (!entry || entry.isFree?.() || entry.isCompressed?.()) continue;
+      let image;
+      try { image = doc.resolveObject(entry.objectNumber, entry.generationNumber || 0); } catch (_) { continue; }
+      if (!(image instanceof PdfStream) || image.dictionary.getName('Subtype') !== 'Image') continue;
+      stats.scanned++;
+      const filters = this.#filters(image.getFilter());
+      if (image.dictionary.has('Mask') || image.dictionary.has('SMask')) { stats.skipped++; continue; }
+      if (filters.length === 1 && filters[0] === 'JPXDecode') { stats.skipped++; continue; }
+      try {
+        const width = image.dictionary.getNumber('Width');
+        const height = image.dictionary.getNumber('Height');
+        let rgba;
+        if (filters.length === 1 && (filters[0] === 'DCTDecode' || filters[0] === 'DCT')) {
+          rgba = await this.#jpegRgba(image.bytes, width, height);
+        } else {
+          const cs = PdfColorSpace.parseColorSpace(image.dictionary.get('ColorSpace'), doc);
+          const bits = image.dictionary.getNumber('BitsPerComponent') || 8;
+          const decode = this.#decodeArray(image.dictionary.get('Decode'));
+          rgba = PdfColorSpace.toRgba(PdfStreamDecoder.decode(image), width, height, cs, bits, decode, null);
+        }
+        const scaled = this.#downsample(rgba, width, height, options.maxDimension);
+        const jpeg = this.#canvasJpeg(scaled.rgba, scaled.width, scaled.height, options.quality);
+        if (!jpeg || jpeg.length >= image.bytes.length) { stats.skipped++; continue; }
+        const saved = image.bytes.length - jpeg.length;
+        image.setBytes(jpeg);
+        image.dictionary.set('Width', PdfNumber.of(scaled.width));
+        image.dictionary.set('Height', PdfNumber.of(scaled.height));
+        image.dictionary.set('ColorSpace', PdfName.of('DeviceRGB'));
+        image.dictionary.set('BitsPerComponent', PdfNumber.of(8));
+        image.dictionary.set('Filter', PdfName.of('DCTDecode'));
+        image.dictionary.delete('Decode');
+        image.dictionary.delete('DecodeParms');
+        stats.optimized++;
+        stats.bytesSaved += saved;
+      } catch (_) { stats.skipped++; }
+    }
+  }
+
+  static async #jpegRgba(bytes, width, height) {
+    const bitmap = await createImageBitmap(new Blob([bytes], { type: 'image/jpeg' }));
+    const canvas = document.createElement('canvas');
+    canvas.width = width; canvas.height = height;
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    ctx.drawImage(bitmap, 0, 0, width, height);
+    const rgba = new Uint8Array(ctx.getImageData(0, 0, width, height).data);
+    bitmap.close();
+    return rgba;
+  }
+
+  static #canvasJpeg(rgba, width, height, quality) {
+    const canvas = document.createElement('canvas');
+    canvas.width = width; canvas.height = height;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return null;
+    ctx.putImageData(new ImageData(new Uint8ClampedArray(rgba), width, height), 0, 0);
+    const url = canvas.toDataURL('image/jpeg', quality);
+    const comma = url.indexOf(',');
+    if (comma < 0) return null;
+    const bin = atob(url.slice(comma + 1));
+    const bytes = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    return bytes;
+  }
+
+  static #downsample(rgba, width, height, maxDimension) {
+    if (!maxDimension || Math.max(width, height) <= maxDimension) return { rgba, width, height };
+    const scale = maxDimension / Math.max(width, height);
+    const nw = Math.max(1, Math.round(width * scale));
+    const nh = Math.max(1, Math.round(height * scale));
+    const src = document.createElement('canvas');
+    const dst = document.createElement('canvas');
+    src.width = width; src.height = height; dst.width = nw; dst.height = nh;
+    src.getContext('2d').putImageData(new ImageData(new Uint8ClampedArray(rgba), width, height), 0, 0);
+    const ctx = dst.getContext('2d', { willReadFrequently: true });
+    ctx.drawImage(src, 0, 0, nw, nh);
+    return { rgba: new Uint8Array(ctx.getImageData(0, 0, nw, nh).data), width: nw, height: nh };
+  }
+
+  static #candidates(doc, original) {
+    const out = [{ bytes: original, mode: 'original' }];
+    try { out.push({ bytes: PdfWriter.write(doc), mode: 'standard' }); } catch (_) {}
+    try { out.push({ bytes: PdfWriter.write(doc, { compact: true }), mode: 'compact' }); } catch (_) {}
+    return out;
+  }
+
+  static #select(candidates, original, pageCount) {
+    const valid = [];
+    for (const candidate of candidates) {
+      try {
+        const loaded = PdfDocument.load(candidate.bytes);
+        if (loaded.getPageCount() !== pageCount) continue;
+        loaded.getCatalog().getPageTree().getAllPages();
+        valid.push(candidate);
+      } catch (_) {}
+    }
+    valid.sort((a, b) => a.bytes.length - b.bytes.length);
+    if (!valid.length || valid[0].bytes.length >= original.length) {
+      return { bytes: original, mode: 'original' };
+    }
+    return valid[0];
+  }
+
+  static #finish(report, selected, original, start) {
+    report.bytes = selected.bytes;
+    report.compressedSize = selected.bytes.length;
+    report.writerMode = selected.mode;
+    report.fallbackUsed = selected.bytes === original;
+    report.rebuiltSize = report.compressedSize;
+    try { report.finalObjectCount = PdfDocument.load(selected.bytes).getXRefTable().getEntries().length; } catch (_) {}
+    report.objectsPurged = Math.max(0, report.originalObjectCount - report.finalObjectCount);
+    report.savedBytes = report.originalSize - report.compressedSize;
+    report.ratioPercent = report.originalSize ? Number(((report.savedBytes / report.originalSize) * 100).toFixed(1)) : 0;
+    report.reductionPercent = Math.max(0, report.ratioPercent);
+    report.grew = report.compressedSize > report.originalSize;
+    report.durationMs = Math.max(1, Math.round(this.#now() - start));
+    return report;
+  }
+
+  static #filters(filter) {
+    if (!filter) return [];
+    if (filter.isName?.()) return [filter.value];
+    if (filter instanceof PdfArray) return filter.asArray().filter(x => x?.isName?.()).map(x => x.value);
     return [];
+  }
+
+  static #decodeArray(value) {
+    if (!value?.isArray?.()) return null;
+    const out = [];
+    for (let i = 0; i < value.size(); i++) out.push(value.getNumber(i));
+    return out;
+  }
+
+  static #quality(level, options) {
+    if (options.imageQuality !== undefined) return Math.max(0.1, Math.min(1, Number(options.imageQuality)));
+    return level === 'extreme' ? 0.6 : 0.75;
+  }
+
+  static #now() {
+    return typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now();
   }
 }
