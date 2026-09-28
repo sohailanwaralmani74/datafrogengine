@@ -20,15 +20,8 @@ export class PdfCompressor {
     return PdfCompressor.compressWithReport(docOrBytes, options).bytes;
   }
 
-  /**
-   * Compresses a PDF and returns metrics describing the actual result.
-   *
-   * Stream compression is deliberately lossless. A stream is replaced only
-   * when the resulting bytes are smaller than the existing stream bytes.
-   */
   static compressWithReport(docOrBytes, options = {}) {
     const startTime = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
-
     let originalBytes = docOrBytes instanceof Uint8Array ? new Uint8Array(docOrBytes) : null;
     let originalSize = originalBytes ? originalBytes.length : 0;
     const doc = docOrBytes instanceof PdfDocument ? docOrBytes : PdfDocument.load(docOrBytes);
@@ -39,21 +32,11 @@ export class PdfCompressor {
     }
 
     const level = options.level || 'recommended';
-    const stripMeta = options.stripMetadata !== undefined
-      ? options.stripMetadata
-      : (level === 'extreme' || level === 'recommended');
-    const stripAnnots = options.stripAnnotations !== undefined
-      ? options.stripAnnotations
-      : (level === 'extreme');
-    const compressStreams = options.compressStreams !== undefined
-      ? options.compressStreams
-      : true;
-    const optimizeImages = options.optimizeImages !== undefined
-      ? options.optimizeImages
-      : (level === 'recommended' || level === 'extreme');
-    const imageQuality = options.imageQuality !== undefined
-      ? Math.max(0.1, Math.min(1, Number(options.imageQuality)))
-      : (level === 'extreme' ? 0.6 : 0.75);
+    const stripMeta = options.stripMetadata !== undefined ? options.stripMetadata : (level === 'extreme' || level === 'recommended');
+    const stripAnnots = options.stripAnnotations !== undefined ? options.stripAnnotations : (level === 'extreme');
+    const compressStreams = options.compressStreams !== undefined ? options.compressStreams : true;
+    const optimizeImages = options.optimizeImages !== undefined ? options.optimizeImages : (level === 'recommended' || level === 'extreme');
+    const imageQuality = options.imageQuality !== undefined ? Math.max(0.1, Math.min(1, Number(options.imageQuality))) : (level === 'extreme' ? 0.6 : 0.75);
 
     const originalObjectStates = PdfCompressor.#captureObjectStates(doc);
 
@@ -83,36 +66,31 @@ export class PdfCompressor {
 
     if (changedObjects.length && !doc.securityHandler) {
       const candidates = [];
-
       try {
         const incrementalBytes = PdfWriter.writeIncremental(doc, originalBytes, changedObjects);
         candidates.push({ bytes: incrementalBytes, mode: 'incremental' });
         rebuiltSize = Math.min(rebuiltSize, incrementalBytes.length);
       } catch (_) {}
-
       try {
         const standardBytes = PdfWriter.write(doc);
         candidates.push({ bytes: standardBytes, mode: 'standard' });
         rebuiltSize = Math.min(rebuiltSize, standardBytes.length);
       } catch (_) {}
-
       try {
         const compactBytes = PdfWriter.write(doc, { compact: true });
         candidates.push({ bytes: compactBytes, mode: 'compact' });
         rebuiltSize = Math.min(rebuiltSize, compactBytes.length);
       } catch (_) {}
-
       for (const candidate of candidates) {
         if (candidate.bytes.length < compressedBytes.length) {
           compressedBytes = candidate.bytes;
           writerMode = candidate.mode;
         }
       }
-
       fallbackUsed = compressedBytes === originalBytes;
     }
-    const compressedSize = compressedBytes.length;
 
+    const compressedSize = compressedBytes.length;
     let finalObjectCount = 0;
     try {
       const reloaded = PdfDocument.load(compressedBytes);
@@ -122,10 +100,7 @@ export class PdfCompressor {
 
     const objectsPurged = Math.max(0, originalObjectCount - finalObjectCount);
     const savedBytes = originalSize - compressedSize;
-    const ratioPercent = originalSize > 0
-      ? Number(((savedBytes / originalSize) * 100).toFixed(1))
-      : 0;
-
+    const ratioPercent = originalSize > 0 ? Number(((savedBytes / originalSize) * 100).toFixed(1)) : 0;
     const pageCount = doc.getPageCount ? doc.getPageCount() : 1;
     const endTime = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
 
@@ -191,61 +166,6 @@ export class PdfCompressor {
     if (!xref || typeof xref.getEntries !== 'function') return;
 
     for (const entry of xref.getEntries()) {
-      const objectNumber = entry.objectNumber;
-      if (!entry || (entry.isFree && entry.isFree()) || (entry.isCompressed && entry.isCompressed())) continue;
-
-      let object;
-      try {
-        object = doc.resolveObject(objectNumber, entry.generationNumber || 0);
-      } catch (_) {
-        continue;
-      }
-
-      if (!(object instanceof PdfStream)) continue;
-      stats.scanned++;
-
-      const filterNames = PdfCompressor.#filterNames(object.getFilter());
-      let rawBytes;
-      let shouldSetFilter = false;
-
-      try {
-        if (filterNames.length === 0) {
-          rawBytes = object.bytes;
-          shouldSetFilter = true;
-        } else if (filterNames.length === 1 && filterNames[0] === 'FlateDecode') {
-          rawBytes = FlateDecode.decode(object.bytes);
-        } else {
-          stats.skipped++;
-          continue;
-        }
-
-        const encoded = FlateEncode.encode(rawBytes);
-        if (encoded.length >= object.bytes.length) {
-          stats.skipped++;
-          continue;
-        }
-
-        const oldLength = object.bytes.length;
-        object.setBytes(encoded);
-
-        if (shouldSetFilter) object.dictionary.set('Filter', PdfName.of('FlateDecode'));
-
-        stats.compressed++;
-        stats.bytesSaved += oldLength - encoded.length;
-      } catch (_) {
-        stats.skipped++;
-      }
-    }
-  }
-
-
-  static #optimizeImages(doc, stats, quality) {
-    if (typeof document === 'undefined' || typeof document.createElement !== 'function') return;
-
-    const xref = doc.getXRefTable();
-    if (!xref || typeof xref.getEntries !== 'function') return;
-
-    for (const entry of xref.getEntries()) {
       if (!entry || (entry.isFree && entry.isFree()) || (entry.isCompressed && entry.isCompressed())) continue;
 
       let object;
@@ -256,9 +176,50 @@ export class PdfCompressor {
       }
 
       if (!(object instanceof PdfStream)) continue;
+      stats.scanned++;
+
+      const filterNames = PdfCompressor.#filterNames(object.getFilter());
+      try {
+        // Decode the complete filter chain first. This is important for PDFs
+        // using combinations such as ASCII85Decode + FlateDecode. Recompressing
+        // only a single Flate layer cannot remove the ASCII85 overhead.
+        const rawBytes = filterNames.length
+          ? PdfStreamDecoder.decode(object)
+          : object.bytes;
+
+        const encoded = FlateEncode.encode(rawBytes);
+        if (encoded.length >= object.bytes.length) {
+          stats.skipped++;
+          continue;
+        }
+
+        const oldLength = object.bytes.length;
+        object.setBytes(encoded);
+        object.dictionary.set('Filter', PdfName.of('FlateDecode'));
+        object.dictionary.delete('DecodeParms');
+
+        stats.compressed++;
+        stats.bytesSaved += oldLength - encoded.length;
+      } catch (_) {
+        // Native compressed image formats (JPEG/JPX) and unsupported filters
+        // are intentionally left untouched.
+        stats.skipped++;
+      }
+    }
+  }
+
+  static #optimizeImages(doc, stats, quality) {
+    if (typeof document === 'undefined' || typeof document.createElement !== 'function') return;
+    const xref = doc.getXRefTable();
+    if (!xref || typeof xref.getEntries !== 'function') return;
+
+    for (const entry of xref.getEntries()) {
+      if (!entry || (entry.isFree && entry.isFree()) || (entry.isCompressed && entry.isCompressed())) continue;
+      let object;
+      try { object = doc.resolveObject(entry.objectNumber, entry.generationNumber || 0); } catch (_) { continue; }
+      if (!(object instanceof PdfStream)) continue;
       const dict = object.dictionary;
       if (dict.getName('Subtype') !== 'Image') continue;
-
       stats.scanned++;
 
       if (dict.has('SMask') || dict.has('Mask') || PdfCompressor.#filterNames(dict.get('Filter')).includes('DCTDecode')) {
@@ -268,10 +229,7 @@ export class PdfCompressor {
 
       const width = dict.getNumber('Width');
       const height = dict.getNumber('Height');
-      if (!width || !height || width < 1 || height < 1) {
-        stats.skipped++;
-        continue;
-      }
+      if (!width || !height || width < 1 || height < 1) { stats.skipped++; continue; }
 
       try {
         const colorSpace = PdfColorSpace.parseColorSpace(dict.get('ColorSpace'), doc);
@@ -279,36 +237,21 @@ export class PdfCompressor {
         const decode = PdfCompressor.#parseDecodeArray(dict.get('Decode'));
         const decoded = PdfStreamDecoder.decode(object);
         const rgba = PdfColorSpace.toRgba(decoded, width, height, colorSpace, bits, decode, null);
-
         const canvas = document.createElement('canvas');
         canvas.width = width;
         canvas.height = height;
         const ctx = canvas.getContext('2d');
-        if (!ctx) {
-          stats.skipped++;
-          continue;
-        }
-
+        if (!ctx) { stats.skipped++; continue; }
         const imageData = new ImageData(new Uint8ClampedArray(rgba), width, height);
         ctx.putImageData(imageData, 0, 0);
-
         const dataUrl = canvas.toDataURL('image/jpeg', quality);
         const comma = dataUrl.indexOf(',');
-        if (comma < 0) {
-          stats.skipped++;
-          continue;
-        }
-
+        if (comma < 0) { stats.skipped++; continue; }
         const binary = atob(dataUrl.slice(comma + 1));
         const jpegBytes = new Uint8Array(binary.length);
         for (let i = 0; i < binary.length; i++) jpegBytes[i] = binary.charCodeAt(i);
-
         const oldLength = object.bytes.length;
-        if (jpegBytes.length >= oldLength) {
-          stats.skipped++;
-          continue;
-        }
-
+        if (jpegBytes.length >= oldLength) { stats.skipped++; continue; }
         object.setBytes(jpegBytes);
         dict.set('Width', PdfNumber.of(width));
         dict.set('Height', PdfNumber.of(height));
@@ -317,12 +260,9 @@ export class PdfCompressor {
         dict.set('Filter', PdfName.of('DCTDecode'));
         dict.delete('Decode');
         dict.delete('DecodeParms');
-
         stats.optimized++;
         stats.bytesSaved += oldLength - jpegBytes.length;
-      } catch (_) {
-        stats.skipped++;
-      }
+      } catch (_) { stats.skipped++; }
     }
   }
 
@@ -333,15 +273,10 @@ export class PdfCompressor {
 
   static #filterNames(filter) {
     if (!filter) return [];
-
     if (filter.isName && filter.isName()) return [filter.value];
-
     if (filter instanceof PdfArray) {
-      return filter.asArray()
-        .filter(item => item && item.isName && item.isName())
-        .map(item => item.value);
+      return filter.asArray().filter(item => item && item.isName && item.isName()).map(item => item.value);
     }
-
     return [];
   }
 }
