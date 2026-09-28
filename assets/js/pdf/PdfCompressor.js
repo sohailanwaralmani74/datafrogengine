@@ -82,18 +82,34 @@ export class PdfCompressor {
     let fallbackUsed = false;
 
     if (changedObjects.length && !doc.securityHandler) {
+      const candidates = [];
+
       try {
         const incrementalBytes = PdfWriter.writeIncremental(doc, originalBytes, changedObjects);
-        rebuiltSize = incrementalBytes.length;
-        if (incrementalBytes.length < originalSize) {
-          compressedBytes = incrementalBytes;
-          writerMode = 'incremental';
-        } else {
-          fallbackUsed = true;
+        candidates.push({ bytes: incrementalBytes, mode: 'incremental' });
+        rebuiltSize = Math.min(rebuiltSize, incrementalBytes.length);
+      } catch (_) {}
+
+      try {
+        const standardBytes = PdfWriter.write(doc);
+        candidates.push({ bytes: standardBytes, mode: 'standard' });
+        rebuiltSize = Math.min(rebuiltSize, standardBytes.length);
+      } catch (_) {}
+
+      try {
+        const compactBytes = PdfWriter.write(doc, { compact: true });
+        candidates.push({ bytes: compactBytes, mode: 'compact' });
+        rebuiltSize = Math.min(rebuiltSize, compactBytes.length);
+      } catch (_) {}
+
+      for (const candidate of candidates) {
+        if (candidate.bytes.length < compressedBytes.length) {
+          compressedBytes = candidate.bytes;
+          writerMode = candidate.mode;
         }
-      } catch (_) {
-        fallbackUsed = true;
       }
+
+      fallbackUsed = compressedBytes === originalBytes;
     }
     const compressedSize = compressedBytes.length;
 
