@@ -43,7 +43,7 @@ export class PdfCompressor {
       this.#optimizeRawImages(doc, report.images, this.#quality(level, options));
     }
 
-    const selected = this.#select(this.#candidates(doc, original), original, report.pageCount);
+    const selected = this.#select(this.#candidates(doc, original), original, report.pageCount, report);
     return this.#finish(report, selected, original, start);
   }
 
@@ -71,7 +71,7 @@ export class PdfCompressor {
       });
     }
 
-    const selected = this.#select(this.#candidates(doc, original), original, report.pageCount);
+    const selected = this.#select(this.#candidates(doc, original), original, report.pageCount, report);
     return this.#finish(report, selected, original, start);
   }
 
@@ -85,7 +85,8 @@ export class PdfCompressor {
       originalObjectCount: objects, finalObjectCount: objects, objectsPurged: 0,
       durationMs: 0, level,
       streams: { scanned: 0, compressed: 0, bytesSaved: 0, skipped: 0 },
-      images: { discovered: 0, scanned: 0, optimized: 0, bytesSaved: 0, skipped: 0 }
+      images: { discovered: 0, scanned: 0, optimized: 0, bytesSaved: 0, skipped: 0 },
+      validationErrors: []
     };
   }
 
@@ -277,22 +278,36 @@ export class PdfCompressor {
   static #candidates(doc, original) {
     const out = [];
     try { out.push({ bytes: PdfWriter.write(doc), mode: 'standard' }); } catch (_) {}
-    try { out.push({ bytes: PdfWriter.write(doc, { compact: true }), mode: 'compact' }); } catch (_) {}
-    return out;
-  }
-
-  static #select(candidates, original, pageCount) {
+    try { out.push({ bytes: PdfWriter.write(doc, { compact: true }), mode: 'compa  static #select(candidates, original, pageCount, report = null) {
     const valid = [];
     for (const candidate of candidates) {
       try {
         const loaded = PdfDocument.load(candidate.bytes);
-        if (loaded.getPageCount() !== pageCount) continue;
+        const actualPages = loaded.getPageCount();
+        if (actualPages !== pageCount) {
+          if (report) {
+            report.validationErrors.push({
+              mode: candidate.mode,
+              error: `Page count changed: expected ${pageCount}, got ${actualPages}`
+            });
+          }
+          continue;
+        }
         loaded.getCatalog().getPageTree().getAllPages();
         valid.push(candidate);
-      } catch (_) {}
+      } catch (error) {
+        if (report) {
+          report.validationErrors.push({
+            mode: candidate.mode,
+            error: error?.stack || error?.message || String(error)
+          });
+        }
+      }
     }
     valid.sort((a, b) => a.bytes.length - b.bytes.length);
     return valid[0] || { bytes: original, mode: 'original' };
+  }
+ { bytes: original, mode: 'original' };
   }
 
   static #finish(report, selected, original, start) {
