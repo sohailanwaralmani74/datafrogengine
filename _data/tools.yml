@@ -1,0 +1,6 @@
+- name: Compress PDF
+  category: pdf
+  url: /pdf/compress-pdf
+  description: Reduce PDF file size in your browser while preserving the document and showing what changed.
+  icon: compress
+  color: emerald
