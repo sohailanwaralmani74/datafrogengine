@@ -5,11 +5,6 @@ import { PdfName } from '../objects/PdfName.js';
 import { FlateEncode } from '../streams/filters/FlateEncode.js';
 
 export class PdfTextEditor {
-  /**
-   * Replace text inside real PDF text-showing operators.
-   * The editor changes the content stream itself; it does not cover old text
-   * with a white rectangle. Unsupported encodings are reported safely.
-   */
   static replaceText(page, searchText, replacementText, options = {}) {
     const all = options.all !== false;
     if (!page || typeof searchText !== 'string' || !searchText) {
@@ -31,10 +26,8 @@ export class PdfTextEditor {
       }
 
       let streamChanged = false;
-
       for (const op of operators) {
         if (!['Tj', "'", '"'].includes(op.name)) continue;
-
         const argIndex = op.name === '"' ? 2 : 0;
         const value = op.getArg(argIndex);
         if (!(value instanceof PdfString)) continue;
@@ -42,8 +35,7 @@ export class PdfTextEditor {
         const source = value.value;
         if (!source.includes(searchText)) continue;
 
-        const encoded = PdfTextEditor.#encodeLatinByteText(replacement);
-        if (!encoded) {
+        if (!PdfTextEditor.#canEncodeByteText(replacement)) {
           unsupported++;
           details.push({
             type: 'unsupported-encoding',
@@ -53,11 +45,9 @@ export class PdfTextEditor {
           continue;
         }
 
-        const next = source.split(searchText).join(replacement);
-        op.args[argIndex] = PdfString.of(next, encoded);
+        op.args[argIndex] = PdfString.of(source.split(searchText).join(replacement));
         replacements++;
         streamChanged = true;
-
         if (!all) break;
       }
 
@@ -73,22 +63,14 @@ export class PdfTextEditor {
       }
     }
 
-    return {
-      changed: replacements > 0,
-      replacements,
-      unsupported,
-      details
-    };
+    return { changed: replacements > 0, replacements, unsupported, details };
   }
 
-  static #encodeLatinByteText(text) {
-    const bytes = new Uint8Array(text.length);
+  static #canEncodeByteText(text) {
     for (let i = 0; i < text.length; i++) {
-      const code = text.charCodeAt(i);
-      if (code > 0xFF) return null;
-      bytes[i] = code;
+      if (text.charCodeAt(i) > 0xFF) return false;
     }
-    return bytes;
+    return true;
   }
 
   static #serializeOperators(operators) {
@@ -97,6 +79,16 @@ export class PdfTextEditor {
 
     for (const op of operators) {
       if (!op || !op.name) continue;
+
+      if (op.name === 'BI' && op.args.length >= 2 && op.args[1] instanceof Uint8Array) {
+        chunks.push(encoder.encode('BI\n'));
+        chunks.push(PdfObjectWriter.serialize(op.args[0]));
+        chunks.push(encoder.encode('\nID\n'));
+        chunks.push(op.args[1]);
+        chunks.push(encoder.encode('\nEI\n'));
+        continue;
+      }
+
       for (const arg of op.args) {
         chunks.push(PdfObjectWriter.serialize(arg));
         chunks.push(encoder.encode(' '));
