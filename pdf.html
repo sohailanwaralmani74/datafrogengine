@@ -50,71 +50,21 @@ description: Free browser-based PDF tools for compressing, splitting, merging, e
       </span>
     </div>
 
-    <!-- Active Tool Card: Compress PDF -->
-    <div class="tool-card-featured" style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.85) 100%); border: 1px solid rgba(16, 185, 129, 0.4); border-radius: 16px; padding: 28px; box-shadow: 0 12px 32px rgba(0,0,0,0.35); position: relative; overflow: hidden; margin-bottom: 32px;">
-      <div style="position: absolute; top: 0; right: 0; width: 200px; height: 200px; background: radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, transparent 70%); pointer-events: none;"></div>
-      
-      <div style="display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 20px;">
-        <div style="max-width: 680px;">
-          <div style="display: inline-flex; align-items: center; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
-            <span style="background: #ef4444; color: #fff; font-size: 0.6875rem; font-weight: 800; padding: 3px 8px; border-radius: 5px; letter-spacing: 0.05em;">PDF</span>
-            <span style="background: rgba(16, 185, 129, 0.2); color: #34d399; font-size: 0.6875rem; font-weight: 800; padding: 3px 10px; border-radius: 9999px; border: 1px solid rgba(16, 185, 129, 0.4);">
-              &bull; ACTIVE TOOL
-            </span>
-            <span style="color: #94a3b8; font-size: 0.75rem; font-weight: 600;">100% In-Browser &bull; Zero Server Uploads</span>
-          </div>
-
-          <h3 style="font-size: 1.625rem; font-weight: 800; color: #ffffff; margin-bottom: 10px; letter-spacing: -0.02em;">
-            Compress PDF Online
-          </h3>
-          
-          <p style="font-size: 0.9375rem; color: #cbd5e1; line-height: 1.6; margin-bottom: 18px;">
-            Reduce PDF file sizes up to 85% directly inside your browser. Features drag-and-drop file upload, interactive multi-page Canvas/PDF viewer, compression preset tuning (Recommended, Extreme, Low), live progress indicators, before/after metrics, and instant download.
-          </p>
-
-          <!-- Feature tags -->
-          <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px;">
-            <span style="background: rgba(255, 255, 255, 0.06); color: #e2e8f0; font-size: 0.75rem; font-weight: 600; padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.1);">
-              ⚡ Flate / Deflate Re-encoding
-            </span>
-            <span style="background: rgba(255, 255, 255, 0.06); color: #e2e8f0; font-size: 0.75rem; font-weight: 600; padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.1);">
-              🧹 Dead Object Graph Pruning
-            </span>
-            <span style="background: rgba(255, 255, 255, 0.06); color: #e2e8f0; font-size: 0.75rem; font-weight: 600; padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.1);">
-              👁️ Live Canvas &amp; Native Embed Viewer
-            </span>
-            <span style="background: rgba(255, 255, 255, 0.06); color: #e2e8f0; font-size: 0.75rem; font-weight: 600; padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.1);">
-              🔒 GDPR &amp; HIPAA Safe
-            </span>
-          </div>
-        </div>
-
-        <div style="display: flex; flex-direction: column; align-items: flex-end; justify-content: center; gap: 12px;">
-          <div style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 10px; padding: 10px 18px; text-align: center; width: 100%; max-width: 220px;">
-            <div style="font-size: 1.5rem; font-weight: 900; color: #10b981; line-height: 1;">Up to -85%</div>
-            <div style="font-size: 0.6875rem; color: #94a3b8; text-transform: uppercase; font-weight: 700; margin-top: 4px;">Size Reduction</div>
-          </div>
-
-          <a href="{{ '/pdf/compress-pdf' | relative_url }}" class="btn-compress-now" style="text-decoration: none; padding: 14px 28px; font-size: 1rem; font-weight: 800; display: inline-flex; align-items: center; gap: 8px; justify-content: center; width: 100%; max-width: 220px; box-shadow: 0 4px 16px rgba(16, 185, 129, 0.35);">
-            <span>Open Tool</span>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
-          </a>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <div class="page-section">
     <h2 class="section-subheading">Available PDF Tools</h2>
     <div class="feature-pills-grid">
       {% assign category_tools = site.data.tools | where: "category", "pdf" %}
       {% if category_tools.size > 0 %}
         {% for tool in category_tools %}
-          <div class="pill-card">
+          <article class="pill-card" style="background: linear-gradient(145deg, rgba(239,68,68,.10), rgba(15,23,42,.94)); border-color: rgba(239,68,68,.28); padding: 22px; border-radius: 14px;">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+              <span style="display:grid;place-items:center;width:42px;height:42px;border-radius:11px;background:rgba(239,68,68,.16);border:1px solid rgba(239,68,68,.3);font-size:1.2rem;">{% if tool.icon == "compress" %}⇩{% else %}PDF{% endif %}</span>
+              <span style="font-size:.68rem;font-weight:800;letter-spacing:.06em;color:#f87171;text-transform:uppercase;">PDF Tool</span>
+            </div>
             <h4>{{ tool.name }}</h4>
             {% if tool.description %}<p>{{ tool.description }}</p>{% endif %}
             {% if tool.url %}<a href="{{ tool.url | relative_url }}" class="btn btn-secondary">Open Tool</a>{% endif %}
-          </div>
+          </article>
         {% endfor %}
       {% else %}
         <p class="section-desc">No tools are currently listed in this category.</p>
