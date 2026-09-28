@@ -278,7 +278,11 @@ export class PdfCompressor {
   static #candidates(doc, original) {
     const out = [];
     try { out.push({ bytes: PdfWriter.write(doc), mode: 'standard' }); } catch (_) {}
-    try { out.push({ bytes: PdfWriter.write(doc, { compact: true }), mode: 'compa  static #select(candidates, original, pageCount, report = null) {
+    try { out.push({ bytes: PdfWriter.write(doc, { compact: true }), mode: 'compact' }); } catch (_) {}
+    return out;
+  }
+
+  static #select(candidates, original, pageCount, report = null) {
     const valid = [];
     for (const candidate of candidates) {
       try {
@@ -306,8 +310,6 @@ export class PdfCompressor {
     }
     valid.sort((a, b) => a.bytes.length - b.bytes.length);
     return valid[0] || { bytes: original, mode: 'original' };
-  }
- { bytes: original, mode: 'original' };
   }
 
   static #finish(report, selected, original, start) {
