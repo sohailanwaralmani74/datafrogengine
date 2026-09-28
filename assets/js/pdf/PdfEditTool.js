@@ -1,4 +1,6 @@
 import { PdfDocument } from '../document/PdfDocument.js';
+import '../rendering/PdfRenderer.js';
+import '../extraction/PdfTextExtractor.js';
 import { PdfWriter } from '../writer/PdfWriter.js';
 import { PdfEditor } from './PdfEditor.js';
 import { PdfTextEditor } from './PdfTextEditor.js';
