@@ -343,16 +343,18 @@ export class PdfCompressTool {
   loadDocumentBytes(uint8) {
     try {
       this.originalBytes = uint8;
-      this.originalDoc = PdfDocument.load(uint8);
+      this.originalDoc = null;
       this.compressedBytes = null;
       this.compressedDoc = null;
-      this.activeDoc = this.originalDoc;
+      this.activeDoc = null;
       this.activeTab = 'original';
       this.currentPage = 0;
-      this.totalPages = this.originalDoc.getPageCount();
+      this.totalPages = 1;
 
       this.updateWorkspaceUI();
-      this.renderCurrentPage();
+      this.setPreviewMode('original');
+      this.switchViewerMode('embed');
+      this.updateNativeEmbed();
 
       // Show workspace, hide initial dropzone card
       if (this.dropzoneSection) this.dropzoneSection.style.display = 'none';
@@ -371,11 +373,11 @@ export class PdfCompressTool {
     if (this.fileNameDisplay) this.fileNameDisplay.textContent = this.fileName;
     const formattedSize = this.formatBytes(this.originalBytes.length);
     if (this.originalSizeBadge) this.originalSizeBadge.textContent = formattedSize;
-    if (this.pageCountBadge) this.pageCountBadge.textContent = `${this.totalPages} ${this.totalPages === 1 ? 'Page' : 'Pages'}`;
+    if (this.pageCountBadge) this.pageCountBadge.textContent = this.originalDoc ? `${this.totalPages} ${this.totalPages === 1 ? 'Page' : 'Pages'}` : 'Ready to preview';
 
     // Meta details
     if (this.detailSize) this.detailSize.textContent = formattedSize;
-    if (this.detailPages) this.detailPages.textContent = `${this.totalPages} pages`;
+    if (this.detailPages) this.detailPages.textContent = this.originalDoc ? `${this.totalPages} pages` : 'Shown in browser preview';
 
     try {
       const size = this.originalDoc.getPageSize(0);
@@ -388,15 +390,16 @@ export class PdfCompressTool {
     }
 
     if (this.detailVersion) {
-      this.detailVersion.textContent = `PDF ${this.originalDoc.getPdfVersion() || '1.7'}`;
+      this.detailVersion.textContent = this.originalDoc ? `PDF ${this.originalDoc.getPdfVersion() || '1.7'}` : 'Available after compression';
     }
 
-    const meta = this.originalDoc.getMetadata();
-    if (this.detailTitle) {
-      this.detailTitle.textContent = (meta && meta.title) ? meta.title : 'Untitled Document';
-    }
-    if (this.detailProducer) {
-      this.detailProducer.textContent = (meta && meta.producer) ? meta.producer : 'Standard PDF Generator';
+    if (this.originalDoc) {
+      const meta = this.originalDoc.getMetadata();
+      if (this.detailTitle) this.detailTitle.textContent = (meta && meta.title) ? meta.title : 'Untitled Document';
+      if (this.detailProducer) this.detailProducer.textContent = (meta && meta.producer) ? meta.producer : 'Standard PDF Generator';
+    } else {
+      if (this.detailTitle) this.detailTitle.textContent = 'Shown in browser preview';
+      if (this.detailProducer) this.detailProducer.textContent = 'Available after compression';
     }
   }
 
@@ -509,6 +512,14 @@ export class PdfCompressTool {
 
   async runCompression() {
     if (!this.originalBytes) return;
+
+    // Uploading only stores the bytes and opens the browser preview. Parse and process the PDF here, after the user explicitly starts compression.
+    if (!this.originalDoc) {
+      this.originalDoc = PdfDocument.load(this.originalBytes);
+      this.totalPages = this.originalDoc.getPageCount();
+      this.activeDoc = this.originalDoc;
+      this.updateWorkspaceUI();
+    }
 
     // Compression is automatic on the public tool.
     const preset = 'recommended';
