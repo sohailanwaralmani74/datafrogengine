@@ -41,7 +41,7 @@ description: Compress PDF files in your browser. Reduce PDF size, preview the re
 .pdf-result-summary{font-size:1rem;line-height:1.65;color:#dbeafe}
 .pdf-result-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:18px 0}
 .pdf-stat{padding:13px;border-radius:10px;background:#0b1120;border:1px solid #253149}
-.pdf-stat strong{display:block;font-size:1.05rem;color:#fff}
+.pdf-stat strong{display:block;font-size:1.05rem;color:#fff}.pdf-stat-reduction strong{color:#22c55e}
 .pdf-stat span{font-size:.72rem;color:#64748b}
 .pdf-details-title{font-size:.9rem;margin:22px 0 9px}
 #compression-page-details{display:flex;flex-direction:column;gap:7px}
@@ -122,7 +122,7 @@ description: Compress PDF files in your browser. Reduce PDF size, preview the re
         <div class="pdf-result-stats">
           <div class="pdf-stat"><strong id="res-original-size">—</strong><span>Original size</span></div>
           <div class="pdf-stat"><strong id="res-compressed-size">—</strong><span>Compressed size</span></div>
-          <div class="pdf-stat"><strong id="res-savings-percent">—</strong><span>Size reduction</span></div>
+          <div class="pdf-stat pdf-stat-reduction"><strong id="res-savings-percent">—</strong><span>Size reduction</span></div>
           <div class="pdf-stat"><strong id="res-savings-bytes">—</strong><span>Saved</span></div>
         </div>
 
