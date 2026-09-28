@@ -602,7 +602,7 @@ export class PdfCompressTool {
       ? ((savedBytes / report.originalSize) * 100).toFixed(1)
       : '0.0';
 
-    if (this.resSavingsPercent) this.resSavingsPercent.textContent = `-${savingsPercent}%`;
+    if (this.resSavingsPercent) this.resSavingsPercent.textContent = `${savingsPercent}%`;
     if (this.resSavingsBytes) this.resSavingsBytes.textContent = `${this.formatBytes(savedBytes)} saved`;
 
     if (this.resultSummary) {
