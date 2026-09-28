@@ -45,6 +45,13 @@ export class PdfCompressTool {
     this.btnCompressNow = document.getElementById('btn-compress-now');
     this.btnNewFile = document.getElementById('btn-new-file');
     this.stagePresetSelect = document.getElementById('stage-preset-select');
+    this.resultSummary = document.getElementById('compression-result-summary');
+    this.resultChanges = document.getElementById('compression-page-details');
+    this.resultDetails = document.getElementById('compression-details');
+    this.btnShowDetails = document.getElementById('btn-show-compression-details');
+    this.noCompressionModal = document.getElementById('no-compression-modal');
+    this.btnCloseNoCompression = document.getElementById('btn-close-no-compression');
+    this.btnModalDetails = document.getElementById('btn-modal-details');
 
     // Viewer Controls
     this.canvas = document.getElementById('pdf-render-canvas');
@@ -234,7 +241,19 @@ export class PdfCompressTool {
       });
     }
 
-    // Sync presets
+    if (this.btnShowDetails) this.btnShowDetails.addEventListener('click', () => {
+      if (this.resultDetails) this.resultDetails.hidden = !this.resultDetails.hidden;
+      this.btnShowDetails.textContent = this.resultDetails?.hidden ? 'View compression details' : 'Hide compression details';
+    });
+    if (this.btnCloseNoCompression) this.btnCloseNoCompression.addEventListener('click', () => this.closeNoCompressionModal());
+    if (this.btnModalDetails) this.btnModalDetails.addEventListener('click', () => {
+      this.closeNoCompressionModal();
+      if (this.resultDetails) this.resultDetails.hidden = false;
+      if (this.btnShowDetails) this.btnShowDetails.textContent = 'Hide compression details';
+      this.resultDetails?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+
+    // Legacy preset synchronization is retained for compatibility; the public page does not expose it.
     if (this.presetSelect && this.stagePresetSelect) {
       this.presetSelect.addEventListener('change', (e) => {
         this.stagePresetSelect.value = e.target.value;
@@ -491,10 +510,11 @@ export class PdfCompressTool {
   async runCompression() {
     if (!this.originalBytes) return;
 
-    const preset = (this.stagePresetSelect ? this.stagePresetSelect.value : 'recommended') || 'recommended';
-    const stripMeta = document.getElementById('opt-strip-meta')?.checked ?? true;
-    const purgeOrphans = document.getElementById('opt-purge-orphans')?.checked ?? true;
-    const stripAnnots = document.getElementById('opt-strip-annots')?.checked ?? (preset === 'extreme');
+    // Compression is automatic on the public tool.
+    const preset = 'recommended';
+    const stripMeta = true;
+    const purgeOrphans = true;
+    const stripAnnots = false;
 
     // Show Progress Modal
     this.showProgressModal();
@@ -513,7 +533,7 @@ export class PdfCompressTool {
       await new Promise(r => setTimeout(r, 240));
 
       // Step 4: Final binary generation
-      const report = PdfCompressor.compressWithReport(this.originalBytes, {
+      const report = await PdfCompressor.compressWithReportAsync(this.originalBytes, {
         level: preset,
         stripMetadata: stripMeta,
         stripAnnotations: stripAnnots,
@@ -577,18 +597,49 @@ export class PdfCompressTool {
     if (this.resOriginalSize) this.resOriginalSize.textContent = this.formatBytes(report.originalSize);
     if (this.resCompressedSize) this.resCompressedSize.textContent = this.formatBytes(report.compressedSize);
 
-    // If file was already highly optimized or minimal, ensure friendly display
     const savedBytes = Math.max(0, report.originalSize - report.compressedSize);
     const savingsPercent = report.originalSize > 0
       ? ((savedBytes / report.originalSize) * 100).toFixed(1)
       : '0.0';
 
-    if (this.resSavingsPercent) {
-      this.resSavingsPercent.textContent = `-${savingsPercent}%`;
+    if (this.resSavingsPercent) this.resSavingsPercent.textContent = `-${savingsPercent}%`;
+    if (this.resSavingsBytes) this.resSavingsBytes.textContent = `${this.formatBytes(savedBytes)} saved`;
+
+    if (this.resultSummary) {
+      this.resultSummary.innerHTML = savedBytes > 0
+        ? `<strong>Your PDF was compressed successfully.</strong> We reduced it from ${this.formatBytes(report.originalSize)} to ${this.formatBytes(report.compressedSize)}, saving ${this.formatBytes(savedBytes)} (${savingsPercent}%).`
+        : `<strong>Your PDF is already optimized.</strong> We could not safely reduce its size further without changing its content or reducing quality.`;
     }
-    if (this.resSavingsBytes) {
-      this.resSavingsBytes.textContent = `${this.formatBytes(savedBytes)} saved`;
+
+    if (this.resultChanges) {
+      const details = (report.pageDetails || []).filter(p => p.savedBytes > 0);
+      this.resultChanges.innerHTML = details.length
+        ? details.map(p => {
+            const parts = [];
+            if (p.imageSavedBytes > 0) parts.push(`image data reduced by ${this.formatBytes(p.imageSavedBytes)}`);
+            if (p.contentSavedBytes > 0) parts.push(`page content reduced by ${this.formatBytes(p.contentSavedBytes)}`);
+            return `<button type="button" class="compression-page-detail" data-page="${p.pageNumber}"><span>Page ${p.pageNumber}</span><span>${parts.join(' and ')} · ${this.formatBytes(p.savedBytes)} saved</span></button>`;
+          }).join('')
+        : '<p>No individual page produced a measurable saving. See the details below for what was checked.</p>';
+
+      this.resultChanges.querySelectorAll('[data-page]').forEach(button => {
+        button.addEventListener('click', () => {
+          this.currentPage = Math.max(0, Number(button.dataset.page) - 1);
+          this.setPreviewMode('compressed');
+          document.getElementById('pdf-preview')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+      });
     }
+
+    if (this.resultDetails) {
+      const skippedStreams = report.streams?.skipped || 0;
+      const skippedImages = report.images?.skipped || 0;
+      this.resultDetails.innerHTML =
+        `<p>We checked ${report.streams?.scanned || 0} PDF content streams and ${report.images?.discovered || 0} images.</p>
+         <p>${report.streams?.compressed || 0} streams were reduced and ${report.images?.optimized || 0} images were optimized. ${skippedStreams} streams and ${skippedImages} images were left unchanged because changing them did not produce a smaller or safely reusable result.</p>`;
+    }
+
+    if (savedBytes <= 0) this.openNoCompressionModal();
     if (this.resTimeMs) {
       this.resTimeMs.textContent = `${report.durationMs} ms`;
     }
@@ -597,6 +648,14 @@ export class PdfCompressTool {
     if (reportPurged) {
       reportPurged.textContent = `${report.objectsPurged} items`;
     }
+  }
+
+  openNoCompressionModal() {
+    if (this.noCompressionModal) this.noCompressionModal.style.display = 'flex';
+  }
+
+  closeNoCompressionModal() {
+    if (this.noCompressionModal) this.noCompressionModal.style.display = 'none';
   }
 
   triggerDownload(bytes, filename) {
