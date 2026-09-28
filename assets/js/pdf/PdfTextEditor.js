@@ -2,6 +2,7 @@ import { PdfContentParser } from '../content/PdfContentParser.js';
 import { PdfObjectWriter } from '../writer/PdfObjectWriter.js';
 import { PdfString } from '../objects/PdfString.js';
 import { PdfName } from '../objects/PdfName.js';
+import { PdfArray } from '../objects/PdfArray.js';
 import { FlateEncode } from '../streams/filters/FlateEncode.js';
 
 export class PdfTextEditor {
@@ -27,28 +28,39 @@ export class PdfTextEditor {
 
       let streamChanged = false;
       for (const op of operators) {
-        if (!['Tj', "'", '"'].includes(op.name)) continue;
-        const argIndex = op.name === '"' ? 2 : 0;
-        const value = op.getArg(argIndex);
-        if (!(value instanceof PdfString)) continue;
-
-        const source = value.value;
-        if (!source.includes(searchText)) continue;
-
-        if (!PdfTextEditor.#canEncodeByteText(replacement)) {
-          unsupported++;
-          details.push({
-            type: 'unsupported-encoding',
-            original: source,
-            reason: 'The replacement contains characters that cannot be safely represented by this PDF text encoding.'
-          });
-          continue;
+        if (['Tj', "'", '"'].includes(op.name)) {
+          const argIndex = op.name === '"' ? 2 : 0;
+          const value = op.getArg(argIndex);
+          if (value instanceof PdfString) {
+            const result = PdfTextEditor.#replaceString(value, searchText, replacement);
+            if (result.unsupported) {
+              unsupported++;
+              details.push({ type: 'unsupported-encoding', original: value.value, reason: 'The replacement contains characters that cannot be safely represented by this PDF text encoding.' });
+            } else if (result.changed) {
+              op.args[argIndex] = result.value;
+              replacements++;
+              streamChanged = true;
+            }
+          }
+        } else if (op.name === 'TJ') {
+          const array = op.getArg(0);
+          if (!(array instanceof PdfArray)) continue;
+          for (let i = 0; i < array.size(); i++) {
+            const item = array.get(i);
+            if (!(item instanceof PdfString)) continue;
+            const result = PdfTextEditor.#replaceString(item, searchText, replacement);
+            if (result.unsupported) {
+              unsupported++;
+              details.push({ type: 'unsupported-encoding', original: item.value, reason: 'The replacement contains characters that cannot be safely represented by this PDF text encoding.' });
+            } else if (result.changed) {
+              array.set(i, result.value);
+              replacements++;
+              streamChanged = true;
+              if (!all) break;
+            }
+          }
         }
-
-        op.args[argIndex] = PdfString.of(source.split(searchText).join(replacement));
-        replacements++;
-        streamChanged = true;
-        if (!all) break;
+        if (streamChanged && !all) break;
       }
 
       if (!streamChanged) continue;
@@ -66,6 +78,12 @@ export class PdfTextEditor {
     return { changed: replacements > 0, replacements, unsupported, details };
   }
 
+  static #replaceString(value, searchText, replacement) {
+    if (!value.value.includes(searchText)) return { changed: false, value };
+    if (!PdfTextEditor.#canEncodeByteText(replacement)) return { unsupported: true, changed: false, value };
+    return { changed: true, value: PdfString.of(value.value.split(searchText).join(replacement)) };
+  }
+
   static #canEncodeByteText(text) {
     for (let i = 0; i < text.length; i++) {
       if (text.charCodeAt(i) > 0xFF) return false;
@@ -79,7 +97,6 @@ export class PdfTextEditor {
 
     for (const op of operators) {
       if (!op || !op.name) continue;
-
       if (op.name === 'BI' && op.args.length >= 2 && op.args[1] instanceof Uint8Array) {
         chunks.push(encoder.encode('BI\n'));
         chunks.push(PdfObjectWriter.serialize(op.args[0]));
@@ -88,7 +105,6 @@ export class PdfTextEditor {
         chunks.push(encoder.encode('\nEI\n'));
         continue;
       }
-
       for (const arg of op.args) {
         chunks.push(PdfObjectWriter.serialize(arg));
         chunks.push(encoder.encode(' '));
