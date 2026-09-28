@@ -351,15 +351,19 @@ export class PdfCompressTool {
       this.currentPage = 0;
       this.totalPages = 1;
 
-      this.updateWorkspaceUI();
-      this.setPreviewMode('original');
-      this.switchViewerMode('embed');
-      this.updateNativeEmbed();
-
-      // Show workspace, hide initial dropzone card
+      // Show the preview workspace first. No PDF parsing, rendering, analysis,
+      // compression or reconstruction happens during upload.
       if (this.dropzoneSection) this.dropzoneSection.style.display = 'none';
       if (this.stageSection) this.stageSection.style.display = 'block';
       if (this.resultsPanel) this.resultsPanel.style.display = 'none';
+
+      this.updateWorkspaceUI();
+
+      // Show the uploaded PDF immediately using the browser's native PDF viewer.
+      // This does not parse or modify the PDF.
+      this.activeTab = 'original';
+      this.switchViewerMode('embed');
+      this.updateNativeEmbed();
 
       // Scroll smoothly to workspace
       this.stageSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -475,7 +479,11 @@ export class PdfCompressTool {
     }
     const blob = new Blob([currentBytes], { type: 'application/pdf' });
     this.activeBlobUrl = URL.createObjectURL(blob);
-    this.nativeEmbed.data = this.activeBlobUrl;
+    if ('src' in this.nativeEmbed) {
+      this.nativeEmbed.src = this.activeBlobUrl;
+    } else {
+      this.nativeEmbed.data = this.activeBlobUrl;
+    }
   }
 
   switchViewerMode(mode) {
