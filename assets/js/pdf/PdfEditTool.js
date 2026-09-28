@@ -8,7 +8,7 @@ class PdfEditTool {
     this.fileInput=document.getElementById('pdf-file-input'); this.dropzone=document.getElementById('pdf-edit-dropzone'); this.uploader=document.getElementById('pdf-edit-uploader');
     this.workspace=document.getElementById('pdf-edit-workspace'); this.stage=document.getElementById('pdf-stage'); this.canvasArea=document.getElementById('pdf-canvas-area');
     this.thumbs=document.getElementById('pdf-thumbs'); this.fileName=document.getElementById('pdf-edit-file-name'); this.pageInput=document.getElementById('edit-page-number'); this.pageCount=document.getElementById('edit-page-count');
-    this.status=document.getElementById('edit-status'); this.outputPanel=document.getElementById('edit-output'); this.download=document.getElementById('edit-download');
+    this.status=document.getElementById('edit-status'); this.outputPanel=document.getElementById('edit-output'); this.download=document.getElementById('edit-download'); this.zoomLabel=document.getElementById('pdf-zoom-label');
     this.selectedPanel=document.getElementById('pdf-text-editor-panel'); this.addPanel=document.getElementById('pdf-add-editor-panel'); this.coverPanel=document.getElementById('pdf-cover-editor-panel'); this.emptyPanel=document.getElementById('pdf-side-empty');
     this.selectedText=document.getElementById('pdf-selected-text'); this.replacement=document.getElementById('pdf-replacement-text'); this.newText=document.getElementById('pdf-new-text'); this.newSize=document.getElementById('pdf-new-size');
     this.currentBytes=null; this.doc=null; this.fileNameValue='edited.pdf'; this.pageIndex=0; this.zoom=1; this.selectedItem=null; this.mode='select'; this.history=[]; this.future=[]; this.drag=null; this.bind();
