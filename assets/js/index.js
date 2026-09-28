@@ -243,6 +243,7 @@ export {
 export {
   PdfConverter,
   PdfEditor,
+  PdfTextEditor,
   PdfComparator,
   PdfAnalyzer,
   PdfCleaner,
