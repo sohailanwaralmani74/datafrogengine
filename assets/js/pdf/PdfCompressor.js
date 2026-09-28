@@ -147,13 +147,9 @@ export class PdfCompressor {
   }
 
   static async #deflate(bytes) {
-    if (typeof CompressionStream !== 'undefined') {
-      const cs = new CompressionStream('deflate');
-      const writer = cs.writable.getWriter();
-      await writer.write(bytes);
-      await writer.close();
-      return new Uint8Array(await new Response(cs.readable).arrayBuffer());
-    }
+    // Use the engine's browser-safe Flate encoder for deterministic completion.
+    // CompressionStream is intentionally not used here because browser stream
+    // implementations can remain pending on large PDF streams.
     return FlateEncode.encode(bytes);
   }
 
