@@ -5,7 +5,7 @@
  * editable source of truth; no PDF -> HTML -> PDF conversion is performed.
  */
 
-import { PdfDocument } from '../document/PdfDocument.js';
+import { PdfEngine } from './PdfEngine.js';
 import { PdfWriter } from '../writer/PdfWriter.js';
 import { PdfEditor } from './PdfEditor.js';
 import { PdfTextEditor } from './PdfTextEditor.js';
@@ -30,7 +30,7 @@ class UnifiedPdfEditor {
     this.selected = null;
     this.history = [];
     this.future = [];
-    this.drag = null;
+    this.drag = null;\n    this.mode = 'select';
 
     this.bind();
   }
@@ -95,9 +95,9 @@ class UnifiedPdfEditor {
     }
 
     try {
-      this.setStatus('Opening PDF…');
+      this.progress(true, 'Opening PDF…', 10);\n      this.setStatus('Opening PDF…');
       this.sourceBytes = new Uint8Array(await file.arrayBuffer());
-      this.doc = await PdfDocument.open(this.sourceBytes);
+      this.progress(true, 'Reading PDF structure…', 35);\n      this.doc = PdfEngine.load(this.sourceBytes);
       this.fileNameValue = file.name.replace(/\.pdf$/i, '') + '-edited.pdf';
       if (this.fileName) this.fileName.textContent = file.name;
 
@@ -108,11 +108,11 @@ class UnifiedPdfEditor {
       if (this.upload) this.upload.style.display = 'none';
       if (this.workspace) this.workspace.style.display = 'block';
 
-      await this.render();
-      this.setStatus('PDF loaded. The original PDF structure is being edited directly.');
+      this.progress(true, 'Rendering PDF…', 70);\n      await this.render();
+      this.progress(false);\n      this.setStatus('PDF loaded. The original PDF structure is being edited directly.');
     } catch (error) {
       this.doc = null;
-      this.setStatus('Could not open this PDF: ' + (error?.message || 'unsupported PDF structure'));
+      this.progress(false);\n      this.setStatus('Could not open this PDF: ' + (error?.message || 'unsupported PDF structure'));
     }
   }
 
@@ -134,7 +134,7 @@ class UnifiedPdfEditor {
     wrapper.style.boxShadow = '0 8px 28px rgba(0,0,0,.25)';
 
     try {
-      const svg = page.renderToSvg({ scale: 1, background: '#fff' });
+      const svg = PdfEngine.renderToSvg(this.doc, this.pageIndex, { scale: 1, background: '#fff' });
       const holder = document.createElement('div');
       holder.className = 'pdf-unified-render';
       holder.innerHTML = svg;
@@ -148,7 +148,7 @@ class UnifiedPdfEditor {
 
     let items = [];
     try {
-      items = PdfTextExtractor.extractTextItems(page) || [];
+      items = PdfEngine.extractTextItems(this.doc, this.pageIndex) || [];
     } catch (_) {}
 
     for (const item of items) {
@@ -297,13 +297,13 @@ class UnifiedPdfEditor {
   async mutate(message, operation) {
     if (!this.doc) return;
 
-    const before = PdfWriter.write(this.doc);
+    const before = PdfEngine.save(this.doc);
     this.history.push(before);
     this.future = [];
 
     try {
       operation();
-      const after = PdfWriter.write(this.doc);
+      const after = PdfEngine.save(this.doc);
       this.sourceBytes = after;
       await this.render();
       this.updateHistoryButtons();
@@ -318,12 +318,12 @@ class UnifiedPdfEditor {
   async undo() {
     if (!this.doc || !this.history.length) return;
 
-    const current = PdfWriter.write(this.doc);
+    const current = PdfEngine.save(this.doc);
     const previous = this.history.pop();
     this.future.push(current);
 
     try {
-      this.doc = await PdfDocument.open(previous);
+      this.doc = PdfEngine.load(previous);
       this.sourceBytes = previous;
       await this.render();
       this.updateHistoryButtons();
@@ -341,7 +341,7 @@ class UnifiedPdfEditor {
     this.history.push(current);
 
     try {
-      this.doc = await PdfDocument.open(next);
+      this.doc = PdfEngine.load(next);
       this.sourceBytes = next;
       await this.render();
       this.updateHistoryButtons();
@@ -356,8 +356,8 @@ class UnifiedPdfEditor {
 
     try {
       this.setStatus('Saving PDF…');
-      const bytes = PdfWriter.write(this.doc);
-      this.sourceBytes = bytes;
+      const bytes = PdfEngine.save(this.doc);
+      this.sourceBytes = bytes;\n      this.progress(true, 'Preparing download…', 85);
 
       const blob = new Blob([bytes], { type: 'application/pdf' });
       const url = URL.createObjectURL(blob);
@@ -375,9 +375,9 @@ class UnifiedPdfEditor {
       }
 
       setTimeout(() => URL.revokeObjectURL(url), 1000);
-      this.setStatus('PDF saved.');
+      this.progress(false);\n      this.setStatus('PDF saved.');
     } catch (error) {
-      this.setStatus('Could not save the PDF: ' + (error?.message || 'PDF write error'));
+      this.progress(false);\n      this.setStatus('Could not save the PDF: ' + (error?.message || 'PDF write error'));
     }
   }
 
