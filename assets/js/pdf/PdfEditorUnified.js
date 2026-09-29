@@ -138,27 +138,31 @@ class UnifiedPdfEditor {
     if (!this.doc || !this.documentEl) return;
 
     const page = this.doc.getPage(this.pageIndex);
-    const size = page.getSize();
+    const viewport = page.getViewport({ scale: 1 });
+    const width = viewport.width;
+    const height = viewport.height;
+
     this.documentEl.innerHTML = '';
 
     const wrapper = document.createElement('section');
     wrapper.className = 'pdf-unified-page';
     wrapper.dataset.page = String(this.pageIndex);
     wrapper.style.position = 'relative';
-    wrapper.style.width = size.width + 'px';
-    wrapper.style.height = size.height + 'px';
+    wrapper.style.width = width + 'px';
+    wrapper.style.height = height + 'px';
     wrapper.style.background = '#fff';
     wrapper.style.margin = '0 auto 28px';
     wrapper.style.boxShadow = '0 8px 28px rgba(0,0,0,.25)';
 
+    const canvas = document.createElement('canvas');
+    canvas.className = 'pdf-unified-canvas';
+    canvas.style.display = 'block';
+    canvas.style.width = width + 'px';
+    canvas.style.height = height + 'px';
+
     try {
-      const svg = PdfEngine.renderToSvg(this.doc, this.pageIndex, { scale: 1, background: '#fff' });
-      const holder = document.createElement('div');
-      holder.className = 'pdf-unified-render';
-      holder.innerHTML = svg;
-      holder.style.position = 'absolute';
-      holder.style.inset = '0';
-      wrapper.appendChild(holder);
+      page.renderToCanvas(canvas, { scale: 1, background: '#ffffff' });
+      wrapper.appendChild(canvas);
     } catch (error) {
       this.setStatus('Page rendering failed: ' + (error?.message || 'renderer error'));
       return;
@@ -167,13 +171,15 @@ class UnifiedPdfEditor {
     let items = [];
     try {
       items = PdfEngine.extractTextItems(this.doc, this.pageIndex) || [];
-    } catch (_) {}
+    } catch (error) {
+      this.setStatus('Text extraction warning: ' + (error?.message || 'unable to extract text'));
+    }
 
     for (const item of items) {
       const text = String(item?.text ?? '').trim();
       if (!text) continue;
 
-      const box = this.itemBox(item, size);
+      const box = this.itemBox(item, { width, height });
       if (!box) continue;
 
       const hit = document.createElement('button');
