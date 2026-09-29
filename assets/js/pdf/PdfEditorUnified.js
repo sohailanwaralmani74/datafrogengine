@@ -168,38 +168,14 @@ class UnifiedPdfEditor {
       return;
     }
 
-    let items = [];
+    // The PDF canvas is the visual document. Do not create one DOM box per
+    // character, word, or extracted text item. Text selection/editing is
+    // handled from the document itself through the editor panel.
+    this.currentPageItems = [];
     try {
-      items = PdfEngine.extractTextItems(this.doc, this.pageIndex) || [];
+      this.currentPageItems = PdfEngine.extractTextItems(this.doc, this.pageIndex) || [];
     } catch (error) {
       this.setStatus('Text extraction warning: ' + (error?.message || 'unable to extract text'));
-    }
-
-    const rows = this.groupTextIntoRows(items);
-    for (const row of rows) {
-      const box = this.rowBox(row, { width, height });
-      if (!box) continue;
-
-      const hit = document.createElement('div');
-      hit.className = 'pdf-unified-row-hit';
-      hit.setAttribute('aria-label', 'Edit text row');
-      hit.style.position = 'absolute';
-      hit.style.left = box.x + 'px';
-      hit.style.top = box.y + 'px';
-      hit.style.width = Math.max(12, box.width) + 'px';
-      hit.style.height = Math.max(12, box.height) + 'px';
-      hit.style.background = 'transparent';
-      hit.style.border = '0';
-      hit.style.outline = '0';
-      hit.style.padding = '0';
-      hit.style.margin = '0';
-      hit.style.cursor = 'text';
-      hit.style.zIndex = '5';
-      hit.addEventListener('click', e => {
-        e.stopPropagation();
-        this.selectRow(row, hit);
-      });
-      wrapper.appendChild(hit);
     }
 
     this.documentEl.appendChild(wrapper);
@@ -260,11 +236,7 @@ class UnifiedPdfEditor {
 
   selectRow(row, element) {
     this.selected = { row, item: row.items[0], element };
-    this.documentEl.querySelectorAll('.pdf-unified-row-hit.selected')
-      .forEach(el => el.classList.remove('selected'));
-    element.classList.add('selected');
-
-    const selected = document.getElementById('pdf-selected-text');
+        const selected = document.getElementById('pdf-selected-text');
     const replacement = document.getElementById('pdf-replacement-text');
     if (selected) {
       selected.value = row.text;
@@ -349,6 +321,57 @@ class UnifiedPdfEditor {
         color: '#000000'
       });
     });
+  }
+
+  onDocumentDoubleClick(event) {
+    if (!this.doc || !this.currentPageItems?.length) return;
+
+    const pageEl = this.documentEl.querySelector('.pdf-unified-page');
+    if (!pageEl) return;
+
+    const rect = pageEl.getBoundingClientRect();
+    const page = this.doc.getPage(this.pageIndex);
+    const size = page.getSize();
+    const x = event.clientX - rect.left;
+    const yTop = event.clientY - rect.top;
+    const yPdf = size.height - yTop;
+
+    const candidates = this.currentPageItems.filter(item => {
+      const ix = Number(item?.x ?? item?.left ?? item?.origin?.x);
+      const iy = Number(item?.y ?? item?.top ?? item?.origin?.y);
+      const iw = Number(item?.width ?? item?.w ?? 0);
+      const ih = Number(item?.height ?? item?.fontSize ?? 12);
+      return Number.isFinite(ix) && Number.isFinite(iy) &&
+        x >= ix - 4 && x <= ix + iw + 4 &&
+        yPdf >= iy - ih && yPdf <= iy + ih;
+    });
+
+    if (!candidates.length) return;
+
+    const row = this.buildRowAtItem(candidates[0]);
+    if (row) {
+      this.selectRow(row, null);
+      this.setStatus('Text row selected. Edit it in the editor panel.');
+    }
+  }
+
+  buildRowAtItem(item) {
+    const y = Number(item?.y ?? item?.top ?? item?.origin?.y);
+    const height = Number(item?.height ?? item?.fontSize ?? 12);
+    if (!Number.isFinite(y)) return null;
+
+    const items = this.currentPageItems.filter(candidate => {
+      const cy = Number(candidate?.y ?? candidate?.top ?? candidate?.origin?.y);
+      return Number.isFinite(cy) && Math.abs(cy - y) <= Math.max(3, height * 0.35);
+    }).sort((a,b) =>
+      Number(a?.x ?? a?.left ?? a?.origin?.x ?? 0) -
+      Number(b?.x ?? b?.left ?? b?.origin?.x ?? 0)
+    );
+
+    return {
+      items,
+      text: items.map(i => String(i?.text ?? '')).join('')
+    };
   }
 
   onPageClick(event) {
