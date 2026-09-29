@@ -87,6 +87,18 @@ class UnifiedPdfEditor {
 
   setStatus(message) {
     if (this.statusEl) this.statusEl.textContent = message;
+    const label = document.getElementById('pdf-progress-label');
+    if (label) label.textContent = message;
+  }
+
+  progress(show, message = 'Processing PDF…', percent = 0) {
+    const modal = document.getElementById('pdf-progress-modal');
+    const bar = document.getElementById('pdf-progress-bar');
+    const label = document.getElementById('pdf-progress-label');
+    if (!modal) return;
+    modal.hidden = !show;
+    if (label) label.textContent = message;
+    if (bar) bar.style.width = Math.max(0, Math.min(100, percent)) + '%';
   }
 
   async load(file) {
