@@ -175,31 +175,27 @@ class UnifiedPdfEditor {
       this.setStatus('Text extraction warning: ' + (error?.message || 'unable to extract text'));
     }
 
-    for (const item of items) {
-      const text = String(item?.text ?? '').trim();
-      if (!text) continue;
-
-      const box = this.itemBox(item, { width, height });
+    const rows = this.groupTextIntoRows(items);
+    for (const row of rows) {
+      const box = this.rowBox(row, { width, height });
       if (!box) continue;
 
       const hit = document.createElement('button');
       hit.type = 'button';
-      hit.className = 'pdf-unified-text-hit';
-      hit.title = text;
-      hit.dataset.text = text;
+      hit.className = 'pdf-unified-row-hit';
+      hit.title = 'Edit row';
       hit.style.position = 'absolute';
       hit.style.left = box.x + 'px';
       hit.style.top = box.y + 'px';
-      hit.style.width = Math.max(3, box.width) + 'px';
-      hit.style.height = Math.max(8, box.height) + 'px';
+      hit.style.width = Math.max(12, box.width) + 'px';
+      hit.style.height = Math.max(12, box.height) + 'px';
       hit.style.background = 'transparent';
       hit.style.border = '0';
       hit.style.padding = '0';
       hit.style.cursor = 'text';
-
       hit.addEventListener('click', e => {
         e.stopPropagation();
-        this.selectText(item, hit);
+        this.selectRow(row, hit);
       });
       wrapper.appendChild(hit);
     }
@@ -207,6 +203,78 @@ class UnifiedPdfEditor {
     this.documentEl.appendChild(wrapper);
     this.renderThumbs();
     this.updatePageControls();
+  }
+
+  groupTextIntoRows(items) {
+    const usable = items.filter(item => String(item?.text ?? '').trim());
+    usable.sort((a, b) => {
+      const ay = Number(a?.y ?? a?.top ?? a?.origin?.y ?? 0);
+      const by = Number(b?.y ?? b?.top ?? b?.origin?.y ?? 0);
+      const ax = Number(a?.x ?? a?.left ?? a?.origin?.x ?? 0);
+      const bx = Number(b?.x ?? b?.left ?? b?.origin?.x ?? 0);
+      return Math.abs(ay - by) < 3 ? ax - bx : ay - by;
+    });
+
+    const rows = [];
+    for (const item of usable) {
+      const y = Number(item?.y ?? item?.top ?? item?.origin?.y ?? 0);
+      const height = Number(item?.height ?? item?.fontSize ?? 12);
+      let row = rows.find(r => Math.abs(r.baseline - y) <= Math.max(3, height * 0.35));
+      if (!row) {
+        row = { baseline: y, items: [] };
+        rows.push(row);
+      }
+      row.items.push(item);
+      row.items.sort((a,b) =>
+        Number(a?.x ?? a?.left ?? a?.origin?.x ?? 0) -
+        Number(b?.x ?? b?.left ?? b?.origin?.x ?? 0)
+      );
+    }
+
+    return rows.map(row => {
+      const first = row.items[0];
+      const last = row.items[row.items.length - 1];
+      const firstX = Number(first?.x ?? first?.left ?? first?.origin?.x ?? 0);
+      const lastX = Number(last?.x ?? last?.left ?? last?.origin?.x ?? firstX);
+      const lastWidth = Number(last?.width ?? last?.w ?? 0);
+      const maxHeight = Math.max(...row.items.map(i => Number(i?.height ?? i?.fontSize ?? 12)));
+      return {
+        items: row.items,
+        text: row.items.map(i => String(i?.text ?? '')).join(''),
+        x: firstX,
+        y: row.baseline,
+        width: Math.max(1, lastX + lastWidth - firstX),
+        height: Math.max(8, maxHeight)
+      };
+    });
+  }
+
+  rowBox(row, size) {
+    if (!row || !Number.isFinite(row.x) || !Number.isFinite(row.y)) return null;
+    const top = row.items[0]?.yIsTop === true || row.items[0]?.coordinateSystem === 'top-left'
+      ? row.y : size.height - row.y - row.height;
+    return { x: row.x, y: top, width: row.width, height: row.height };
+  }
+
+  selectRow(row, element) {
+    this.selected = { row, item: row.items[0], element };
+    this.documentEl.querySelectorAll('.pdf-unified-row-hit.selected')
+      .forEach(el => el.classList.remove('selected'));
+    element.classList.add('selected');
+
+    const selected = document.getElementById('pdf-selected-text');
+    const replacement = document.getElementById('pdf-replacement-text');
+    if (selected) {
+      selected.value = row.text;
+      selected.readOnly = true;
+    }
+    if (replacement) {
+      replacement.value = row.text;
+      replacement.focus();
+      replacement.select();
+    }
+    this.showPanel('text');
+    this.setStatus('Row selected. Edit the complete line, then apply.');
   }
 
   itemBox(item, size) {
@@ -242,16 +310,17 @@ class UnifiedPdfEditor {
     if (!this.doc || !this.selected) return;
 
     const replacement = document.getElementById('pdf-replacement-text')?.value ?? '';
-    const item = this.selected.item;
+    const row = this.selected.row;
+    const original = row.text;
 
-    this.mutate('Text changed.', () => {
-      const result = PdfTextEditor.replaceText(this.doc.getPage(this.pageIndex), item.text, replacement, {
+    this.mutate('Row changed.', () => {
+      const result = PdfTextEditor.replaceText(this.doc.getPage(this.pageIndex), original, replacement, {
         all: false,
-        textItem: item
+        textItems: row.items
       });
 
       if (!result.changed) {
-        throw new Error(result.details?.[0]?.message || 'The selected text could not be rewritten.');
+        throw new Error(result.details?.[0]?.message || 'The selected row could not be rewritten.');
       }
     });
   }
