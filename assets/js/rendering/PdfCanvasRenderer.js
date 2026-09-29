@@ -441,8 +441,8 @@ export class PdfCanvasRenderer {
     // characters as missing-glyph boxes before every real character.
     // PDF text is not supposed to display those NULs, so normalize this
     // representation before sending it to Canvas.
-    if (decodedText.indexOf('\\u0000') !== -1) {
-      decodedText = decodedText.replace(/\\u0000/g, '');
+    if (decodedText.indexOf('\u0000') !== -1) {
+      decodedText = decodedText.replace(/\u0000/g, '');
     }
 
     const fontSize = ts.fontSize || 12;
