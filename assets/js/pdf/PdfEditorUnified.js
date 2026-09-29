@@ -180,10 +180,9 @@ class UnifiedPdfEditor {
       const box = this.rowBox(row, { width, height });
       if (!box) continue;
 
-      const hit = document.createElement('button');
-      hit.type = 'button';
+      const hit = document.createElement('div');
       hit.className = 'pdf-unified-row-hit';
-      hit.title = 'Edit row';
+      hit.setAttribute('aria-label', 'Edit text row');
       hit.style.position = 'absolute';
       hit.style.left = box.x + 'px';
       hit.style.top = box.y + 'px';
@@ -191,8 +190,11 @@ class UnifiedPdfEditor {
       hit.style.height = Math.max(12, box.height) + 'px';
       hit.style.background = 'transparent';
       hit.style.border = '0';
+      hit.style.outline = '0';
       hit.style.padding = '0';
+      hit.style.margin = '0';
       hit.style.cursor = 'text';
+      hit.style.zIndex = '5';
       hit.addEventListener('click', e => {
         e.stopPropagation();
         this.selectRow(row, hit);
