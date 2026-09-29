@@ -6,52 +6,79 @@ format: pdf
 description: Convert a PDF into an editable Word-style document in your browser and download the edited document as PDF.
 ---
 <style>
-.pdf-word-page{max-width:1280px;margin:0 auto;padding:28px 18px 70px}.pdf-word-hero{text-align:center;margin-bottom:20px}
-.pdf-word-privacy{color:#15803d;font-size:.9rem}.pdf-word-upload{padding:34px;border:1.5px dashed #475569;border-radius:16px;text-align:center}
-.pdf-word-upload button,.pdf-word-toolbar button{border:1px solid #475569;border-radius:8px;padding:8px 12px;cursor:pointer}
-.pdf-word-upload .primary,.pdf-word-toolbar .primary{background:#ef4444;color:#fff;border-color:#ef4444}.pdf-word-upload input{display:none}
-.pdf-word-workspace{display:none;border:1px solid #334155;border-radius:14px;overflow:hidden;background:#1e293b}
-.pdf-word-toolbar{display:flex;gap:6px;align-items:center;flex-wrap:wrap;padding:9px;background:#111827;border-bottom:1px solid #334155}
-.pdf-word-toolbar select,.pdf-word-toolbar input{height:34px;border:1px solid #475569;border-radius:7px;background:#0f172a;color:#e5e7eb;padding:0 7px}
-.pdf-word-toolbar .spacer{flex:1}.pdf-word-body{display:grid;grid-template-columns:180px minmax(0,1fr);height:calc(100vh - 210px);min-height:650px}
-.pdf-word-thumbs{overflow-y:auto;background:#0f172a;padding:10px}.pdf-word-thumb{margin-bottom:10px;padding:5px;border:1px solid #334155;border-radius:7px;background:#1e293b;cursor:pointer}.pdf-word-thumb.active{border-color:#ef4444}
-.pdf-word-thumb-page{background:#fff;color:#111;overflow:hidden;position:relative;width:100%;aspect-ratio:8.5/11}.pdf-word-thumb-page .thumb-line{position:absolute;white-space:nowrap;transform-origin:left top}
-.pdf-word-main{overflow:auto;background:#475569;padding:35px}.pdf-word-document{display:flex;flex-direction:column;align-items:center;gap:28px}
-.pdf-word-page{background:#fff;color:#111;box-shadow:0 10px 35px rgba(0,0,0,.35);position:relative;flex:none;overflow:hidden}
-.pdf-word-page-content{position:absolute;inset:0;padding:55px 55px;outline:none;overflow:hidden}
-.pdf-word-line{min-height:1em;white-space:pre-wrap;word-break:break-word;outline:none;margin:0;padding:0}
-.pdf-word-run{outline:none}.pdf-word-image{position:absolute;max-width:none;user-select:none}
-.pdf-word-page:focus-within{box-shadow:0 0 0 2px #2563eb,0 10px 35px rgba(0,0,0,.35)}
-.pdf-word-status{padding:8px 12px;color:#cbd5e1;font-size:.82rem}
-@media(max-width:800px){.pdf-word-body{grid-template-columns:95px;height:calc(100vh - 170px)}.pdf-word-main{padding:15px}.pdf-word-page-content{padding:30px}.pdf-word-toolbar{font-size:.8rem}}
+.pdf-editor-page{max-width:1400px;margin:auto;padding:24px 16px}.pdf-editor-hero{text-align:center;margin-bottom:20px}
+.pdf-editor-upload{border:2px dashed #64748b;border-radius:16px;padding:55px 20px;text-align:center}.pdf-editor-upload button,.pdf-editor-toolbar button{border:1px solid #64748b;border-radius:7px;padding:8px 12px;cursor:pointer}.primary{background:#ef4444!important;color:#fff;border-color:#ef4444!important}.pdf-editor-upload input{display:none}
+.pdf-editor-workspace{display:none;border:1px solid #334155;border-radius:12px;overflow:hidden;background:#1e293b}.pdf-editor-toolbar{display:flex;gap:7px;align-items:center;flex-wrap:wrap;padding:9px;background:#111827}.pdf-editor-toolbar .spacer{flex:1}
+.pdf-editor-body{display:grid;grid-template-columns:170px 1fr;min-height:680px}.pdf-editor-thumbs{padding:10px;background:#0f172a;overflow:auto}.pdf-editor-thumbs button{display:block;width:100%;margin-bottom:8px;padding:9px;background:#1e293b;color:#e5e7eb;border:1px solid #334155;border-radius:6px;cursor:pointer}.pdf-editor-thumbs button.active{border-color:#ef4444}
+.pdf-editor-main{overflow:auto;background:#475569;padding:30px}.pdf-editor-document{display:flex;justify-content:center}.pdf-unified-page{flex:none}.pdf-unified-render,.pdf-unified-render svg{width:100%;height:100%;display:block}.pdf-unified-text-hit.selected{outline:2px solid #2563eb;background:rgba(37,99,235,.12)!important}
+.pdf-editor-status{padding:8px 12px;color:#cbd5e1;font-size:.85rem}.pdf-progress-modal{position:fixed;inset:0;background:rgba(0,0,0,.62);z-index:99999;display:grid;place-items:center}.pdf-progress-card{width:min(430px,calc(100vw - 40px));background:#fff;color:#111;border-radius:14px;padding:25px;box-shadow:0 20px 60px rgba(0,0,0,.4)}.pdf-progress-track{height:9px;background:#e5e7eb;border-radius:99px;overflow:hidden;margin-top:16px}.pdf-progress-bar{height:100%;width:0;background:#ef4444;transition:width .2s}.pdf-progress-modal[hidden]{display:none}
+.pdf-editor-panel{display:none;position:fixed;right:20px;bottom:20px;z-index:1000;background:#fff;color:#111;padding:14px;border-radius:10px;box-shadow:0 8px 30px #0005}.pdf-editor-panel input{margin:4px;padding:7px}
+@media(max-width:800px){.pdf-editor-body{grid-template-columns:85px 1fr}.pdf-editor-main{padding:12px}}
 </style>
 
-<div class="pdf-word-page">
-  <div class="pdf-word-hero"><h1>Edit PDF</h1><p>Turn your PDF into an editable Word-style document, edit it in your browser, then download it as PDF.</p><div class="pdf-word-privacy">Your PDF stays in your browser. It is not uploaded.</div></div>
-  <div id="pdf-word-upload" class="pdf-word-upload">
-    <div style="font-size:2.4rem">📄</div><h2>Drop your PDF here</h2><p>or choose a PDF file from your device</p>
+<div class="pdf-editor-page">
+  <div class="pdf-editor-hero">
+    <h1>Edit PDF</h1>
+    <p>Edit text and PDF pages directly in your browser, then save the PDF.</p>
+    <div>Your file stays in your browser.</div>
+  </div>
+
+  <div id="pdf-word-upload" class="pdf-editor-upload">
+    <div style="font-size:3rem">📄</div>
+    <h2>Choose a PDF to edit</h2>
+    <p>Drag and drop a PDF here or choose one from your device.</p>
     <button id="pdf-word-browse" class="primary" type="button">Choose PDF</button>
     <input id="pdf-word-file" type="file" accept="application/pdf,.pdf">
   </div>
 
-  <section id="pdf-word-workspace" class="pdf-word-workspace">
-    <div class="pdf-word-toolbar">
-      <button id="pdf-word-undo" type="button">↶</button><button id="pdf-word-redo" type="button">↷</button>
-      <span style="width:1px;height:25px;background:#334155"></span>
-      <select id="pdf-word-font" title="Font"><option value="">Font</option><option>Arial</option><option>Times New Roman</option><option>Georgia</option><option>Courier New</option></select>
-      <select id="pdf-word-size" title="Font size"><option value="">Size</option><option>8</option><option>10</option><option>11</option><option>12</option><option>14</option><option>16</option><option>18</option><option>20</option><option>24</option><option>28</option><option>32</option></select>
-      <button data-cmd="bold" type="button"><b>B</b></button><button data-cmd="italic" type="button"><i>I</i></button><button data-cmd="underline" type="button"><u>U</u></button>
-      <button data-cmd="justifyLeft" type="button">≡</button><button data-cmd="justifyCenter" type="button">≡</button><button data-cmd="justifyRight" type="button">≡</button>
-      <button id="pdf-word-add-table" type="button">Table</button>
-      <div class="spacer"></div><span id="pdf-word-page-label" style="color:#cbd5e1;font-size:.82rem"></span>
-      <button id="pdf-word-download" class="primary" type="button">Download PDF</button>
+  <section id="pdf-word-workspace" class="pdf-editor-workspace">
+    <div class="pdf-editor-toolbar">
+      <button id="pdf-word-undo" type="button">↶ Undo</button>
+      <button id="pdf-word-redo" type="button">↷ Redo</button>
+      <button id="pdf-add-text-tool" type="button">Add text</button>
+      <button id="pdf-cover-tool" type="button">Cover area</button>
+      <button id="pdf-rotate-tool" type="button">Rotate page</button>
+      <button id="pdf-delete-page-tool" type="button">Delete page</button>
+      <span class="spacer"></span>
+      <span id="pdf-word-page-label"></span>
+      <button id="pdf-word-download" class="primary" type="button">Save PDF</button>
     </div>
-    <div class="pdf-word-body">
-      <aside id="pdf-word-thumbs" class="pdf-word-thumbs"></aside>
-      <main class="pdf-word-main"><div id="pdf-word-document" class="pdf-word-document"></div></main>
+    <div class="pdf-editor-body">
+      <aside id="pdf-word-thumbs" class="pdf-editor-thumbs"></aside>
+      <main class="pdf-editor-main">
+        <div id="pdf-word-document" class="pdf-editor-document"></div>
+      </main>
     </div>
-    <div id="pdf-word-status" class="pdf-word-status">Ready.</div>
+    <div id="pdf-word-status" class="pdf-editor-status">Ready.</div>
   </section>
+
+  <div id="pdf-text-editor-panel" class="pdf-editor-panel">
+    <strong>Edit selected text</strong><br>
+    <input id="pdf-selected-text" readonly>
+    <input id="pdf-replacement-text" type="text">
+    <button id="pdf-apply-replacement" class="primary" type="button">Apply</button>
+    <button id="pdf-cancel-selection" type="button">Cancel</button>
+  </div>
+
+  <div id="pdf-add-editor-panel" class="pdf-editor-panel">
+    <strong>Add text</strong><br>
+    <input id="pdf-new-text" type="text" placeholder="Text">
+    <input id="pdf-new-size" type="number" value="12" min="1" style="width:70px">
+    <button id="pdf-place-text" class="primary" type="button">Place</button>
+    <button id="pdf-cancel-add" type="button">Cancel</button>
+  </div>
+
+  <div id="pdf-cover-editor-panel" class="pdf-editor-panel">
+    Click the page where the white cover should start.
+    <button id="pdf-cancel-cover" type="button">Cancel</button>
+  </div>
 </div>
 
-<script type="module">import "{{ '/assets/js/pdf/PdfEditorUnified.js' | relative_url }}?v=unified-editor-1";</script>
+<div id="pdf-progress-modal" class="pdf-progress-modal" hidden>
+  <div class="pdf-progress-card">
+    <strong id="pdf-progress-label">Processing PDF…</strong>
+    <div class="pdf-progress-track"><div id="pdf-progress-bar" class="pdf-progress-bar"></div></div>
+  </div>
+</div>
+
+<script type="module">import "{{ '/assets/js/pdf/PdfEditorUnified.js' | relative_url }}?v=unified-editor-2";</script>
