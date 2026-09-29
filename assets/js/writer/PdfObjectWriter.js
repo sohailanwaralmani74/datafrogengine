@@ -61,6 +61,9 @@ export class PdfObjectWriter {
         const encBytes = context.securityHandler.encrypt(valBytes, context.objNum, 0);
         return new TextEncoder().encode(`<${PdfHexString.fromBytes(encBytes).hex}>`);
       }
+      if (obj instanceof PdfString && obj.bytes instanceof Uint8Array) {
+        return PdfObjectWriter.escapeBytes(obj.bytes);
+      }
       return new TextEncoder().encode(PdfObjectWriter.escapeString(val));
     }
 
