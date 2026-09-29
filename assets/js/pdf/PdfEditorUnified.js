@@ -96,9 +96,11 @@ class UnifiedPdfEditor {
     }
 
     try {
-      this.progress(true, 'Opening PDF…', 10);\n      this.setStatus('Opening PDF…');
+      this.progress(true, 'Opening PDF…', 10);
+      this.setStatus('Opening PDF…');
       this.sourceBytes = new Uint8Array(await file.arrayBuffer());
-      this.progress(true, 'Reading PDF structure…', 35);\n      this.doc = PdfEngine.load(this.sourceBytes);
+      this.progress(true, 'Reading PDF structure…', 35);
+      this.doc = PdfEngine.load(this.sourceBytes);
       this.fileNameValue = file.name.replace(/\.pdf$/i, '') + '-edited.pdf';
       if (this.fileName) this.fileName.textContent = file.name;
 
@@ -109,11 +111,14 @@ class UnifiedPdfEditor {
       if (this.upload) this.upload.style.display = 'none';
       if (this.workspace) this.workspace.style.display = 'block';
 
-      this.progress(true, 'Rendering PDF…', 70);\n      await this.render();
-      this.progress(false);\n      this.setStatus('PDF loaded. The original PDF structure is being edited directly.');
+      this.progress(true, 'Rendering PDF…', 70);
+      await this.render();
+      this.progress(false);
+      this.setStatus('PDF loaded. The original PDF structure is being edited directly.');
     } catch (error) {
       this.doc = null;
-      this.progress(false);\n      this.setStatus('Could not open this PDF: ' + (error?.message || 'unsupported PDF structure'));
+      this.progress(false);
+      this.setStatus('Could not open this PDF: ' + (error?.message || 'unsupported PDF structure'));
     }
   }
 
@@ -358,7 +363,8 @@ class UnifiedPdfEditor {
     try {
       this.setStatus('Saving PDF…');
       const bytes = PdfEngine.save(this.doc);
-      this.sourceBytes = bytes;\n      this.progress(true, 'Preparing download…', 85);
+      this.sourceBytes = bytes;
+      this.progress(true, 'Preparing download…', 85);
 
       const blob = new Blob([bytes], { type: 'application/pdf' });
       const url = URL.createObjectURL(blob);
@@ -376,9 +382,11 @@ class UnifiedPdfEditor {
       }
 
       setTimeout(() => URL.revokeObjectURL(url), 1000);
-      this.progress(false);\n      this.setStatus('PDF saved.');
+      this.progress(false);
+      this.setStatus('PDF saved.');
     } catch (error) {
-      this.progress(false);\n      this.setStatus('Could not save the PDF: ' + (error?.message || 'PDF write error'));
+      this.progress(false);
+      this.setStatus('Could not save the PDF: ' + (error?.message || 'PDF write error'));
     }
   }
 
