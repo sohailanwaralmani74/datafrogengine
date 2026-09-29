@@ -228,6 +228,9 @@ export class PdfTextExtractor {
 
     output.push({
       text: decodedText,
+      rawBytes: str instanceof Uint8Array ? new Uint8Array(str) : new Uint8Array(Array.from(String(str)).map(c => c.charCodeAt(0) & 0xFF)),
+      fontResource: ts.fontName,
+      fontBaseName: font ? font.baseFont : (ts.fontName || 'Default'),
       page: pageNumber,
       x: Math.round(x * 100) / 100,
       y: Math.round(y * 100) / 100,
