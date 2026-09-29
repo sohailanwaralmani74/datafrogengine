@@ -92,6 +92,35 @@ export class CMap {
   }
 
   /**
+   * Encodes Unicode text back to the source character codes.
+   * This reverse mapping is intentionally conservative: only exact
+   * one-to-one Unicode mappings are encoded.
+   * @param {string} text
+   * @param {boolean} [twoByte=false]
+   * @returns {Uint8Array|null}
+   */
+  encodeString(text, twoByte = false) {
+    const reverse = new Map();
+    for (const [code, unicode] of this.#map.entries()) {
+      if (!reverse.has(unicode)) reverse.set(unicode, code);
+    }
+
+    const out = [];
+    for (const ch of String(text)) {
+      const code = reverse.get(ch);
+      if (code === undefined) return null;
+      if (twoByte) {
+        out.push((code >> 8) & 0xFF, code & 0xFF);
+      } else if (code <= 0xFF) {
+        out.push(code);
+      } else {
+        return null;
+      }
+    }
+    return new Uint8Array(out);
+  }
+
+  /**
    * Parses a CMap from a stream, byte buffer, or string.
    * 
    * @param {PdfStream|Uint8Array|string} source
