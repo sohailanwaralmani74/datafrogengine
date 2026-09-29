@@ -431,8 +431,19 @@ export class PdfCanvasRenderer {
 
     const ts = gstate.textState;
     const font = getFont(ts.fontName);
-    const decodedText = font ? font.decodeString(str) : (typeof str === 'string' ? str : '');
+    let decodedText = font ? font.decodeString(str) : (typeof str === 'string' ? str : '');
     if (decodedText.length === 0) return;
+
+    // Some PDFs store text for a single-byte font as UTF-16BE-style
+    // byte pairs (00 44 00 65 ...). When the font dictionary does not
+    // expose a usable two-byte CMap, the generic decoder can leave the
+    // NUL bytes in the string. Canvas then renders those control
+    // characters as missing-glyph boxes before every real character.
+    // PDF text is not supposed to display those NULs, so normalize this
+    // representation before sending it to Canvas.
+    if (decodedText.indexOf('\\u0000') !== -1) {
+      decodedText = decodedText.replace(/\\u0000/g, '');
+    }
 
     const fontSize = ts.fontSize || 12;
     const hScale = (ts.horizontalScaling || 100) / 100;
