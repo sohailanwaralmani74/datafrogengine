@@ -30,7 +30,8 @@ class UnifiedPdfEditor {
     this.selected = null;
     this.history = [];
     this.future = [];
-    this.drag = null;\n    this.mode = 'select';
+    this.drag = null;
+    this.mode = 'select';
 
     this.bind();
   }
