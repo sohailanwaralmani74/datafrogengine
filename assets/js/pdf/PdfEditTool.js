@@ -61,7 +61,7 @@ class PdfEditTool {
   selectItem(item,el,text){this.selectedItem={item,el,text};this.stage.querySelectorAll('.pdf-text-overlay.selected').forEach(x=>x.classList.remove('selected'));el.classList.add('selected');this.selectedText.value=text;this.replacement.value=text;this.showPanel('text');this.setStatus('Text selected. Change it on the right and apply.')}
   applyReplacement(){
     if(!this.selectedItem||!this.doc)return;const search=this.selectedItem.text,replacement=this.replacement.value;if(!search)return;
-    this.mutate('',()=>{const result=PdfTextEditor.replaceText(this.doc.getPage(this.pageIndex),search,replacement,{all:false});if(!result.changed)throw new Error(result.unsupported?'This text encoding cannot be safely rewritten.':'The selected text could not be rewritten.');this.setStatus('Text changed.')});
+    this.mutate('',()=>{const result=PdfTextEditor.replaceText(this.doc.getPage(this.pageIndex),search,replacement,{all:false,textItem:this.selectedItem.item});if(!result.changed)throw new Error(result.unsupported?'This text encoding cannot be safely rewritten.':'The selected text could not be rewritten.');this.setStatus('Text changed.')});
   }
   onStageClick(e){
     if(e.target.closest('.pdf-text-overlay'))return;
