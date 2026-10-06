@@ -436,13 +436,14 @@ class PdfWordEditor {
     if (!this.doc) return;
     this.pushHistory();
     const base = this.pages[this.pages.length - 1] || { width: 612, height: 792 };
+    const blank = this.blankJpeg(base.width, base.height);
     this.pages.push({
       width: base.width,
       height: base.height,
       rotation: 0,
-      background: this.blankJpeg(base.width, base.height).bytes,
-      backgroundWidth: this.blankJpeg(base.width, base.height).width,
-      backgroundHeight: this.blankJpeg(base.width, base.height).height,
+      background: blank.bytes,
+      backgroundWidth: blank.width,
+      backgroundHeight: blank.height,
       items: [],
       hasEditableText: false
     });
