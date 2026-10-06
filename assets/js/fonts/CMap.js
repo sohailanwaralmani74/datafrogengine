@@ -77,14 +77,17 @@ export class CMap {
         if (i + 1 < bytes.length) {
           const code = (bytes[i] << 8) | bytes[i + 1];
           const mapped = this.mapCode(code);
-          result += mapped !== null ? mapped : String.fromCharCode(code);
+          // An unmapped CID is not a Unicode character. Rendering it as
+          // String.fromCharCode(code) creates visible tofu/square glyphs in
+          // the browser. Only emit a character when the CMap actually knows it.
+          if (mapped !== null) result += mapped;
         }
       }
     } else {
       for (let i = 0; i < bytes.length; i++) {
         const code = bytes[i];
         const mapped = this.mapCode(code);
-        result += mapped !== null ? mapped : String.fromCharCode(code);
+        if (mapped !== null) result += mapped;
       }
     }
 
