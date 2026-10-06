@@ -82,6 +82,7 @@ class UnifiedPdfEditor {
     document.getElementById('pdf-cancel-cover')?.addEventListener('click', () => this.setMode('select'));
 
     this.documentEl?.addEventListener('click', e => this.onPageClick(e));
+    this.documentEl?.addEventListener('dblclick', e => this.onDocumentDoubleClick(e));
     this.documentEl?.addEventListener('pointerdown', e => this.onPointerDown(e));
   }
 
@@ -218,7 +219,7 @@ class UnifiedPdfEditor {
       const maxHeight = Math.max(...row.items.map(i => Number(i?.height ?? i?.fontSize ?? 12)));
       return {
         items: row.items,
-        text: row.items.map(i => String(i?.text ?? '')).join(''),
+        text: this.assembleRowText(row.items),
         x: firstX,
         y: row.baseline,
         width: Math.max(1, lastX + lastWidth - firstX),
@@ -370,7 +371,7 @@ class UnifiedPdfEditor {
 
     return {
       items,
-      text: items.map(i => String(i?.text ?? '')).join('')
+      text: this.assembleRowText(items)
     };
   }
 
