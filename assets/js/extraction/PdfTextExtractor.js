@@ -195,7 +195,7 @@ export class PdfTextExtractor {
 
     const ts = gstate.textState;
     const font = getFont(ts.fontName);
-    const decodedText = font ? font.decodeString(str) : (typeof str === 'string' ? str : '');
+    const decodedText = PdfTextExtractor.#cleanDecodedText(font ? font.decodeString(str) : (typeof str === 'string' ? str : ''));
     if (decodedText.length === 0) {
       return;
     }
@@ -248,6 +248,13 @@ export class PdfTextExtractor {
    * Applies kerning offset to text matrix.
    * @private
    */
+  static #cleanDecodedText(text) {
+    return String(text ?? '')
+      .replace(/[\\u0000-\\u0008\\u000B\\u000C\\u000E-\\u001F\\u007F]/g, '')
+      .replace(/\\uFFFD/g, '')
+      .replace(/[\\u200B-\\u200D\\u2060\\uFEFF]/g, '');
+  }
+
   static #normalizeColor(color) {
     if (!Array.isArray(color)) return [0, 0, 0];
     if (color.length === 1) return [color[0], color[0], color[0]];
