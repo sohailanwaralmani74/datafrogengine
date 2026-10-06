@@ -28,7 +28,7 @@ export class PdfCanvasRenderer {
       throw new PdfInvalidArgumentException('page', page, 'PdfPage');
     }
 
-    const { scale = 1.0, rotation = null, background = '#ffffff' } = options;
+    const { scale = 1.0, rotation = null, background = '#ffffff', renderText = true } = options;
     const viewport = PdfViewport.fromPage(page, { scale, rotation });
 
     let ctx;
@@ -59,7 +59,7 @@ export class PdfCanvasRenderer {
     const contentStreams = page.getContents();
     if (contentStreams && contentStreams.length > 0) {
       const operators = PdfContentParser.parse(contentStreams);
-      PdfCanvasRenderer.#executeOperators(operators, page, ctx);
+      PdfCanvasRenderer.#executeOperators(operators, page, ctx, renderText);
     }
 
     ctx.restore();
@@ -70,7 +70,7 @@ export class PdfCanvasRenderer {
    * Executes parsed PDF operators on Canvas context.
    * @private
    */
-  static #executeOperators(operators, page, ctx) {
+  static #executeOperators(operators, page, ctx, renderText = true) {
     const resources = page.getResources();
     const doc = page.document;
 
@@ -378,14 +378,14 @@ export class PdfCanvasRenderer {
 
         case 'Tj': {
           const str = op.getArg(0);
-          PdfCanvasRenderer.#renderTextString(str, gstate, getFont, ctx);
+          if (renderText) PdfCanvasRenderer.#renderTextString(str, gstate, getFont, ctx);
           break;
         }
 
         case '\'': {
           gstate.textState.nextLine();
           const str = op.getArg(0);
-          PdfCanvasRenderer.#renderTextString(str, gstate, getFont, ctx);
+          if (renderText) PdfCanvasRenderer.#renderTextString(str, gstate, getFont, ctx);
           break;
         }
 
@@ -394,7 +394,7 @@ export class PdfCanvasRenderer {
           gstate.textState.charSpacing = op.getNumber(1);
           gstate.textState.nextLine();
           const str = op.getArg(2);
-          PdfCanvasRenderer.#renderTextString(str, gstate, getFont, ctx);
+          if (renderText) PdfCanvasRenderer.#renderTextString(str, gstate, getFont, ctx);
           break;
         }
 
@@ -409,7 +409,7 @@ export class PdfCanvasRenderer {
                 PdfCanvasRenderer.#applyKerning(item.value, gstate);
               } else {
                 const str = (item && item.isString && item.isString()) ? item.value : item;
-                PdfCanvasRenderer.#renderTextString(str, gstate, getFont, ctx);
+                if (renderText) PdfCanvasRenderer.#renderTextString(str, gstate, getFont, ctx);
               }
             }
           }
