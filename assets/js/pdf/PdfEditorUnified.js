@@ -1,44 +1,37 @@
 /**
- * Unified PDF Editor
- * Uses the existing DataFrog PDF document, content, text, image, annotation,
- * form, page-operation and writer engines. The PDF document remains the
- * editable source of truth; no PDF -> HTML -> PDF conversion is performed.
+ * DataFrog Word-Style PDF Editor
+ *
+ * PDF -> fixed-page editable document -> PDF.
+ * The original PDF is never exposed as a collection of character boxes.
+ * Non-text page artwork is rendered without text and used as the page artwork;
+ * recovered PDF text becomes normal contenteditable paragraphs.
  */
-
 import { PdfEngine } from './PdfEngine.js';
-import { PdfWriter } from '../writer/PdfWriter.js';
-import { PdfEditor } from './PdfEditor.js';
-import { PdfTextEditor } from './PdfTextEditor.js';
-import { PdfTextExtractor } from '../extraction/PdfTextExtractor.js';
-import { PdfImageExtractor } from '../images/PdfImageExtractor.js';
 
-class UnifiedPdfEditor {
+class PdfWordEditor {
   constructor() {
-    this.fileInput = document.getElementById('pdf-word-file') || document.getElementById('pdf-file-input');
-    this.upload = document.getElementById('pdf-word-upload') || document.getElementById('pdf-edit-dropzone');
-    this.workspace = document.getElementById('pdf-word-workspace') || document.getElementById('pdf-edit-workspace');
-    this.documentEl = document.getElementById('pdf-word-document') || document.getElementById('pdf-stage');
-    this.thumbs = document.getElementById('pdf-word-thumbs') || document.getElementById('pdf-thumbs');
-    this.statusEl = document.getElementById('pdf-word-status') || document.getElementById('edit-status');
-    this.fileName = document.getElementById('pdf-edit-file-name');
-    this.download = document.getElementById('edit-download');
+    this.fileInput = document.getElementById('pdf-word-file');
+    this.upload = document.getElementById('pdf-word-upload');
+    this.workspace = document.getElementById('pdf-word-workspace');
+    this.documentEl = document.getElementById('pdf-word-document');
+    this.thumbs = document.getElementById('pdf-word-thumbs');
+    this.statusEl = document.getElementById('pdf-word-status');
 
     this.doc = null;
-    this.sourceBytes = null;
-    this.fileNameValue = 'edited.pdf';
+    this.fileName = 'edited.pdf';
+    this.pages = [];
     this.pageIndex = 0;
-    this.selected = null;
     this.history = [];
     this.future = [];
-    this.drag = null;
-    this.mode = 'select';
+    this.dirty = false;
+    this.renderScale = 2;
+    this.activeBlock = null;
 
     this.bind();
   }
 
   bind() {
-    const browse = document.getElementById('pdf-word-browse') || document.getElementById('btn-browse-file');
-    browse?.addEventListener('click', () => this.fileInput?.click());
+    document.getElementById('pdf-word-browse')?.addEventListener('click', () => this.fileInput?.click());
     this.fileInput?.addEventListener('change', e => {
       const file = e.target.files?.[0];
       if (file) this.load(file);
@@ -57,517 +50,506 @@ class UnifiedPdfEditor {
     });
 
     document.getElementById('pdf-word-download')?.addEventListener('click', () => this.save());
-    document.getElementById('pdf-save')?.addEventListener('click', () => this.save());
-
     document.getElementById('pdf-word-undo')?.addEventListener('click', () => this.undo());
     document.getElementById('pdf-word-redo')?.addEventListener('click', () => this.redo());
-    document.getElementById('pdf-undo')?.addEventListener('click', () => this.undo());
-    document.getElementById('pdf-redo')?.addEventListener('click', () => this.redo());
+    document.getElementById('pdf-word-prev')?.addEventListener('click', () => this.goPage(this.pageIndex - 1));
+    document.getElementById('pdf-word-next')?.addEventListener('click', () => this.goPage(this.pageIndex + 1));
+    document.getElementById('pdf-word-add-page')?.addEventListener('click', () => this.addPage());
 
-    document.getElementById('pdf-prev-page')?.addEventListener('click', () => this.goPage(this.pageIndex - 1));
-    document.getElementById('pdf-next-page')?.addEventListener('click', () => this.goPage(this.pageIndex + 1));
-    document.getElementById('edit-page-number')?.addEventListener('change', e => this.goPage((Number(e.target.value) || 1) - 1));
+    document.getElementById('pdf-word-bold')?.addEventListener('click', () => this.exec('bold'));
+    document.getElementById('pdf-word-italic')?.addEventListener('click', () => this.exec('italic'));
+    document.getElementById('pdf-word-align-left')?.addEventListener('click', () => this.exec('justifyLeft'));
+    document.getElementById('pdf-word-align-center')?.addEventListener('click', () => this.exec('justifyCenter'));
+    document.getElementById('pdf-word-align-right')?.addEventListener('click', () => this.exec('justifyRight'));
 
-    document.getElementById('pdf-delete-page-tool')?.addEventListener('click', () => this.deletePage());
-    document.getElementById('pdf-rotate-tool')?.addEventListener('click', () => this.mutate('Page rotated.', () => PdfEditor.rotatePage(this.doc, this.pageIndex, 90)));
+    document.getElementById('pdf-word-font-size')?.addEventListener('change', e => {
+      const value = Number(e.target.value);
+      if (!value || !this.activeBlock) return;
+      this.pushHistory();
+      this.activeBlock.style.fontSize = value + 'px';
+      this.markDirty();
+    });
 
-    document.getElementById('pdf-apply-replacement')?.addEventListener('click', () => this.replaceSelected());
-    document.getElementById('pdf-cancel-selection')?.addEventListener('click', () => this.clearSelection());
+    document.getElementById('pdf-word-font')?.addEventListener('change', e => {
+      if (!this.activeBlock || !e.target.value) return;
+      this.pushHistory();
+      this.activeBlock.style.fontFamily = e.target.value;
+      this.markDirty();
+    });
 
-    document.getElementById('pdf-place-text')?.addEventListener('click', () => this.addText());
-    document.getElementById('pdf-add-text-tool')?.addEventListener('click', () => this.setMode('add'));
-    document.getElementById('pdf-select-tool')?.addEventListener('click', () => this.setMode('select'));
-    document.getElementById('pdf-cover-tool')?.addEventListener('click', () => this.setMode('cover'));
-    document.getElementById('pdf-cancel-add')?.addEventListener('click', () => this.setMode('select'));
-    document.getElementById('pdf-cancel-cover')?.addEventListener('click', () => this.setMode('select'));
-
-    this.documentEl?.addEventListener('click', e => this.onPageClick(e));
-    this.documentEl?.addEventListener('dblclick', e => this.onDocumentDoubleClick(e));
-    this.documentEl?.addEventListener('pointerdown', e => this.onPointerDown(e));
+    document.addEventListener('selectionchange', () => {
+      const selection = window.getSelection();
+      if (!selection?.anchorNode) return;
+      const el = selection.anchorNode.nodeType === 1
+        ? selection.anchorNode
+        : selection.anchorNode.parentElement;
+      const block = el?.closest?.('.pdf-word-text');
+      if (block) this.activeBlock = block;
+    });
   }
 
   setStatus(message) {
     if (this.statusEl) this.statusEl.textContent = message;
-    const label = document.getElementById('pdf-progress-label');
-    if (label) label.textContent = message;
   }
 
-  progress(show, message = 'Processing PDF…', percent = 0) {
+  progress(show, message, percent) {
     const modal = document.getElementById('pdf-progress-modal');
     const bar = document.getElementById('pdf-progress-bar');
     const label = document.getElementById('pdf-progress-label');
     if (!modal) return;
     modal.hidden = !show;
-    if (label) label.textContent = message;
-    if (bar) bar.style.width = Math.max(0, Math.min(100, percent)) + '%';
+    if (label) label.textContent = message || 'Processing PDF…';
+    if (bar && Number.isFinite(percent)) bar.style.width = Math.max(0, Math.min(100, percent)) + '%';
   }
 
   async load(file) {
-    if (!file.name.toLowerCase().endsWith('.pdf')) {
+    if (!/\.pdf$/i.test(file.name)) {
       this.setStatus('Please choose a PDF file.');
       return;
     }
 
     try {
-      this.progress(true, 'Opening PDF…', 10);
-      this.setStatus('Opening PDF…');
-      this.sourceBytes = new Uint8Array(await file.arrayBuffer());
-      this.progress(true, 'Reading PDF structure…', 35);
-      this.doc = PdfEngine.load(this.sourceBytes);
-      this.fileNameValue = file.name.replace(/\.pdf$/i, '') + '-edited.pdf';
-      if (this.fileName) this.fileName.textContent = file.name;
-
+      this.progress(true, 'Opening PDF…', 5);
+      const bytes = new Uint8Array(await file.arrayBuffer());
+      this.doc = PdfEngine.load(bytes);
+      this.fileName = file.name.replace(/\.pdf$/i, '') + '-edited.pdf';
+      this.pages = [];
       this.history = [];
       this.future = [];
       this.pageIndex = 0;
+      this.dirty = false;
 
-      if (this.upload) this.upload.style.display = 'none';
-      if (this.workspace) this.workspace.style.display = 'block';
+      const count = this.doc.getPageCount();
+      for (let i = 0; i < count; i++) {
+        this.progress(true, 'Converting page ' + (i + 1) + ' of ' + count + '…', 10 + Math.round(i / count * 80));
+        this.pages.push(await this.buildPageModel(i));
+      }
 
-      this.progress(true, 'Rendering PDF…', 70);
+      this.upload.style.display = 'none';
+      this.workspace.style.display = 'block';
       await this.render();
       this.progress(false);
-      this.setStatus('PDF loaded. The original PDF structure is being edited directly.');
+      this.setStatus('PDF is ready. Click text and edit it like a document.');
     } catch (error) {
-      this.doc = null;
       this.progress(false);
-      this.setStatus('Could not open this PDF: ' + (error?.message || 'unsupported PDF structure'));
+      this.doc = null;
+      this.setStatus('Could not open this PDF: ' + (error?.message || 'unsupported PDF'));
     }
   }
 
-  async render() {
-    if (!this.doc || !this.documentEl) return;
-
-    const page = this.doc.getPage(this.pageIndex);
-    const viewport = page.getViewport({ scale: 1 });
-    const width = viewport.width;
-    const height = viewport.height;
-
-    this.documentEl.innerHTML = '';
-
-    const wrapper = document.createElement('section');
-    wrapper.className = 'pdf-unified-page';
-    wrapper.dataset.page = String(this.pageIndex);
-    wrapper.style.position = 'relative';
-    wrapper.style.width = width + 'px';
-    wrapper.style.height = height + 'px';
-    wrapper.style.background = '#fff';
-    wrapper.style.margin = '0 auto 28px';
-    wrapper.style.boxShadow = '0 8px 28px rgba(0,0,0,.25)';
-
+  async buildPageModel(index) {
+    const page = this.doc.getPage(index);
+    const size = page.getSize();
     const canvas = document.createElement('canvas');
-    canvas.className = 'pdf-unified-canvas';
-    canvas.style.display = 'block';
-    canvas.style.width = width + 'px';
-    canvas.style.height = height + 'px';
 
-    try {
-      page.renderToCanvas(canvas, { scale: 1, background: '#ffffff' });
-      wrapper.appendChild(canvas);
-    } catch (error) {
-      this.setStatus('Page rendering failed: ' + (error?.message || 'renderer error'));
-      return;
-    }
+    page.renderToCanvas(canvas, {
+      scale: this.renderScale,
+      background: '#ffffff',
+      renderText: false
+    });
 
-    // The PDF canvas is the visual document. Do not create one DOM box per
-    // character, word, or extracted text item. Text selection/editing is
-    // handled from the document itself through the editor panel.
-    this.currentPageItems = [];
-    try {
-      this.currentPageItems = PdfEngine.extractTextItems(this.doc, this.pageIndex) || [];
-    } catch (error) {
-      this.setStatus('Text extraction warning: ' + (error?.message || 'unable to extract text'));
-    }
+    const jpeg = this.canvasToBytes(canvas, 'image/jpeg', 0.96);
+    const items = PdfEngine.extractTextItems(this.doc, index) || [];
+    const lines = this.groupItems(items, size);
 
-    this.documentEl.appendChild(wrapper);
-    this.renderThumbs();
-    this.updatePageControls();
+    return {
+      width: size.width,
+      height: size.height,
+      rotation: page.getRotation(),
+      background: jpeg,
+      items: lines,
+      hasEditableText: lines.length > 0
+    };
   }
 
-  groupTextIntoRows(items) {
-    const usable = items.filter(item => String(item?.text ?? '').trim());
-    usable.sort((a, b) => {
-      const ay = Number(a?.y ?? a?.top ?? a?.origin?.y ?? 0);
-      const by = Number(b?.y ?? b?.top ?? b?.origin?.y ?? 0);
-      const ax = Number(a?.x ?? a?.left ?? a?.origin?.x ?? 0);
-      const bx = Number(b?.x ?? b?.left ?? b?.origin?.x ?? 0);
-      return Math.abs(ay - by) < 3 ? ax - bx : ay - by;
-    });
+  canvasToBytes(canvas, type, quality) {
+    const dataUrl = canvas.toDataURL(type, quality);
+    const base64 = dataUrl.split(',')[1];
+    const binary = atob(base64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    return bytes;
+  }
+
+  groupItems(items, size) {
+    const usable = items
+      .filter(item => String(item?.text ?? '').length > 0)
+      .map(item => ({ ...item }))
+      .sort((a, b) => {
+        const ay = Number(a.y || 0);
+        const by = Number(b.y || 0);
+        if (Math.abs(by - ay) > Math.max(3, Math.min(a.height || 12, b.height || 12) * 0.45)) {
+          return by - ay;
+        }
+        return Number(a.x || 0) - Number(b.x || 0);
+      });
 
     const rows = [];
     for (const item of usable) {
-      const y = Number(item?.y ?? item?.top ?? item?.origin?.y ?? 0);
-      const height = Number(item?.height ?? item?.fontSize ?? 12);
-      let row = rows.find(r => Math.abs(r.baseline - y) <= Math.max(3, height * 0.35));
+      const y = Number(item.y || 0);
+      const h = Number(item.height || item.fontSize || 12);
+      let row = rows.find(r => Math.abs(r.y - y) <= Math.max(3, h * 0.45));
       if (!row) {
-        row = { baseline: y, items: [] };
+        row = { y, items: [] };
         rows.push(row);
       }
       row.items.push(item);
-      row.items.sort((a,b) =>
-        Number(a?.x ?? a?.left ?? a?.origin?.x ?? 0) -
-        Number(b?.x ?? b?.left ?? b?.origin?.x ?? 0)
-      );
     }
 
+    rows.sort((a, b) => b.y - a.y);
+
     return rows.map(row => {
+      row.items.sort((a, b) => Number(a.x || 0) - Number(b.x || 0));
       const first = row.items[0];
       const last = row.items[row.items.length - 1];
-      const firstX = Number(first?.x ?? first?.left ?? first?.origin?.x ?? 0);
-      const lastX = Number(last?.x ?? last?.left ?? last?.origin?.x ?? firstX);
-      const lastWidth = Number(last?.width ?? last?.w ?? 0);
-      const maxHeight = Math.max(...row.items.map(i => Number(i?.height ?? i?.fontSize ?? 12)));
+      const x = Number(first.x || 0);
+      const right = Number(last.x || 0) + Number(last.width || 0);
+      const height = Math.max(...row.items.map(i => Number(i.height || i.fontSize || 12)));
+      const text = this.joinItems(row.items);
+
       return {
-        items: row.items,
-        text: this.assembleRowText(row.items),
-        x: firstX,
-        y: row.baseline,
-        width: Math.max(1, lastX + lastWidth - firstX),
-        height: Math.max(8, maxHeight)
+        id: crypto.randomUUID ? crypto.randomUUID() : String(Math.random()),
+        text,
+        x,
+        y: Number(row.y || 0),
+        top: size.height - Number(row.y || 0) - height,
+        width: Math.max(20, right - x),
+        height: Math.max(10, height),
+        fontSize: Number(first.fontSize || height || 12),
+        font: this.normalFont(first.fontName || first.fontBaseName || 'Helvetica'),
+        color: this.pdfColor(first.color),
+        bold: /bold/i.test(first.fontName || first.fontBaseName || ''),
+        italic: /italic|oblique/i.test(first.fontName || first.fontBaseName || ''),
+        rotate: this.rotationFromItem(first),
+        align: 'left'
       };
     });
   }
 
-  rowBox(row, size) {
-    if (!row || !Number.isFinite(row.x) || !Number.isFinite(row.y)) return null;
-    const top = row.items[0]?.yIsTop === true || row.items[0]?.coordinateSystem === 'top-left'
-      ? row.y : size.height - row.y - row.height;
-    return { x: row.x, y: top, width: row.width, height: row.height };
-  }
+  joinItems(items) {
+    let text = '';
+    let previous = null;
 
-  selectRow(row, element) {
-    this.selected = { row, item: row.items[0], element };
-        const selected = document.getElementById('pdf-selected-text');
-    const replacement = document.getElementById('pdf-replacement-text');
-    if (selected) {
-      selected.value = row.text;
-      selected.readOnly = true;
+    for (const item of items) {
+      const current = String(item.text ?? '');
+      if (previous) {
+        const gap = Number(item.x || 0) - (Number(previous.x || 0) + Number(previous.width || 0));
+        const average = Number(previous.width || 0) / Math.max(1, String(previous.text || '').length);
+        if (gap > Math.max(1.5, average * 0.35) &&
+            !previous.text.endsWith(' ') && !current.startsWith(' ')) {
+          text += ' ';
+        }
+      }
+      text += current;
+      previous = item;
     }
-    if (replacement) {
-      replacement.value = row.text;
-      replacement.focus();
-      replacement.select();
+
+    return text;
+  }
+
+  normalFont(name) {
+    const n = String(name || '').replace(/^\+/, '');
+    if (/courier/i.test(n)) return /bold/i.test(n) ? 'Courier-Bold' : 'Courier';
+    if (/times/i.test(n)) {
+      if (/bold.*italic|italic.*bold/i.test(n)) return 'Times-BoldItalic';
+      if (/bold/i.test(n)) return 'Times-Bold';
+      if (/italic|oblique/i.test(n)) return 'Times-Italic';
+      return 'Times-Roman';
     }
-    this.showPanel('text');
-    this.setStatus('Row selected. Edit the complete line, then apply.');
+    if (/helvetica|arial|sans/i.test(n)) {
+      if (/bold.*oblique|oblique.*bold|bold.*italic|italic.*bold/i.test(n)) return 'Helvetica-BoldOblique';
+      if (/bold/i.test(n)) return 'Helvetica-Bold';
+      if (/italic|oblique/i.test(n)) return 'Helvetica-Oblique';
+      return 'Helvetica';
+    }
+    if (/symbol/i.test(n)) return 'Symbol';
+    return 'Helvetica';
   }
 
-  itemBox(item, size) {
-    const x = Number(item?.x ?? item?.left ?? item?.origin?.x);
-    const y = Number(item?.y ?? item?.top ?? item?.origin?.y);
-    if (!Number.isFinite(x) || !Number.isFinite(y)) return null;
-
-    const width = Number(item?.width ?? item?.w ?? item?.bbox?.width ?? 20);
-    const height = Number(item?.height ?? item?.h ?? item?.bbox?.height ?? item?.fontSize ?? 12);
-    const top = item?.yIsTop === true || item?.coordinateSystem === 'top-left'
-      ? y
-      : size.height - y - height;
-
-    return { x, y: top, width, height };
+  pdfColor(color) {
+    if (Array.isArray(color) && color.length >= 3) {
+      return color.map(v => Math.max(0, Math.min(1, Number(v) || 0)));
+    }
+    return [0, 0, 0];
   }
 
-  selectText(item, element) {
-    this.selected = { item, element };
-    this.documentEl.querySelectorAll('.pdf-unified-text-hit.selected')
-      .forEach(el => el.classList.remove('selected'));
-    element.classList.add('selected');
-
-    const selected = document.getElementById('pdf-selected-text');
-    const replacement = document.getElementById('pdf-replacement-text');
-    if (selected) selected.value = item.text || '';
-    if (replacement) replacement.value = item.text || '';
-
-    this.showPanel('text');
-    this.setStatus('Text selected. Replace it without rebuilding the page.');
+  rotationFromItem(item) {
+    const m = item?.matrix;
+    if (!Array.isArray(m) || m.length < 4) return 0;
+    let angle = Math.atan2(Number(m[1]), Number(m[0])) * 180 / Math.PI;
+    if (!Number.isFinite(angle)) angle = 0;
+    return Math.round(angle);
   }
 
-  replaceSelected() {
-    if (!this.doc || !this.selected) return;
+  async render() {
+    const model = this.pages[this.pageIndex];
+    if (!model || !this.documentEl) return;
 
-    const replacement = document.getElementById('pdf-replacement-text')?.value ?? '';
-    const row = this.selected.row;
-    const original = row.text;
+    this.documentEl.innerHTML = '';
+    const page = document.createElement('section');
+    page.className = 'pdf-word-page';
+    page.style.width = model.width + 'px';
+    page.style.height = model.height + 'px';
 
-    this.mutate('Row changed.', () => {
-      const result = PdfTextEditor.replaceText(this.doc.getPage(this.pageIndex), original, replacement, {
-        all: false,
-        textItems: row.items
-      });
+    const background = document.createElement('img');
+    background.className = 'pdf-word-background';
+    background.alt = '';
+    background.draggable = false;
+    background.src = this.bytesToDataUrl(model.background, 'image/jpeg');
+    page.appendChild(background);
 
-      if (!result.changed) {
-        throw new Error(result.details?.[0]?.message || 'The selected row could not be rewritten.');
+    for (const item of model.items) {
+      page.appendChild(this.createTextBlock(item, model));
+    }
+
+    this.documentEl.appendChild(page);
+    this.renderThumbs();
+    this.updatePageControls();
+    this.updateHistoryButtons();
+  }
+
+  bytesToDataUrl(bytes, mime) {
+    let binary = '';
+    const chunk = 0x8000;
+    for (let i = 0; i < bytes.length; i += chunk) {
+      binary += String.fromCharCode(...bytes.subarray(i, Math.min(i + chunk, bytes.length)));
+    }
+    return 'data:' + mime + ';base64,' + btoa(binary);
+  }
+
+  createTextBlock(item, model) {
+    const el = document.createElement('div');
+    el.className = 'pdf-word-text';
+    el.contentEditable = 'true';
+    el.spellcheck = false;
+    el.textContent = item.text;
+    el.dataset.id = item.id;
+
+    el.style.left = item.x + 'px';
+    el.style.top = item.top + 'px';
+    el.style.minWidth = Math.max(20, item.width) + 'px';
+    el.style.minHeight = Math.max(10, item.height) + 'px';
+    el.style.fontSize = item.fontSize + 'px';
+    el.style.fontFamily = item.font;
+    el.style.fontWeight = item.bold ? '700' : '400';
+    el.style.fontStyle = item.italic ? 'italic' : 'normal';
+    el.style.color = this.rgbCss(item.color);
+    el.style.textAlign = item.align || 'left';
+    el.style.transform = item.rotate ? 'rotate(' + item.rotate + 'deg)' : '';
+    el.style.transformOrigin = 'left top';
+
+    el.addEventListener('focus', () => {
+      this.activeBlock = el;
+      this.pushHistory();
+      el.classList.add('editing');
+    });
+    el.addEventListener('blur', () => {
+      el.classList.remove('editing');
+      this.syncBlock(el);
+      this.markDirty();
+    });
+    el.addEventListener('input', () => {
+      this.syncBlock(el);
+      this.markDirty();
+    });
+    el.addEventListener('keydown', e => {
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        document.execCommand('insertText', false, '    ');
       }
     });
+
+    return el;
   }
 
-  addText() {
-    if (!this.doc) return;
-
-    const text = document.getElementById('pdf-new-text')?.value?.trim();
-    if (!text) {
-      this.setStatus('Enter the text first.');
-      return;
-    }
-
-    const size = Number(document.getElementById('pdf-new-size')?.value) || 12;
-    const page = this.doc.getPage(this.pageIndex);
-    const box = page.getSize();
-
-    this.mutate('Text added.', () => {
-      page.drawText(text, {
-        x: 50,
-        y: box.height - 70,
-        size,
-        font: 'Helvetica',
-        color: '#000000'
-      });
-    });
+  rgbCss(color) {
+    const r = Math.round((color?.[0] ?? 0) * 255);
+    const g = Math.round((color?.[1] ?? 0) * 255);
+    const b = Math.round((color?.[2] ?? 0) * 255);
+    return 'rgb(' + r + ',' + g + ',' + b + ')';
   }
 
-  onDocumentDoubleClick(event) {
-    if (!this.doc || !this.currentPageItems?.length) return;
+  syncBlock(el) {
+    const model = this.pages[this.pageIndex];
+    const item = model?.items.find(x => x.id === el.dataset.id);
+    if (!item) return;
 
-    const pageEl = this.documentEl.querySelector('.pdf-unified-page');
-    if (!pageEl) return;
-
-    const rect = pageEl.getBoundingClientRect();
-    const page = this.doc.getPage(this.pageIndex);
-    const size = page.getSize();
-    const x = event.clientX - rect.left;
-    const yTop = event.clientY - rect.top;
-    const yPdf = size.height - yTop;
-
-    const candidates = this.currentPageItems.filter(item => {
-      const ix = Number(item?.x ?? item?.left ?? item?.origin?.x);
-      const iy = Number(item?.y ?? item?.top ?? item?.origin?.y);
-      const iw = Number(item?.width ?? item?.w ?? 0);
-      const ih = Number(item?.height ?? item?.fontSize ?? 12);
-      return Number.isFinite(ix) && Number.isFinite(iy) &&
-        x >= ix - 4 && x <= ix + iw + 4 &&
-        yPdf >= iy - ih && yPdf <= iy + ih;
-    });
-
-    if (!candidates.length) return;
-
-    const row = this.buildRowAtItem(candidates[0]);
-    if (row) {
-      this.selectRow(row, null);
-      this.setStatus('Text row selected. Edit it in the editor panel.');
-    }
+    item.text = el.innerText.replace(/\r/g, '');
+    item.fontSize = parseFloat(getComputedStyle(el).fontSize) || item.fontSize;
+    item.font = this.normalFont(getComputedStyle(el).fontFamily || item.font);
+    item.bold = getComputedStyle(el).fontWeight === '700' || getComputedStyle(el).fontWeight === 'bold';
+    item.italic = getComputedStyle(el).fontStyle === 'italic';
+    item.align = getComputedStyle(el).textAlign || 'left';
   }
 
-  buildRowAtItem(item) {
-    const y = Number(item?.y ?? item?.top ?? item?.origin?.y);
-    const height = Number(item?.height ?? item?.fontSize ?? 12);
-    if (!Number.isFinite(y)) return null;
-
-    const items = this.currentPageItems.filter(candidate => {
-      const cy = Number(candidate?.y ?? candidate?.top ?? candidate?.origin?.y);
-      return Number.isFinite(cy) && Math.abs(cy - y) <= Math.max(3, height * 0.35);
-    }).sort((a,b) =>
-      Number(a?.x ?? a?.left ?? a?.origin?.x ?? 0) -
-      Number(b?.x ?? b?.left ?? b?.origin?.x ?? 0)
-    );
-
-    return {
-      items,
-      text: this.assembleRowText(items)
-    };
+  exec(command) {
+    if (!this.activeBlock) return;
+    this.pushHistory();
+    this.activeBlock.focus();
+    document.execCommand(command, false, null);
+    this.syncBlock(this.activeBlock);
+    this.markDirty();
   }
 
-  onPageClick(event) {
-    if (event.target.closest('.pdf-unified-text-hit')) return;
-    if (this.mode !== 'cover') return;
-
-    const page = this.doc?.getPage(this.pageIndex);
-    if (!page) return;
-
-    const r = this.documentEl.querySelector('.pdf-unified-page').getBoundingClientRect();
-    const x = event.clientX - r.left;
-    const y = event.clientY - r.top;
-    const size = page.getSize();
-
-    this.mutate('White cover added.', () => {
-      page.drawRectangle({
-        x,
-        y: size.height - y - 20,
-        width: 120,
-        height: 20,
-        fillColor: '#ffffff'
-      });
-    });
-  }
-
-  onPointerDown() {}
-
-  deletePage() {
-    if (!this.doc) return;
-    if (this.doc.getPageCount() <= 1) {
-      this.setStatus('A PDF must contain at least one page.');
-      return;
-    }
-
-    this.mutate('Page deleted.', () => {
-      PdfEditor.deletePage(this.doc, this.pageIndex);
-      this.pageIndex = Math.min(this.pageIndex, this.doc.getPageCount() - 1);
-    });
-  }
-
-  async mutate(message, operation) {
-    if (!this.doc) return;
-
-    const before = PdfEngine.save(this.doc);
-    this.history.push(before);
+  pushHistory() {
+    const snapshot = JSON.stringify(this.pages);
+    if (this.history.length && this.history[this.history.length - 1] === snapshot) return;
+    this.history.push(snapshot);
+    if (this.history.length > 40) this.history.shift();
     this.future = [];
+    this.updateHistoryButtons();
+  }
 
-    try {
-      operation();
-      const after = PdfEngine.save(this.doc);
-      this.sourceBytes = after;
-      await this.render();
-      this.updateHistoryButtons();
-      this.setStatus(message);
-    } catch (error) {
-      this.history.pop();
-      this.updateHistoryButtons();
-      this.setStatus('Change failed: ' + (error?.message || 'PDF write error'));
-    }
+  restoreSnapshot(snapshot) {
+    this.pages = JSON.parse(snapshot);
+  }
+
+  markDirty() {
+    this.dirty = true;
+    this.updateHistoryButtons();
   }
 
   async undo() {
-    if (!this.doc || !this.history.length) return;
-
-    const current = PdfEngine.save(this.doc);
+    if (!this.history.length) return;
+    const current = JSON.stringify(this.pages);
     const previous = this.history.pop();
     this.future.push(current);
-
-    try {
-      this.doc = PdfEngine.load(previous);
-      this.sourceBytes = previous;
-      await this.render();
-      this.updateHistoryButtons();
-      this.setStatus('Undid the last change.');
-    } catch (error) {
-      this.setStatus('Undo failed: ' + (error?.message || 'PDF open error'));
-    }
+    this.restoreSnapshot(previous);
+    await this.render();
+    this.setStatus('Undid the last change.');
   }
 
   async redo() {
-    if (!this.doc || !this.future.length) return;
-
-    const current = PdfWriter.write(this.doc);
+    if (!this.future.length) return;
+    const current = JSON.stringify(this.pages);
     const next = this.future.pop();
     this.history.push(current);
-
-    try {
-      this.doc = PdfEngine.load(next);
-      this.sourceBytes = next;
-      await this.render();
-      this.updateHistoryButtons();
-      this.setStatus('Redid the last change.');
-    } catch (error) {
-      this.setStatus('Redo failed: ' + (error?.message || 'PDF open error'));
-    }
+    this.restoreSnapshot(next);
+    await this.render();
+    this.setStatus('Redid the last change.');
   }
 
-  async save() {
+  addPage() {
     if (!this.doc) return;
+    this.pushHistory();
+    const base = this.pages[this.pages.length - 1] || { width: 612, height: 792 };
+    this.pages.push({
+      width: base.width,
+      height: base.height,
+      rotation: 0,
+      background: this.blankJpeg(base.width, base.height),
+      items: [],
+      hasEditableText: false
+    });
+    this.pageIndex = this.pages.length - 1;
+    this.markDirty();
+    this.render();
+  }
 
-    try {
-      this.setStatus('Saving PDF…');
-      const bytes = PdfEngine.save(this.doc);
-      this.sourceBytes = bytes;
-      this.progress(true, 'Preparing download…', 85);
-
-      const blob = new Blob([bytes], { type: 'application/pdf' });
-      const url = URL.createObjectURL(blob);
-
-      if (this.download) {
-        this.download.href = url;
-        this.download.download = this.fileNameValue;
-        this.download.style.display = '';
-        this.download.click();
-      } else {
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = this.fileNameValue;
-        a.click();
-      }
-
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
-      this.progress(false);
-      this.setStatus('PDF saved.');
-    } catch (error) {
-      this.progress(false);
-      this.setStatus('Could not save the PDF: ' + (error?.message || 'PDF write error'));
-    }
+  blankJpeg(width, height) {
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.max(1, Math.round(width * this.renderScale));
+    canvas.height = Math.max(1, Math.round(height * this.renderScale));
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    return this.canvasToBytes(canvas, 'image/jpeg', 0.96);
   }
 
   async goPage(index) {
-    if (!this.doc) return;
-    this.pageIndex = Math.max(0, Math.min(index, this.doc.getPageCount() - 1));
+    this.pageIndex = Math.max(0, Math.min(index, this.pages.length - 1));
     await this.render();
   }
 
   renderThumbs() {
-    if (!this.thumbs || !this.doc) return;
+    if (!this.thumbs) return;
     this.thumbs.innerHTML = '';
 
-    for (let i = 0; i < this.doc.getPageCount(); i++) {
+    this.pages.forEach((model, index) => {
       const button = document.createElement('button');
       button.type = 'button';
-      button.textContent = 'Page ' + (i + 1);
-      button.className = i === this.pageIndex ? 'active' : '';
-      button.addEventListener('click', () => this.goPage(i));
+      button.className = index === this.pageIndex ? 'active' : '';
+      button.innerHTML = '<span>Page ' + (index + 1) + '</span><img alt="" src="' +
+        this.bytesToDataUrl(model.background, 'image/jpeg') + '">';
+      button.addEventListener('click', () => this.goPage(index));
       this.thumbs.appendChild(button);
-    }
+    });
   }
 
   updatePageControls() {
-    const pageInput = document.getElementById('edit-page-number');
-    const pageCount = document.getElementById('edit-page-count');
     const label = document.getElementById('pdf-word-page-label');
-
-    if (pageInput) {
-      pageInput.value = String(this.pageIndex + 1);
-      pageInput.max = String(this.doc.getPageCount());
-    }
-    if (pageCount) pageCount.textContent = String(this.doc.getPageCount());
-    if (label) label.textContent = 'Page ' + (this.pageIndex + 1) + ' of ' + this.doc.getPageCount();
+    if (label) label.textContent = 'Page ' + (this.pageIndex + 1) + ' of ' + this.pages.length;
   }
 
   updateHistoryButtons() {
     document.getElementById('pdf-word-undo')?.toggleAttribute('disabled', !this.history.length);
     document.getElementById('pdf-word-redo')?.toggleAttribute('disabled', !this.future.length);
-    document.getElementById('pdf-undo')?.toggleAttribute('disabled', !this.history.length);
-    document.getElementById('pdf-redo')?.toggleAttribute('disabled', !this.future.length);
   }
 
-  setMode(mode) {
-    this.mode = mode;
-    this.showPanel(mode === 'add' ? 'add' : mode === 'cover' ? 'cover' : 'empty');
-  }
+  async save() {
+    if (!this.pages.length) return;
 
-  showPanel(which) {
-    const map = [
-      ['pdf-side-empty', which === 'empty'],
-      ['pdf-text-editor-panel', which === 'text'],
-      ['pdf-add-editor-panel', which === 'add'],
-      ['pdf-cover-editor-panel', which === 'cover']
-    ];
+    try {
+      this.syncVisibleBlocks();
+      this.progress(true, 'Building edited PDF…', 10);
 
-    for (const [id, visible] of map) {
-      const el = document.getElementById(id);
-      if (el) el.style.display = visible ? 'block' : 'none';
+      const output = PdfEngine.create();
+      for (let i = 0; i < this.pages.length; i++) {
+        const model = this.pages[i];
+        this.progress(true, 'Writing page ' + (i + 1) + ' of ' + this.pages.length + '…',
+          10 + Math.round((i / this.pages.length) * 80));
+
+        const page = output.addPage(model.width, model.height);
+        page.drawImage(model.background, {
+          x: 0,
+          y: 0,
+          width: model.width,
+          height: model.height
+        });
+
+        for (const item of model.items) {
+          this.drawEditableItem(page, item, model);
+        }
+      }
+
+      const bytes = PdfEngine.save(output);
+      const blob = new Blob([bytes], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = this.fileName;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 2000);
+
+      this.progress(false);
+      this.dirty = false;
+      this.setStatus('PDF downloaded.');
+    } catch (error) {
+      this.progress(false);
+      this.setStatus('Could not create the PDF: ' + (error?.message || 'PDF write error'));
     }
   }
 
-  clearSelection() {
-    this.selected = null;
-    this.documentEl?.querySelectorAll('.pdf-unified-text-hit.selected')
-      .forEach(el => el.classList.remove('selected'));
-    this.showPanel('empty');
+  syncVisibleBlocks() {
+    this.documentEl?.querySelectorAll('.pdf-word-text').forEach(el => this.syncBlock(el));
+  }
+
+  drawEditableItem(page, item, model) {
+    if (!item.text) return;
+
+    const y = model.height - item.top - item.fontSize;
+    page.drawText(item.text, {
+      x: item.x,
+      y,
+      size: item.fontSize,
+      font: item.font,
+      color: item.color,
+      rotate: item.rotate,
+      align: item.align
+    });
   }
 }
 
-window.addEventListener('DOMContentLoaded', () => new UnifiedPdfEditor());
+window.addEventListener('DOMContentLoaded', () => new PdfWordEditor());
