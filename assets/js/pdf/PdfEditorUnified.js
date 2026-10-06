@@ -844,14 +844,18 @@ class PdfWordEditor {
         if (node.nodeValue) {
           const parent = node.parentElement || p;
           const cs = getComputedStyle(parent);
+          const bold = Number.parseInt(cs.fontWeight, 10) >= 600 || cs.fontWeight === 'bold';
+          const italic = cs.fontStyle === 'italic' || cs.fontStyle === 'oblique';
+          const underline = String(cs.textDecorationLine || '').includes('underline');
           out.push({
             text: node.nodeValue,
             style: {
-              font: PdfWordDocument.pdfFontName(cs.fontFamily),
+              font: this.pdfFontForComputed(cs.fontFamily, bold, italic),
               size: parseFloat(cs.fontSize) * 0.75 || 12,
               color: this.cssToRgb(cs.color),
-              bold: Number(cs.fontWeight) >= 600,
-              italic: cs.fontStyle === 'italic'
+              bold,
+              italic,
+              underline
             }
           });
         }
@@ -862,6 +866,26 @@ class PdfWordEditor {
     };
     walk(p);
     return out;
+  }
+
+  pdfFontForComputed(family, bold, italic) {
+    let base = PdfWordDocument.pdfFontName(family);
+    if (/courier/i.test(base)) {
+      if (bold && italic) return 'Courier-BoldOblique';
+      if (bold) return 'Courier-Bold';
+      if (italic) return 'Courier-Oblique';
+      return 'Courier';
+    }
+    if (/times/i.test(base)) {
+      if (bold && italic) return 'Times-BoldItalic';
+      if (bold) return 'Times-Bold';
+      if (italic) return 'Times-Italic';
+      return 'Times-Roman';
+    }
+    if (bold && italic) return 'Helvetica-BoldOblique';
+    if (bold) return 'Helvetica-Bold';
+    if (italic) return 'Helvetica-Oblique';
+    return 'Helvetica';
   }
 
   cssToRgb(value) {
