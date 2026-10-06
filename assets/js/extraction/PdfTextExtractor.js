@@ -211,14 +211,20 @@ export class PdfTextExtractor {
     const hScale = ts.horizontalScaling / 100;
 
     let stringWidth = 0;
-    const rawBytes = typeof str === 'string'
-      ? Array.from(str).map(c => c.charCodeAt(0))
-      : (str instanceof Uint8Array ? Array.from(str) : []);
+    let characterCodes = [];
 
-    for (let i = 0; i < rawBytes.length; i++) {
-      const charCode = rawBytes[i];
+    if (font && typeof font.getCharacterCodes === 'function') {
+      characterCodes = font.getCharacterCodes(str);
+    } else {
+      characterCodes = typeof str === 'string'
+        ? Array.from(str).map(c => c.charCodeAt(0))
+        : (str instanceof Uint8Array ? Array.from(str) : []);
+    }
+
+    for (const charCode of characterCodes) {
       const glyphWidth = font ? font.getWidth(charCode) : 600;
-      const charW = (glyphWidth / 1000) * fontSize * hScale + ts.charSpacing + (charCode === 32 ? ts.wordSpacing : 0);
+      const charW = (glyphWidth / 1000) * fontSize * hScale +
+        ts.charSpacing + (charCode === 32 ? ts.wordSpacing : 0);
       stringWidth += charW;
     }
 
