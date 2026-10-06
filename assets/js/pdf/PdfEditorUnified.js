@@ -527,8 +527,8 @@ class PdfWordEditor {
   }
 
   createParagraph(model) {
-    const p = document.createElement(model.heading ? 'h2' : 'p');
-    p.className = 'df-word-paragraph';
+    const p = document.createElement('p');
+    p.className = 'df-word-paragraph' + (model.heading ? ' df-word-heading' : '');
     p.dataset.blockType = 'paragraph';
     p.style.textAlign = model.align || 'left';
     p.style.marginTop = '0';
@@ -560,7 +560,7 @@ class PdfWordEditor {
     img.alt = '';
     img.draggable = false;
     img.src = block.image.toDataUrl();
-    img.style.width = Math.min(block.width, 100) + '%';
+    img.style.width = block.width + 'px';
     img.style.maxWidth = '100%';
     img.style.height = 'auto';
     img.dataset.originalWidth = String(block.width);
@@ -654,6 +654,9 @@ class PdfWordEditor {
     this.syncCurrentPage();
     this.pageIndex = clamp(index, 0, this.doc.pages.length - 1);
     this.render();
+    this.history = [this.documentEl.innerHTML];
+    this.future = [];
+    this.updateControls();
   }
 
   renderThumbs() {
