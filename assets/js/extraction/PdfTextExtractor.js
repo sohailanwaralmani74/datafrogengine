@@ -237,7 +237,10 @@ export class PdfTextExtractor {
       width: Math.round(stringWidth * 100) / 100,
       height: Math.round(fontSize * 100) / 100,
       fontName: font ? font.baseFont : (ts.fontName || 'Default'),
-      fontSize: fontSize
+      fontSize: fontSize,
+      color: PdfTextExtractor.#normalizeColor(gstate.nonStrokeColor),
+      renderingMode: ts.renderingMode,
+      matrix: [trm[0], trm[1], trm[2], trm[3], trm[4], trm[5]]
     });
   }
 
@@ -245,6 +248,23 @@ export class PdfTextExtractor {
    * Applies kerning offset to text matrix.
    * @private
    */
+  static #normalizeColor(color) {
+    if (!Array.isArray(color)) return [0, 0, 0];
+    if (color.length === 1) return [color[0], color[0], color[0]];
+    if (color.length >= 3) {
+      if (color.length === 4) {
+        const k = color[3] ?? 0;
+        return [
+          (1 - color[0]) * (1 - k),
+          (1 - color[1]) * (1 - k),
+          (1 - color[2]) * (1 - k)
+        ];
+      }
+      return [color[0], color[1], color[2]];
+    }
+    return [0, 0, 0];
+  }
+
   static #applyKerning(kerningNum, gstate) {
     const ts = gstate.textState;
     const fontSize = ts.fontSize;
