@@ -11,6 +11,9 @@ export class PdfTextEditor {
   static replaceText(page, searchText, replacementText, options = {}) {
     // Prefer an exact text run selected by the visual editor. This keeps the
     // original page, resources, font, matrix and surrounding content intact.
+    if (options.textItems?.length) {
+      return PdfTextEditor.replaceTextRow(page, options.textItems, replacementText);
+    }
     if (options.textItem) {
       return PdfTextEditor.replaceTextItem(page, options.textItem, replacementText);
     }
@@ -85,6 +88,87 @@ export class PdfTextEditor {
     return { changed: replacements > 0, replacements, unsupported, details };
   }
 
+
+  static replaceTextRow(page, textItems, replacementText) {
+    if (!page || !Array.isArray(textItems) || textItems.length === 0 || typeof replacementText !== 'string') {
+      return { changed: false, replacements: 0, unsupported: 0, details: [] };
+    }
+
+    // A row may contain several original PDF text runs. The safe operation is
+    // to replace the row only when its source runs form one contiguous text
+    // showing operation; otherwise use the first selected run as the exact
+    // editable slot rather than risking unrelated page content.
+    if (textItems.length === 1) {
+      return PdfTextEditor.replaceTextItem(page, textItems[0], replacementText);
+    }
+
+    const first = textItems[0];
+    const original = textItems.map(item => String(item?.text ?? '')).join('');
+    if (!original) return { changed: false, replacements: 0, unsupported: 0, details: [] };
+
+    const resources = page.getResources();
+    const fontDict = resources.getFont(first.fontResource);
+    const font = fontDict ? PdfFont.create(fontDict, page.document) : null;
+    if (!font) {
+      return { changed: false, replacements: 0, unsupported: 1, details: [{ type: 'missing-font', message: 'The source PDF font could not be resolved.' }] };
+    }
+
+    const encoded = font.encodeString(replacementText);
+    if (!encoded) {
+      return { changed: false, replacements: 0, unsupported: 1, details: [{ type: 'unsupported-encoding', message: 'The replacement cannot be encoded by the original PDF font.' }] };
+    }
+
+    // Match the row's runs by their exact original bytes and font resource.
+    // Replacing the first run and removing the remaining row runs preserves
+    // the source font and coordinates without creating an HTML reflow layer.
+    const rawRuns = textItems.map(item => item.rawBytes instanceof Uint8Array
+      ? item.rawBytes
+      : new Uint8Array(Array.from(String(item.text ?? '')).map(ch => ch.charCodeAt(0) & 0xFF)));
+
+    for (const stream of page.getContents()) {
+      let operators;
+      try { operators = PdfContentParser.parse(stream); } catch (_) { continue; }
+
+      let inText = false;
+      let currentFontName = null;
+      let runIndex = 0;
+      let changed = false;
+
+      for (const op of operators) {
+        if (op.name === 'BT') { inText = true; continue; }
+        if (op.name === 'ET') { inText = false; continue; }
+        if (!inText) continue;
+        if (op.name === 'Tf') { currentFontName = op.getName(0); continue; }
+        if (currentFontName !== first.fontResource) continue;
+
+        const argIndex = ['Tj', "'", '"'].includes(op.name) ? (op.name === '"' ? 2 : 0) : -1;
+        if (argIndex >= 0) {
+          const value = op.getArg(argIndex);
+          if (!(value instanceof PdfString) || !PdfTextEditor.#bytesEqual(value.bytes, rawRuns[runIndex])) continue;
+          if (runIndex === 0) {
+            op.args[argIndex] = PdfString.of(new TextDecoder('latin1').decode(encoded), encoded);
+            changed = true;
+          } else if (runIndex < rawRuns.length) {
+            op.args[argIndex] = PdfString.of('', new Uint8Array());
+          }
+          runIndex++;
+          if (runIndex === rawRuns.length) break;
+        }
+      }
+
+      if (changed && runIndex === rawRuns.length) {
+        const bytes = PdfTextEditor.#serializeOperators(operators);
+        stream.setBytes(FlateEncode.encode(bytes));
+        stream.dictionary.delete('DecodeParms');
+        stream.dictionary.set('Filter', PdfName.of('FlateDecode'));
+        return { changed: true, replacements: 1, unsupported: 0, details: [{ type: 'font-preserved', font: font.baseFont, layoutPreserved: true }] };
+      }
+    }
+
+    // If the row was split across operators that cannot be safely matched,
+    // do not make a destructive partial edit.
+    return { changed: false, replacements: 0, unsupported: 0, details: [{ type: 'text-row-not-found', message: 'The selected text row was not found as the same source text runs.' }] };
+  }
 
   static replaceTextItem(page, textItem, replacementText) {
     if (!page || !textItem || typeof replacementText !== 'string') {
@@ -179,6 +263,12 @@ export class PdfTextEditor {
     }
 
     return { changed: false, replacements: 0, unsupported: 0, details: [{ type: 'text-run-not-found', message: 'The selected text run was not found in the page content.' }] };
+  }
+
+  static #bytesEqual(a, b) {
+    if (!(a instanceof Uint8Array) || !(b instanceof Uint8Array) || a.length !== b.length) return false;
+    for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return false;
+    return true;
   }
 
   static #textWidth(font, bytes, fontSize) {
