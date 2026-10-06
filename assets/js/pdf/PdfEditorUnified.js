@@ -250,6 +250,13 @@ class PdfWordEditor {
     return text;
   }
 
+  editorFont(name) {
+    const n = String(name || '');
+    if (/courier/i.test(n)) return '"Courier New", Courier, monospace';
+    if (/times/i.test(n)) return 'Georgia, "Times New Roman", serif';
+    return 'Arial, Helvetica, sans-serif';
+  }
+
   normalFont(name) {
     const n = String(name || '').replace(/^\+/, '');
     if (/courier/i.test(n)) return /bold/i.test(n) ? 'Courier-Bold' : 'Courier';
@@ -333,7 +340,7 @@ class PdfWordEditor {
     el.style.minWidth = Math.max(20, item.width) + 'px';
     el.style.minHeight = Math.max(10, item.height) + 'px';
     el.style.fontSize = item.fontSize + 'px';
-    el.style.fontFamily = item.font;
+    el.style.fontFamily = this.editorFont(item.font);
     el.style.fontWeight = item.bold ? '700' : '400';
     el.style.fontStyle = item.italic ? 'italic' : 'normal';
     el.style.color = this.rgbCss(item.color);
