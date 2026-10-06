@@ -470,6 +470,9 @@ class PdfWordEditor {
       this.upload.style.display = 'none';
       this.workspace.style.display = 'block';
       this.render();
+      this.history = [this.documentEl.innerHTML];
+      this.future = [];
+      this.updateControls();
       this.progress(false);
 
       const textPages = this.doc.pages.filter(p => p.sourceHasText).length;
