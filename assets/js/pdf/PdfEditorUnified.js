@@ -7,6 +7,7 @@
  * recovered PDF text becomes normal contenteditable paragraphs.
  */
 import { PdfEngine } from './PdfEngine.js';
+import { PdfImage } from '../images/PdfImage.js';
 
 class PdfWordEditor {
   constructor() {
@@ -148,7 +149,7 @@ class PdfWordEditor {
       renderText: false
     });
 
-    const jpeg = this.canvasToBytes(canvas, 'image/jpeg', 0.96);
+    const jpeg = this.canvasToBytes(canvas, 'image/jpeg', 0.98);
     const items = PdfEngine.extractTextItems(this.doc, index) || [];
     const lines = this.groupItems(items, size);
 
@@ -157,6 +158,8 @@ class PdfWordEditor {
       height: size.height,
       rotation: page.getRotation(),
       background: jpeg,
+      backgroundWidth: canvas.width,
+      backgroundHeight: canvas.height,
       items: lines,
       hasEditableText: lines.length > 0
     };
@@ -437,7 +440,9 @@ class PdfWordEditor {
       width: base.width,
       height: base.height,
       rotation: 0,
-      background: this.blankJpeg(base.width, base.height),
+      background: this.blankJpeg(base.width, base.height).bytes,
+      backgroundWidth: this.blankJpeg(base.width, base.height).width,
+      backgroundHeight: this.blankJpeg(base.width, base.height).height,
       items: [],
       hasEditableText: false
     });
@@ -453,7 +458,11 @@ class PdfWordEditor {
     const ctx = canvas.getContext('2d');
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    return this.canvasToBytes(canvas, 'image/jpeg', 0.96);
+    return {
+      bytes: this.canvasToBytes(canvas, 'image/jpeg', 0.98),
+      width: canvas.width,
+      height: canvas.height
+    };
   }
 
   async goPage(index) {
@@ -500,12 +509,21 @@ class PdfWordEditor {
           10 + Math.round((i / this.pages.length) * 80));
 
         const page = output.addPage(model.width, model.height);
-        page.drawImage(model.background, {
-          x: 0,
-          y: 0,
-          width: model.width,
-          height: model.height
-        });
+        const background = new PdfImage({
+        name: 'page-background-' + (i + 1),
+        width: model.backgroundWidth || Math.round(model.width * this.renderScale),
+        height: model.backgroundHeight || Math.round(model.height * this.renderScale),
+        colorSpace: { family: 'DeviceRGB', components: 3, details: {} },
+        bitsPerComponent: 8,
+        bytes: model.background,
+        format: 'jpeg'
+      });
+      page.drawImage(background, {
+        x: 0,
+        y: 0,
+        width: model.width,
+        height: model.height
+      });
 
         for (const item of model.items) {
           this.drawEditableItem(page, item, model);
