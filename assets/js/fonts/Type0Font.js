@@ -80,6 +80,29 @@ export class Type0Font extends PdfFont {
   }
 
   /**
+   * Returns the source character/CID codes represented by a PDF string.
+   * Kept separate from decodeString so text extraction can calculate the
+   * actual advance without confusing UTF-16 bytes with PDF CIDs.
+   */
+  getCharacterCodes(bytesOrString) {
+    let bytes;
+    if (typeof bytesOrString === 'string') {
+      bytes = new Uint8Array(bytesOrString.length);
+      for (let i = 0; i < bytesOrString.length; i++) bytes[i] = bytesOrString.charCodeAt(i) & 0xFF;
+    } else if (bytesOrString instanceof Uint8Array) {
+      bytes = bytesOrString;
+    } else {
+      return [];
+    }
+
+    const codes = [];
+    for (let i = 0; i + 1 < bytes.length; i += 2) {
+      codes.push((bytes[i] << 8) | bytes[i + 1]);
+    }
+    return codes;
+  }
+
+  /**
    * Decodes 2-byte CID string into Unicode text.
    * 
    * @param {Uint8Array|string} bytesOrString
